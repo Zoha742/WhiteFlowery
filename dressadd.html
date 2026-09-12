@@ -31,13 +31,15 @@
         .size-row-input { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
         .add-size-btn { background: #3b82f6; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
 
-        /* Small Table for Sizes */
         .size-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; background: #0b0f19; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
         .size-table th, .size-table td { padding: 8px; font-size: 11px; text-align: center; border-bottom: 1px solid var(--card-border); }
         .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
+        
+        /* Loading Overlay */
+        .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
     </style>
 </head>
 <body>
@@ -49,7 +51,7 @@
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Size Setup</h4>
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Cloudinary Upload</h4>
             
             <div class="form-group">
                 <label>Dress Name</label>
@@ -57,8 +59,13 @@
             </div>
 
             <div class="form-group">
-                <label>Category</label>
-                <input type="text" id="newCat" class="form-control" placeholder="e.g. Gowns / Party Wear">
+                <label>Category (Always Tracked)</label>
+                <select id="newCat" class="form-control">
+                    <option value="Gowns">Gowns</option>
+                    <option value="Party Wear">Party Wear</option>
+                    <option value="Casual Sets">Casual Sets</option>
+                    <option value="Bridal">Bridal</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -66,7 +73,7 @@
                 <input type="number" id="newPrice" class="form-control" placeholder="4500">
             </div>
 
-            <!-- Size Dropdown & Quantity Input -->
+            <!-- Size Setup -->
             <div class="size-row-input">
                 <div style="flex: 1;">
                     <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
@@ -86,46 +93,40 @@
                 <button type="button" class="add-size-btn" onclick="addSizeToTable()"><i class="fa-solid fa-plus"></i> Add</button>
             </div>
 
-            <!-- Small Table for Added Sizes -->
             <table class="size-table">
                 <thead>
-                    <tr>
-                        <th>Size</th>
-                        <th>Pieces</th>
-                        <th>Action</th>
-                    </tr>
+                    <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
                 </thead>
                 <tbody id="sizeTableBody">
-                    <tr>
-                        <td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet. Select and add above.</td>
-                    </tr>
+                    <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
                 </tbody>
             </table>
 
             <div class="form-group">
-                <label>Product Image Link / URL</label>
-                <input type="text" id="newImg" class="form-control" placeholder="https://image-url.com/dress.jpg">
+                <label>Upload Product Photo (Goes to Cloudinary: shop/Product add)</label>
+                <input type="file" id="productImgFile" class="form-control" accept="image/*" style="color: #94a3b8;">
             </div>
 
-            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Publish to Shop</button>
+            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Upload & Publish</button>
         </div>
+    </div>
+
+    <!-- Uploading Loader -->
+    <div id="uploadOverlay" class="uploading-overlay">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #c084fc;"></i>
+        <span>Uploading image to Cloudinary (shop/Product add)...</span>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let addedSizesList = {}; // Store size and pieces mapping
+        let addedSizesList = {};
 
         function addSizeToTable() {
             let size = document.getElementById('sizeDropdown').value;
             let qty = parseInt(document.getElementById('sizeQty').value) || 0;
-
-            if (qty <= 0) {
-                tg.showAlert("⚠️ Please enter valid pieces quantity!");
-                return;
-            }
-
+            if (qty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
             addedSizesList[size] = qty;
             renderSizeTable();
         }
@@ -138,12 +139,10 @@
         function renderSizeTable() {
             let tbody = document.getElementById('sizeTableBody');
             let keys = Object.keys(addedSizesList);
-
             if (keys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet. Select and add above.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>`;
                 return;
             }
-
             tbody.innerHTML = '';
             keys.forEach(size => {
                 tbody.innerHTML += `
@@ -158,33 +157,55 @@
 
         function publishDress() {
             let name = document.getElementById('newName').value.trim();
-            let cat = document.getElementById('newCat').value.trim() || "General";
+            let cat = document.getElementById('newCat').value;
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
-            let img = document.getElementById('newImg').value.trim() || "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300";
-            
+            let fileInput = document.getElementById('productImgFile');
             let sizeKeys = Object.keys(addedSizesList);
 
-            if (!name || price <= 0) {
-                tg.showAlert("⚠️ Please enter dress name and price!");
-                return;
-            }
+            if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
+            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Please add at least one size & quantity!"); return; }
+            if (fileInput.files.length === 0) { tg.showAlert("⚠️ Please select a product photo!"); return; }
 
-            if (sizeKeys.length === 0) {
-                tg.showAlert("⚠️ Please add at least one size and quantity!");
-                return;
-            }
+            document.getElementById('uploadOverlay').style.display = 'flex';
 
-            // Calculate total stock from table sizes
+            let file = fileInput.files[0];
+            let formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "ml_default"); // আপনার ক্লাউডিনারি আনসায়ার্ড প্রিসেট এখানে দিন
+            formData.append("folder", "shop/Product add"); // আপনার নির্দেশিত ক্লাউডিনারি ফোল্ডার
+
+            // Cloudinary Upload API Request
+            fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                if (data.secure_url) {
+                    saveDressToStorage(name, cat, price, data.secure_url, sizeKeys);
+                } else {
+                    tg.showAlert("❌ Image upload failed! Check Cloudinary configuration.");
+                }
+            })
+            .catch(error => {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                console.error("Cloudinary Error:", error);
+                tg.showAlert("❌ Error uploading image to Cloudinary.");
+            });
+        }
+
+        function saveDressToStorage(name, category, price, imageUrl, sizeKeys) {
             let totalStock = 0;
             sizeKeys.forEach(s => totalStock += addedSizesList[s]);
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
                 name: name,
-                category: cat,
+                category: category, // Always tracked category
                 price: price,
-                image: img,
-                sizes: addedSizesList, // Saved as object e.g. { M: 10, L: 15 }
+                image: imageUrl, // Cloudinary secure URL
+                sizes: addedSizesList,
                 totalStock: totalStock
             };
 
@@ -192,7 +213,14 @@
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
-            tg.showAlert(`✅ Dress "${name}" published with size inventory successfully!`);
+            // Track categories list globally
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            if(!categories.includes(category)) {
+                categories.push(category);
+                localStorage.setItem('shopCategories', JSON.stringify(categories));
+            }
+
+            tg.showAlert(`✅ Dress uploaded to Cloudinary & published successfully!`);
             window.location.href = "dresslist.html";
         }
     </script>
