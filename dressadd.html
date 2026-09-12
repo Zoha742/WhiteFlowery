@@ -50,21 +50,23 @@
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product, Details & Media Setup</h4>
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Multi-Image & Dynamic Setup</h4>
             
             <div class="form-group">
                 <label>Dress Name</label>
                 <input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock">
             </div>
 
+            <!-- Dynamic Category Management -->
             <div class="form-group">
-                <label>Category</label>
-                <select id="newCat" class="form-control">
-                    <option value="Gowns">Gowns</option>
-                    <option value="Party Wear">Party Wear</option>
-                    <option value="Casual Sets">Casual Sets</option>
-                    <option value="Bridal">Bridal</option>
-                </select>
+                <label>Select Category</label>
+                <div style="display: flex; gap: 6px;">
+                    <select id="newCat" class="form-control" style="flex: 2;">
+                        <!-- Categories loaded from localStorage -->
+                    </select>
+                    <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
+                    <button type="button" class="add-size-btn" onclick="addNewCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -72,7 +74,6 @@
                 <input type="number" id="newPrice" class="form-control" placeholder="4500">
             </div>
 
-            <!-- Product Details / Description -->
             <div class="form-group">
                 <label>Product Details / Description</label>
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
@@ -107,10 +108,18 @@
                 </tbody>
             </table>
 
-            <!-- Photo Upload -->
+            <!-- 3 Image Uploads (Min 1, Max 3) -->
             <div class="form-group">
-                <label>Product Photo (Cloudinary)</label>
-                <input type="file" id="productImgFile" class="form-control" accept="image/*" style="color: #94a3b8;">
+                <label>Product Photo 1 (Required - Cloudinary)</label>
+                <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
+            </div>
+            <div class="form-group">
+                <label>Product Photo 2 (Optional)</label>
+                <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
+            </div>
+            <div class="form-group">
+                <label>Product Photo 3 (Optional)</label>
+                <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
             </div>
 
             <!-- Video Upload -->
@@ -125,7 +134,7 @@
 
     <div id="uploadOverlay" class="uploading-overlay">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #c084fc;"></i>
-        <span>Uploading media and saving dress...</span>
+        <span>Uploading images & publishing dress...</span>
     </div>
 
     <script>
@@ -133,6 +142,38 @@
         tg.expand();
 
         let addedSizesList = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadCategoriesDropdown();
+        });
+
+        function loadCategoriesDropdown() {
+            let catSelect = document.getElementById('newCat');
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            
+            catSelect.innerHTML = '';
+            categories.forEach(cat => {
+                catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        function addNewCategory() {
+            let customInput = document.getElementById('customCatInput');
+            let newCat = customInput.value.trim();
+            if(!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
+
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            if(!categories.includes(newCat)) {
+                categories.push(newCat);
+                localStorage.setItem('shopCategories', JSON.stringify(categories));
+                loadCategoriesDropdown();
+                document.getElementById('newCat').value = newCat;
+                customInput.value = '';
+                tg.showAlert(`✅ Category "${newCat}" created successfully!`);
+            } else {
+                tg.showAlert("⚠️ Category already exists!");
+            }
+        }
 
         function addSizeToTable() {
             let size = document.getElementById('sizeDropdown').value;
@@ -166,78 +207,74 @@
             });
         }
 
-        function publishDress() {
+        async function uploadToCloudinary(file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "ml_default");
+            formData.append("folder", "shop/Product add");
+
+            try {
+                let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
+                let data = await res.json();
+                return data.secure_url || "";
+            } catch (err) {
+                return new Promise((resolve) => {
+                    let reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        async function publishDress() {
             let name = document.getElementById('newName').value.trim();
             let cat = document.getElementById('newCat').value;
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
             let details = document.getElementById('newDetails').value.trim();
-            let imgInput = document.getElementById('productImgFile');
+            
+            let file1 = document.getElementById('imgFile1').files[0];
+            let file2 = document.getElementById('imgFile2').files[0];
+            let file3 = document.getElementById('imgFile3').files[0];
             let videoInput = document.getElementById('productVideoFile');
             let sizeKeys = Object.keys(addedSizesList);
 
             if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
             if (sizeKeys.length === 0) { tg.showAlert("⚠️ Please add at least one size & quantity!"); return; }
-            if (imgInput.files.length === 0) { tg.showAlert("⚠️ Please select a product photo!"); return; }
+            if (!file1) { tg.showAlert("⚠️ Product Photo 1 is required!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
-            let imgFile = imgInput.files[0];
-            let videoFile = videoInput.files.length > 0 ? videoInput.files[0] : null;
 
-            // Upload Image to Cloudinary
-            let formData = new FormData();
-            formData.append("file", imgFile);
-            formData.append("upload_preset", "ml_default");
-            formData.append("folder", "shop/Product add");
+            let images = [];
+            let url1 = await uploadToCloudinary(file1);
+            if(url1) images.push(url1);
 
-            fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.json())
-            .then(imgData => {
-                let imgUrl = imgData.secure_url || "";
-                
-                if (videoFile) {
-                    let vFormData = new FormData();
-                    vFormData.append("file", videoFile);
-                    vFormData.append("upload_preset", "ml_default");
-                    vFormData.append("folder", "shop/Product add");
+            if(file2) {
+                let url2 = await uploadToCloudinary(file2);
+                if(url2) images.push(url2);
+            }
+            if(file3) {
+                let url3 = await uploadToCloudinary(file3);
+                if(url3) images.push(url3);
+            }
 
-                    fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
-                        method: "POST",
-                        body: vFormData
-                    })
-                    .then(res => res.json())
-                    .then(vidData => {
-                        let vidUrl = vidData.secure_url || "";
-                        finalizeSave(name, cat, price, details, imgUrl, vidUrl, sizeKeys);
-                    }).catch(() => finalizeSave(name, cat, price, details, imgUrl, "", sizeKeys));
-                } else {
-                    finalizeSave(name, cat, price, details, imgUrl, "", sizeKeys);
-                }
-            })
-            .catch(() => {
-                // Fallback reader
-                let reader = new FileReader();
-                reader.onloadend = () => {
-                    finalizeSave(name, cat, price, details, reader.result, "", sizeKeys);
-                };
-                reader.readAsDataURL(imgFile);
-            });
-        }
+            let videoUrl = "";
+            if(videoInput.files.length > 0) {
+                videoUrl = await uploadToCloudinary(videoInput.files[0]);
+            }
 
-        function finalizeSave(name, category, price, details, imageUrl, videoUrl, sizeKeys) {
             document.getElementById('uploadOverlay').style.display = 'none';
+
             let totalStock = 0;
             sizeKeys.forEach(s => totalStock += addedSizesList[s]);
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
                 name: name,
-                category: category,
+                category: cat,
                 price: price,
                 details: details || "No details provided.",
-                image: imageUrl,
+                images: images, // Array of 1 to 3 images
+                image: images[0], // Main thumbnail fallback
                 video: videoUrl,
                 sizes: addedSizesList,
                 totalStock: totalStock
@@ -247,13 +284,15 @@
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
-            tg.showAlert(`✅ Dress "${name}" added successfully! You can add more.`);
+            tg.showAlert(`✅ Dress "${name}" published successfully! Add more if you want.`);
             
-            // Reset form for next entry without redirecting
+            // Reset form for next entry
             document.getElementById('newName').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
-            document.getElementById('productImgFile').value = '';
+            document.getElementById('imgFile1').value = '';
+            document.getElementById('imgFile2').value = '';
+            document.getElementById('imgFile3').value = '';
             document.getElementById('productVideoFile').value = '';
             addedSizesList = {};
             renderSizeTable();
