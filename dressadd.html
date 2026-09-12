@@ -38,7 +38,6 @@
 
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
         
-        /* Loading Overlay */
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
     </style>
 </head>
@@ -114,7 +113,7 @@
     <!-- Uploading Loader -->
     <div id="uploadOverlay" class="uploading-overlay">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #c084fc;"></i>
-        <span>Uploading image to Cloudinary (shop/Product add)...</span>
+        <span>Processing image & publishing dress...</span>
     </div>
 
     <script>
@@ -167,14 +166,14 @@
             if (fileInput.files.length === 0) { tg.showAlert("⚠️ Please select a product photo!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
-
             let file = fileInput.files[0];
+
             let formData = new FormData();
             formData.append("file", file);
-            formData.append("upload_preset", "ml_default"); // আপনার ক্লাউডিনারি আনসায়ার্ড প্রিসেট এখানে দিন
-            formData.append("folder", "shop/Product add"); // আপনার নির্দেশিত ক্লাউডিনারি ফোল্ডার
+            formData.append("upload_preset", "ml_default"); 
+            formData.append("folder", "shop/Product add");
 
-            // Cloudinary Upload API Request
+            // Cloudinary Upload Attempt
             fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
                 method: "POST",
                 body: formData
@@ -185,14 +184,22 @@
                 if (data.secure_url) {
                     saveDressToStorage(name, cat, price, data.secure_url, sizeKeys);
                 } else {
-                    tg.showAlert("❌ Image upload failed! Check Cloudinary configuration.");
+                    fallbackToLocalSave(name, cat, price, file, sizeKeys);
                 }
             })
             .catch(error => {
-                document.getElementById('uploadOverlay').style.display = 'none';
-                console.error("Cloudinary Error:", error);
-                tg.showAlert("❌ Error uploading image to Cloudinary.");
+                console.warn("Cloudinary fetch error, using local fallback:", error);
+                fallbackToLocalSave(name, cat, price, file, sizeKeys);
             });
+        }
+
+        function fallbackToLocalSave(name, cat, price, file, sizeKeys) {
+            let reader = new FileReader();
+            reader.onloadend = () => {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                saveDressToStorage(name, cat, price, reader.result, sizeKeys);
+            };
+            reader.readAsDataURL(file);
         }
 
         function saveDressToStorage(name, category, price, imageUrl, sizeKeys) {
@@ -202,9 +209,9 @@
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
                 name: name,
-                category: category, // Always tracked category
+                category: category,
                 price: price,
-                image: imageUrl, // Cloudinary secure URL
+                image: imageUrl,
                 sizes: addedSizesList,
                 totalStock: totalStock
             };
@@ -213,14 +220,13 @@
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
-            // Track categories list globally
             let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
             if(!categories.includes(category)) {
                 categories.push(category);
                 localStorage.setItem('shopCategories', JSON.stringify(categories));
             }
 
-            tg.showAlert(`✅ Dress uploaded to Cloudinary & published successfully!`);
+            tg.showAlert(`✅ Dress published successfully!`);
             window.location.href = "dresslist.html";
         }
     </script>
