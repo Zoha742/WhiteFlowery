@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Order Management</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #080b12;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; margin-bottom: 14px; }
+        
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        
+        .list-box { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
+        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .item-title { color: #c084fc; }
+        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
+        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+        
+        .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-accept { background: #10b981; color: #fff; }
+        .btn-cancel { background: #ef4444; color: #fff; }
+        .btn-screenshot { background: #3b82f6; color: #fff; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-box"></i> Order Management</h3>
+            <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
+        </div>
+
+        <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID (e.g. 884920)..." onkeyup="filterOrdersByUserId()">
+
+        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+            <button class="btn-sm" style="background:#7c3aed; color:#fff;" onclick="switchOrderSub('live')">Live Orders</button>
+            <button class="btn-sm" style="background:#10b981; color:#fff;" onclick="switchOrderSub('accepted')">Accepted History</button>
+            <button class="btn-sm" style="background:#ef4444; color:#fff;" onclick="switchOrderSub('rejected')">Rejected History</button>
+        </div>
+
+        <!-- Live Orders -->
+        <div id="sub-live" class="order-sub-section admin-card">
+            <h4 class="card-title">Live Orders</h4>
+            <div class="list-box" id="liveOrdersContainer">
+                <div class="list-item" data-userid="884920">
+                    <div class="item-header">
+                        <span class="item-title">Order #WF-9921 (ID: 884920)</span>
+                        <span class="item-badge" style="color:#fbbf24; background:rgba(251,191,36,0.1)">Pending</span>
+                    </div>
+                    <div class="item-body">
+                        <b>Item:</b> Royal Silk Gown (Size: L, Qty: 1)<br>
+                        <b>Total:</b> ৳ 8,600<br>
+                        <b>Customer:</b> Zoha
+                    </div>
+                    <div class="action-row">
+                        <button class="btn-sm btn-screenshot" onclick="viewPaymentScreenshot('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')"><i class="fa-solid fa-receipt"></i> View Payment Slip</button>
+                        <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept</button>
+                        <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accepted History -->
+        <div id="sub-accepted" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#10b981;">Accepted Orders History</h4>
+            <div class="list-box" id="acceptedOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>
+            </div>
+        </div>
+
+        <!-- Rejected History -->
+        <div id="sub-rejected" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#ef4444;">Rejected Orders History</h4>
+            <div class="list-box" id="rejectedOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screenshot Modal -->
+    <div id="screenshotModal" class="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer;" onclick="closeModal()">&times;</span>
+            <h4 style="color:#fff; margin-bottom:10px;">Payment Slip</h4>
+            <img id="modalReceiptImg" src="" alt="Payment Slip" style="width:100%; max-height:300px; object-fit:contain; border-radius:8px;">
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function switchOrderSub(subId) {
+            document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
+            document.getElementById(`sub-${subId}`).style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('screenshotModal').style.display = 'none';
+        }
+
+        function viewPaymentScreenshot(imgUrl) {
+            document.getElementById('modalReceiptImg').src = imgUrl;
+            document.getElementById('screenshotModal').style.display = 'flex';
+        }
+
+        function moveOrder(btn, type, orderId, userId, itemName, amount) {
+            let itemCard = btn.closest('.list-item');
+            itemCard.querySelector('.action-row').remove();
+            let badge = itemCard.querySelector('.item-badge');
+
+            if(type === 'accepted') {
+                badge.innerText = "Accepted & Invoiced";
+                badge.style.color = "#10b981";
+                document.getElementById('acceptedOrdersContainer').appendChild(itemCard);
+
+                // Update Profile Badge & Auto Invoice
+                let currentCount = parseInt(localStorage.getItem('deliveredOrdersCount') || 0) + 1;
+                localStorage.setItem('deliveredOrdersCount', currentCount);
+
+                let invoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
+                invoices.unshift({ orderId, itemName, amount, method: 'bKash/Nagad', date: new Date().toLocaleDateString() });
+                localStorage.setItem('userInvoices', JSON.stringify(invoices));
+
+                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice generated.`);
+            } else {
+                badge.innerText = "Rejected";
+                badge.style.color = "#ef4444";
+                document.getElementById('rejectedOrdersContainer').appendChild(itemCard);
+                tg.showAlert(`❌ Order #${orderId} Rejected.`);
+            }
+        }
+
+        function filterOrdersByUserId() {
+            let query = document.getElementById('searchUserId').value.trim().toLowerCase();
+            document.querySelectorAll('.list-item').forEach(item => {
+                let uid = item.getAttribute('data-userid') || "";
+                item.style.display = uid.toLowerCase().includes(query) ? "block" : "none";
+            });
+        }
+    </script>
+</body>
+</html>
