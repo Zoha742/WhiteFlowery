@@ -69,6 +69,18 @@
                 </div>
             </div>
 
+            <!-- Rename Category -->
+            <div class="form-group">
+                <label>Rename Category</label>
+                <div style="display: flex; gap: 6px;">
+                    <select id="renameCatSelect" class="form-control" style="flex: 2;">
+                        <!-- Categories loaded from localStorage -->
+                    </select>
+                    <input type="text" id="renameCatInput" class="form-control" placeholder="New name..." style="flex: 1;">
+                    <button type="button" class="add-size-btn" onclick="renameCategory()" style="background:#f59e0b; height:38px;"><i class="fa-solid fa-pen"></i></button>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Price (৳)</label>
                 <input type="number" id="newPrice" class="form-control" placeholder="4500">
@@ -149,12 +161,55 @@
 
         function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
+            let renameSelect = document.getElementById('renameCatSelect');
             let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
             
             catSelect.innerHTML = '';
+            renameSelect.innerHTML = '';
             categories.forEach(cat => {
                 catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                renameSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
+        }
+
+        function renameCategory() {
+            let oldName = document.getElementById('renameCatSelect').value;
+            let newNameInput = document.getElementById('renameCatInput');
+            let newName = newNameInput.value.trim();
+
+            if (!oldName) { tg.showAlert("⚠️ No category selected!"); return; }
+            if (!newName) { tg.showAlert("⚠️ Enter the new category name!"); return; }
+
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+
+            if (newName !== oldName && categories.includes(newName)) {
+                tg.showAlert(`⚠️ Category "${newName}" already exists! Choose a different name.`);
+                return;
+            }
+
+            // Rename in the category list
+            categories = categories.map(c => c === oldName ? newName : c);
+            localStorage.setItem('shopCategories', JSON.stringify(categories));
+
+            // Update every existing dress that belonged to the old category name,
+            // so already-published products don't get orphaned/hidden.
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let updatedCount = 0;
+            dresses = dresses.map(d => {
+                if (d.category === oldName) {
+                    updatedCount++;
+                    return { ...d, category: newName };
+                }
+                return d;
+            });
+            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+
+            loadCategoriesDropdown();
+            document.getElementById('newCat').value = newName;
+            document.getElementById('renameCatSelect').value = newName;
+            newNameInput.value = '';
+
+            tg.showAlert(`✅ Category renamed to "${newName}"! (${updatedCount} product(s) updated)`);
         }
 
         function addNewCategory() {
@@ -213,18 +268,20 @@
             formData.append("upload_preset", "ml_default");
             formData.append("folder", "shop/Product_add");
 
+            // IMPORTANT: give every upload a guaranteed-unique public_id.
+            // Without this, if Cloudinary's preset (or the browser's file
+            // picker reusing the same filename, e.g. IMG_1234.jpg) ends up
+            // generating the same public_id twice, Cloudinary can hand back
+            // the URL of the OLD asset instead of storing the new photo —
+            // so the upload "succeeds" but the image never actually
+            // changes, and the same old picture keeps showing up.
+            let uniqueId = "dress_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
+            formData.append("public_id", uniqueId);
+
             try {
                 let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
                 let data = await res.json();
 
-                // Cloudinary can respond with HTTP 200/400 and an error payload
-                // (bad/unsigned preset, wrong cloud name, etc.) without fetch()
-                // ever throwing. Previously that meant data.secure_url was
-                // undefined, we saved image: "" for the product, and the
-                // <img onerror> fallback silently swapped in the same old
-                // placeholder photo for every single product. Treat a missing
-                // secure_url as a failure so we fall through to the base64
-                // fallback below instead of saving an empty/broken URL.
                 if (!res.ok || !data.secure_url) {
                     console.error("Cloudinary upload rejected:", data.error ? data.error.message : data);
                     throw new Error(data.error ? data.error.message : "Cloudinary upload failed");
