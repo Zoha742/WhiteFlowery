@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Dress List & Customize</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #080b12;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        
+        .list-box { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
+        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .item-title { color: #c084fc; }
+        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
+        .item-body { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+
+        .btn-edit { background: #7c3aed; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; }
+        
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-shirt"></i> Dress Inventory</h3>
+            <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
+        </div>
+
+        <div class="admin-card">
+            <h4 class="card-title"><i class="fa-solid fa-list"></i> All Dresses</h4>
+            <div class="list-box">
+                <div class="list-item">
+                    <div class="item-header">
+                        <span class="item-title">Royal Silk Gown</span>
+                        <span class="item-badge">৳ 8,500 (Stock: 10)</span>
+                    </div>
+                    <div class="item-body">Category: Gowns</div>
+                    <button class="btn-edit" onclick="openEditModal('Royal Silk Gown', 8500, 10, 'Gowns')"><i class="fa-solid fa-pen-to-square"></i> Full Customize</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress Details</h4>
+            <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
+            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
+            <div class="form-group"><label>Stock (Pcs)</label><input type="number" id="editStock" class="form-control"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control"></div>
+            <button class="submit-btn" onclick="saveEdit()">Save Changes</button>
+            <button class="submit-btn" style="background:#ef4444; margin-top:6px;" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function openEditModal(name, price, stock, cat) {
+            document.getElementById('editName').value = name;
+            document.getElementById('editPrice').value = price;
+            document.getElementById('editStock').value = stock;
+            document.getElementById('editCat').value = cat;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEdit() {
+            tg.showAlert("✅ Dress updated successfully!");
+            closeModal();
+        }
+    </script>
+</body>
+</html>
