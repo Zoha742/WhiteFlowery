@@ -31,7 +31,7 @@
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: rgba(19, 28, 46, 0.9); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); }
 
-        /* Profile Hero with Real User Image & ID */
+        /* Profile Hero with Real User Image & 6 Digit ID */
         .profile-hero {
             background: linear-gradient(135deg, #131c2e 0%, #1e1b4b 100%);
             border: 1px solid rgba(124, 58, 237, 0.4);
@@ -166,13 +166,13 @@
             <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> Home</a>
         </div>
 
-        <!-- Profile Hero with Real User Image & ID -->
+        <!-- Profile Hero with Real User Image & 6 Digit ID -->
         <div class="profile-hero">
             <div class="profile-avatar" id="avatarContainer">
                 <i class="fa-solid fa-user" id="defaultUserIcon"></i>
             </div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
-            <div class="profile-id-tag" id="userIdDisplay">Telegram ID: #TG_------</div>
+            <div class="profile-id-tag" id="userIdDisplay">ID: 884920</div>
         </div>
 
         <!-- Admin Control Panel Banner -->
@@ -269,19 +269,22 @@
         let user = tg.initDataUnsafe.user;
         if (user) {
             document.getElementById('userNameDisplay').innerText = user.first_name || "Valued Customer";
-            document.getElementById('userIdDisplay').innerText = `Telegram ID: #TG_${user.id}`;
             
-            // টেলিগ্রাম প্রোফাইল পিকচার সেট করার লজিক
+            // ইউজারের টেলিগ্রাম আইডি থেকে শেষ ৬ ডিজিট বা পূর্ণ ৬ ডিজিট ফরম্যাট করা
+            let idStr = user.id.toString();
+            let sixDigitId = idStr.length >= 6 ? idStr.slice(-6) : idStr.padStart(6, '0');
+            document.getElementById('userIdDisplay').innerText = `ID: ${sixDigitId}`;
+            
             if (user.photo_url) {
                 let avatarContainer = document.getElementById('avatarContainer');
                 avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="User Photo">`;
             }
         } else {
             document.getElementById('userNameDisplay').innerText = "Zoha";
-            document.getElementById('userIdDisplay').innerText = "Telegram ID: #TG_8849201";
+            document.getElementById('userIdDisplay').innerText = "ID: 884920";
         }
 
-        // পূর্বে সফলভাবে ডেলিভারি নেওয়া অর্ডারের সংখ্যা চেক (ডেলিভারি না নিলে ডিফল্ট 0 থাকবে)
+        // সফলভাবে ডেলিভারি নেওয়া অর্ডারের সংখ্যা (ডেলিভারি না নিলে ডিফল্ট 0 থাকবে)
         let deliveredOrdersCount = localStorage.getItem('deliveredOrdersCount') || 0;
         document.getElementById('deliveredCountBadge').innerText = deliveredOrdersCount;
     </script>
