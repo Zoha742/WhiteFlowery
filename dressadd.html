@@ -17,6 +17,8 @@
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+        .size-box label { font-size: 9px; text-align: center; }
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
     </style>
 </head>
@@ -28,21 +30,60 @@
         </div>
         <div class="admin-card">
             <div class="form-group"><label>Dress Name</label><input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="newCat" class="form-control" placeholder="e.g. Gowns"></div>
             <div class="form-group"><label>Price (৳)</label><input type="number" id="newPrice" class="form-control" placeholder="4500"></div>
-            <div class="form-group"><label>Initial Stock (Pcs)</label><input type="number" id="newStock" class="form-control" placeholder="10"></div>
-            <div class="form-group"><label>Upload Image</label><input type="file" id="newImg" class="form-control" accept="image/*" style="color:var(--text-muted);"></div>
+            
+            <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
+            <div class="size-grid">
+                <div class="size-box"><label>S Size</label><input type="number" id="sizeS" class="form-control" value="0"></div>
+                <div class="size-box"><label>M Size</label><input type="number" id="sizeM" class="form-control" value="0"></div>
+                <div class="size-box"><label>L Size</label><input type="number" id="sizeL" class="form-control" value="0"></div>
+                <div class="size-box"><label>XL Size</label><input type="number" id="sizeXL" class="form-control" value="0"></div>
+            </div>
+
+            <div class="form-group"><label>Product Image Link / URL</label><input type="text" id="newImg" class="form-control" placeholder="https://image-url.com/dress.jpg"></div>
             <button class="submit-btn" onclick="publishDress()">Publish Dress to Shop</button>
         </div>
     </div>
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
+
         function publishDress() {
             let name = document.getElementById('newName').value.trim();
-            if(!name) { tg.showAlert("⚠️ Enter dress name!"); return; }
-            tg.showAlert(`✅ New Dress "${name}" published successfully!`);
-            document.getElementById('newName').value = '';
-            document.getElementById('newPrice').value = '';
-            document.getElementById('newStock').value = '';
+            let cat = document.getElementById('newCat').value.trim() || "General";
+            let price = parseFloat(document.getElementById('newPrice').value) || 0;
+            let img = document.getElementById('newImg').value.trim() || "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300";
+            
+            let sizes = {
+                S: parseInt(document.getElementById('sizeS').value) || 0,
+                M: parseInt(document.getElementById('sizeM').value) || 0,
+                L: parseInt(document.getElementById('sizeL').value) || 0,
+                XL: parseInt(document.getElementById('sizeXL').value) || 0
+            };
+
+            let totalStock = sizes.S + sizes.M + sizes.L + sizes.XL;
+
+            if(!name || price <= 0) {
+                tg.showAlert("⚠️ Please enter a valid dress name and price!");
+                return;
+            }
+
+            let newDress = {
+                id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
+                name: name,
+                category: cat,
+                price: price,
+                image: img,
+                sizes: sizes,
+                totalStock: totalStock
+            };
+
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            dresses.unshift(newDress);
+            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+
+            tg.showAlert(`✅ Dress "${name}" added successfully and tracked in inventory!`);
+            window.location.href = "dresslist.html";
         }
     </script>
 </body>
