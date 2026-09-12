@@ -3,95 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Pro Shop with Stock & Size</title>
+    <title>WhiteFlowery - Master Admin Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #0b0f19;
+            --bg-color: #080b12;
             --card-bg: #131c2e;
             --card-border: #2a1b4e;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
             --accent-pink: #ec4899;
-            --stock-green: #10b981;
+            --success-green: #10b981;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 0 0 90px 0;
+            margin: 0; padding: 0 0 50px 0;
             display: flex; justify-content: center;
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        .search-box { position: relative; margin-bottom: 16px; }
-        .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; }
-        .search-input:focus { border-color: #7c3aed; }
-        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        /* Admin Navigation Tabs */
+        .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 8px 4px; border-radius: 10px; font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; }
+        .tab-btn.active { background: var(--primary-gradient); color: #fff; border-color: transparent; }
 
-        .categories-scroll {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; scrollbar-width: none;
-        }
-        .categories-scroll::-webkit-scrollbar { display: none; }
-        .cat-chip {
-            background: var(--card-bg); border: 1px solid var(--card-border); padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); transition: 0.2s;
-        }
-        .cat-chip.active, .cat-chip:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        .card-title { font-size: 14px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
 
-        /* Products Grid */
-        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .form-control:focus { border-color: #7c3aed; }
         
-        /* Wishlist Button */
-        .wishlist-btn {
-            position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 2; transition: 0.2s; backdrop-filter: blur(5px);
-        }
-        .wishlist-btn.active { color: #ec4899; }
+        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
 
-        /* Zoomable Image Box */
-        .product-img-box { 
-            width: 100%; height: 120px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: zoom-in;
-        }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .product-img-box:hover img { transform: scale(1.25); }
-
-        .product-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
-
-        /* Stock & Size Meta Info */
-        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 10px; }
-        .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 6px; font-weight: bold; }
+        /* List Items */
+        .list-box { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
+        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .item-title { color: #c084fc; }
+        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
+        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
         
-        /* Size Selector */
-        .size-box { display: flex; gap: 4px; margin-bottom: 10px; }
-        .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 5px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+        .action-row { display: flex; gap: 6px; }
+        .btn-sm { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-edit { background: #7c3aed; color: #fff; }
+        .btn-delete { background: #ef4444; color: #fff; }
+        .btn-reply { background: #229ed9; color: #fff; }
 
-        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
-        .add-to-cart-btn:active { transform: scale(0.96); }
-
-        /* Fullscreen Image Zoom Modal */
-        #zoomModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; }
-        #zoomModal img { max-width: 90%; max-height: 80%; border-radius: 12px; border: 2px solid var(--card-border); }
-        .close-zoom { margin-top: 15px; background: #ec4899; color: #fff; border: none; padding: 8px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: var(--card-bg);
-            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
-            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-        }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        /* Reply Box Modal */
+        #replyModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; }
     </style>
 </head>
 <body>
@@ -99,398 +71,165 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-store"></i> WhiteFlowery Pro Shop</h3>
-            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Home</a>
+            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin</h3>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-user"></i> Profile</a>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search dresses by name...">
+        <!-- Navigation Tabs -->
+        <div class="admin-tabs">
+            <div class="tab-btn active" onclick="switchTab('products')"><i class="fa-solid fa-shirt"></i> Products</div>
+            <div class="tab-btn" onclick="switchTab('support')"><i class="fa-solid fa-headset"></i> Support</div>
+            <div class="tab-btn" onclick="switchTab('users')"><i class="fa-solid fa-users"></i> Users</div>
+            <div class="tab-btn" onclick="switchTab('orders')"><i class="fa-solid fa-box"></i> Orders</div>
         </div>
 
-        <!-- Categories Filter -->
-        <div class="categories-scroll">
-            <div class="cat-chip active">All Dresses</div>
-            <div class="cat-chip">Gowns</div>
-            <div class="cat-chip">Party Wear</div>
-            <div class="cat-chip">Casual Sets</div>
-            <div class="cat-chip">Bridal</div>
+        <!-- TAB 1: Product Management & Modification -->
+        <div id="tab-products" class="tab-content">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-plus-circle"></i> Add / Modify Dresses</h4>
+                <div class="form-group"><label>Dress Name</label><input type="text" id="pName" class="form-control" placeholder="Royal Silk Gown"></div>
+                <div class="form-group"><label>Price (৳)</label><input type="number" id="pPrice" class="form-control" placeholder="8500"></div>
+                <div class="form-group"><label>Stock (Pcs)</label><input type="number" id="pStock" class="form-control" placeholder="10"></div>
+                <div class="form-group"><label>Cloudinary Image ID</label><input type="text" id="pImg" class="form-control" placeholder="WhiteFlowery/dress1.jpg"></div>
+                <button class="submit-btn" onclick="saveProduct()">Save Product to Shop</button>
+            </div>
+
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-list-check"></i> Existing Shop Inventory</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-title">Royal Silk Gown</span>
+                            <span class="item-badge">৳ 8,500 (10 Pcs)</span>
+                        </div>
+                        <div class="item-body">Category: Gowns | Cloudinary ID: dress1.jpg</div>
+                        <div class="action-row">
+                            <button class="btn-sm btn-edit" onclick="editProduct('Royal Silk Gown')">Edit</button>
+                            <button class="btn-sm btn-delete" onclick="deleteProduct()">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Products Grid (15 Pro Dresses with Size, 10 Pcs Stock & Cloudinary Links) -->
-        <div class="products-grid">
-            
-            <!-- Dress 1 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress1.jpg" alt="Royal Silk Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+1'">
-                </div>
-                <div>
-                    <h4 class="product-title">Royal Silk Gown</h4>
-                    <p class="product-price">৳ 8,500</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+        <!-- TAB 2: Support Messages & Live Reply -->
+        <div id="tab-support" class="tab-content" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-comments"></i> User Support Tickets</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-title">@zoha_flowery (ID: 98214)</span>
+                            <span class="item-badge" style="color:#ef4444; background:rgba(239,68,68,0.1)">Pending</span>
+                        </div>
+                        <div class="item-body"><b>Issue:</b> I want to exchange my dress size from M to L. Can you help?</div>
+                        <div class="action-row">
+                            <button class="btn-sm btn-reply" onclick="openReplyModal('@zoha_flowery')"><i class="fa-solid fa-reply"></i> Reply User</button>
+                        </div>
                     </div>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add to Cart</button>
             </div>
+        </div>
 
-            <!-- Dress 2 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress2.jpg" alt="White Floral Maxi" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+2'">
-                </div>
-                <div>
-                    <h4 class="product-title">White Floral Maxi</h4>
-                    <p class="product-price">৳ 3,500</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">S</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+        <!-- TAB 3: User Management System -->
+        <div id="tab-users" class="tab-content" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-users-gear"></i> Registered App Users</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-title">Zoha (দোহা)</span>
+                            <span class="item-badge" style="color:#10b981; background:rgba(16,185,129,0.1)">Gold VIP</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Telegram ID:</b> #TG_8849201<br>
+                            <b>Total Orders:</b> 3 Placed | <b>Rewards:</b> 250 FLW
+                        </div>
                     </div>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('White Floral Maxi', 3500)">Add to Cart</button>
             </div>
+        </div>
 
-            <!-- Dress 3 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress3.jpg" alt="Designer Party Frock" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+3'">
-                </div>
-                <div>
-                    <h4 class="product-title">Designer Party Frock</h4>
-                    <p class="product-price">৳ 6,200</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+        <!-- TAB 4: Order Tracking -->
+        <div id="tab-orders" class="tab-content" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-box-archive"></i> Customer Orders</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-title">Order #WF-9921</span>
+                            <span class="item-badge">Processing</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Item:</b> Royal Silk Gown (10 Pcs Stock updated)<br>
+                            <b>Customer:</b> Zoha (017xxxxxxxx)
+                        </div>
                     </div>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Designer Party Frock', 6200)">Add to Cart</button>
             </div>
-
-            <!-- Dress 4 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress4.jpg" alt="Chiffon Ethnic Set" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+4'">
-                </div>
-                <div>
-                    <h4 class="product-title">Chiffon Ethnic Set</h4>
-                    <p class="product-price">৳ 4,800</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 5 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress5.jpg" alt="Velvet Winter Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+5'">
-                </div>
-                <div>
-                    <h4 class="product-title">Velvet Winter Gown</h4>
-                    <p class="product-price">৳ 9,500</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                        <span class="size-pill" onclick="selectSize(this)">XXL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 6 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress6.jpg" alt="Casual Linen Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+6'">
-                </div>
-                <div>
-                    <h4 class="product-title">Casual Linen Dress</h4>
-                    <p class="product-price">৳ 2,200</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 7 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress7.jpg" alt="Embroidered Anarkali" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+7'">
-                </div>
-                <div>
-                    <h4 class="product-title">Embroidered Anarkali</h4>
-                    <p class="product-price">৳ 7,500</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 8 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress8.jpg" alt="Organza Party Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+8'">
-                </div>
-                <div>
-                    <h4 class="product-title">Organza Party Dress</h4>
-                    <p class="product-price">৳ 5,500</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Organza Party Dress', 5500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 9 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress9.jpg" alt="Georgette Long Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+9'">
-                </div>
-                <div>
-                    <h4 class="product-title">Georgette Long Dress</h4>
-                    <p class="product-price">৳ 4,200</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 10 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress10.jpg" alt="Classic Cotton Kurti" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+10'">
-                </div>
-                <div>
-                    <h4 class="product-title">Classic Cotton Kurti</h4>
-                    <p class="product-price">৳ 2,000</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 11 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress11.jpg" alt="Bridal White Lehenga" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+11'">
-                </div>
-                <div>
-                    <h4 class="product-title">Bridal White Lehenga</h4>
-                    <p class="product-price">৳ 10,000</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 12 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress12.jpg" alt="Satin Evening Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+12'">
-                </div>
-                <div>
-                    <h4 class="product-title">Satin Evening Gown</h4>
-                    <p class="product-price">৳ 6,800</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 13 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress13.jpg" alt="Boho Summer Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+13'">
-                </div>
-                <div>
-                    <h4 class="product-title">Boho Summer Dress</h4>
-                    <p class="product-price">৳ 2,800</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">S</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 14 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress14.jpg" alt="Net Layered Frock" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+14'">
-                </div>
-                <div>
-                    <h4 class="product-title">Net Layered Frock</h4>
-                    <p class="product-price">৳ 5,100</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Net Layered Frock', 5100)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 15 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress15.jpg" alt="Luxury Printed Kaftan" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+15'">
-                </div>
-                <div>
-                    <h4 class="product-title">Luxury Printed Kaftan</h4>
-                    <p class="product-price">৳ 3,900</p>
-                    <div class="meta-info">
-                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
-                    </div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add to Cart</button>
-            </div>
-
         </div>
     </div>
 
-    <!-- Fullscreen Image Zoom Modal -->
-    <div id="zoomModal" onclick="closeZoom()">
-        <img id="zoomedImg" src="" alt="Zoomed Dress">
-        <button class="close-zoom">Close</button>
+    <!-- Reply Modal -->
+    <div id="replyModal">
+        <div class="modal-content">
+            <h4 style="margin:0 0 10px 0; color:#fff;" id="replyModalTitle">Reply to User</h4>
+            <div class="form-group">
+                <textarea id="adminReplyText" class="form-control" placeholder="Write your reply message here..." style="height:80px; resize:none;"></textarea>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="submit-btn" style="background:#229ed9;" onclick="sendAdminReply()">Send Reply</button>
+                <button class="submit-btn" style="background:#ef4444;" onclick="closeReplyModal()">Cancel</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
-        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
-        <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
-        <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
-    </div>
-
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function selectSize(pill) {
-            let parent = pill.parentElement;
-            parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
-            pill.classList.add('selected');
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            event.currentTarget.classList.add('active');
         }
 
-        function addToCart(itemName, price) {
-            tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
+        window.saveProduct = function() {
+            let name = document.getElementById('pName').value;
+            let price = document.getElementById('pPrice').value;
+            if(!name || !price) { tg.showAlert("⚠️ Enter product name and price!"); return; }
+            tg.showAlert(`✅ Product "${name}" saved & updated successfully!`);
         }
 
-        function toggleWishlist(btn) {
-            btn.classList.toggle('active');
-            let isFav = btn.classList.contains('active');
-            if(isFav) {
-                tg.showAlert("❤️ Added to Wishlist!");
-            } else {
-                tg.showAlert("💔 Removed from Wishlist!");
+        window.editProduct = function(name) {
+            document.getElementById('pName').value = name;
+            switchTab('products');
+            tg.showAlert(`✏️ Editing mode loaded for: ${name}`);
+        }
+
+        window.deleteProduct = function() {
+            if(confirm("Are you sure you want to delete this dress?")) {
+                tg.showAlert("🗑️ Product deleted from shop!");
             }
         }
 
-        function openZoom(box) {
-            let img = box.querySelector('img');
-            let modal = document.getElementById('zoomModal');
-            let zoomedImg = document.getElementById('zoomedImg');
-            zoomedImg.src = img.src;
-            modal.style.display = 'flex';
+        window.openReplyModal = function(username) {
+            document.getElementById('replyModalTitle').innerText = `Reply to ${username}`;
+            document.getElementById('replyModal').style.display = 'flex';
         }
 
-        function closeZoom() {
-            document.getElementById('zoomModal').style.display = 'none';
+        window.closeReplyModal = function() {
+            document.getElementById('replyModal').style.display = 'none';
+        }
+
+        window.sendAdminReply = function() {
+            let text = document.getElementById('adminReplyText').value.trim();
+            if(!text) { tg.showAlert("⚠️ Type a reply message!"); return; }
+            tg.showAlert("✅ Reply sent successfully to user!");
+            document.getElementById('adminReplyText').value = '';
+            closeReplyModal();
         }
     </script>
 </body>
