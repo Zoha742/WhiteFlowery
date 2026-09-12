@@ -28,13 +28,17 @@
         .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
         
         .list-box { display: flex; flex-direction: column; gap: 10px; }
-        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: center; }
+        
+        .order-img { width: 65px; height: 75px; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; }
+        
+        .order-info { flex: 1; }
         .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
         .item-title { color: #c084fc; }
         .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
         .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
         
-        .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
         .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; }
         .btn-accept { background: #10b981; color: #fff; }
         .btn-cancel { background: #ef4444; color: #fff; }
@@ -64,22 +68,34 @@
         <div id="sub-live" class="order-sub-section admin-card">
             <h4 class="card-title">Live Orders</h4>
             <div class="list-box" id="liveOrdersContainer">
+                
+                <!-- Order Item Example -->
                 <div class="list-item" data-userid="884920">
-                    <div class="item-header">
-                        <span class="item-title">Order #WF-9921 (ID: 884920)</span>
-                        <span class="item-badge" style="color:#fbbf24; background:rgba(251,191,36,0.1)">Pending</span>
-                    </div>
-                    <div class="item-body">
-                        <b>Item:</b> Royal Silk Gown (Size: L, Qty: 1)<br>
-                        <b>Total:</b> ৳ 8,600<br>
-                        <b>Customer:</b> Zoha
-                    </div>
-                    <div class="action-row">
-                        <button class="btn-sm btn-screenshot" onclick="viewPaymentScreenshot('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')"><i class="fa-solid fa-receipt"></i> View Payment Slip</button>
-                        <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept</button>
-                        <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
+                    <!-- Product Photo -->
+                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" class="order-img" onclick="viewModalImage(this.src)" title="Click to view product">
+                    
+                    <div class="order-info">
+                        <div class="item-header">
+                            <span class="item-title">Order #WF-9921</span>
+                            <span class="item-badge" style="color:#fbbf24; background:rgba(251,191,36,0.1)">Pending</span>
+                        </div>
+                        <div class="item-body">
+                            <b>ID:</b> 884920 | <b>Customer:</b> Zoha<br>
+                            <b>Item:</b> Royal Silk Gown (Size: L)<br>
+                            <b>Total:</b> ৳ 8,600<br>
+                            <b>Type:</b> <span style="color:#38bdf8;">Online Payment (Bkash)</span>
+                        </div>
+                        <div class="action-row">
+                            <!-- Payment Slip Button -->
+                            <button class="btn-sm btn-screenshot" onclick="viewModalImage('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')">
+                                <i class="fa-solid fa-receipt"></i> Slip
+                            </button>
+                            <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept</button>
+                            <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -100,12 +116,12 @@
         </div>
     </div>
 
-    <!-- Screenshot Modal -->
-    <div id="screenshotModal" class="modal-overlay">
+    <!-- Universal Image Modal (For Product Photo & Payment Slip) -->
+    <div id="imageModal" class="modal-overlay">
         <div class="modal-content">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer;" onclick="closeModal()">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;">Payment Slip</h4>
-            <img id="modalReceiptImg" src="" alt="Payment Slip" style="width:100%; max-height:300px; object-fit:contain; border-radius:8px;">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal()">&times;</span>
+            <h4 style="color:#fff; margin-bottom:10px;" id="modalTitle">Image Preview</h4>
+            <img id="modalImgSrc" src="" alt="Preview" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px;">
         </div>
     </div>
 
@@ -119,12 +135,12 @@
         }
 
         function closeModal() {
-            document.getElementById('screenshotModal').style.display = 'none';
+            document.getElementById('imageModal').style.display = 'none';
         }
 
-        function viewPaymentScreenshot(imgUrl) {
-            document.getElementById('modalReceiptImg').src = imgUrl;
-            document.getElementById('screenshotModal').style.display = 'flex';
+        function viewModalImage(imgUrl) {
+            document.getElementById('modalImgSrc').src = imgUrl;
+            document.getElementById('imageModal').style.display = 'flex';
         }
 
         function moveOrder(btn, type, orderId, userId, itemName, amount) {
@@ -142,10 +158,10 @@
                 localStorage.setItem('deliveredOrdersCount', currentCount);
 
                 let invoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
-                invoices.unshift({ orderId, itemName, amount, method: 'bKash/Nagad', date: new Date().toLocaleDateString() });
+                invoices.unshift({ orderId, itemName, amount, method: 'Online Payment / COD', date: new Date().toLocaleDateString() });
                 localStorage.setItem('userInvoices', JSON.stringify(invoices));
 
-                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice generated.`);
+                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice automatically generated.`);
             } else {
                 badge.innerText = "Rejected";
                 badge.style.color = "#ef4444";
@@ -158,7 +174,7 @@
             let query = document.getElementById('searchUserId').value.trim().toLowerCase();
             document.querySelectorAll('.list-item').forEach(item => {
                 let uid = item.getAttribute('data-userid') || "";
-                item.style.display = uid.toLowerCase().includes(query) ? "block" : "none";
+                item.style.display = uid.toLowerCase().includes(query) ? "flex" : "none";
             });
         }
     </script>
