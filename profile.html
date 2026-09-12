@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Premium Dashboard</title>
+    <title>WhiteFlowery - Profile Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,7 +16,6 @@
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
             --accent-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
         body {
@@ -29,12 +28,11 @@
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
-        /* Top Header */
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: rgba(19, 28, 46, 0.9); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); }
 
-        /* Premium User Profile Hero Card */
+        /* Profile Hero with ID */
         .profile-hero {
             background: linear-gradient(135deg, #131c2e 0%, #1e1b4b 100%);
             border: 1px solid rgba(124, 58, 237, 0.4);
@@ -46,96 +44,61 @@
             position: relative;
             overflow: hidden;
         }
-        .profile-hero::before {
-            content: ''; position: absolute; top: -50px; right: -50px; width: 120px; height: 120px;
-            background: rgba(236, 72, 153, 0.15); border-radius: 50%; filter: blur(30px);
-        }
         .profile-avatar {
-            width: 75px; height: 75px;
+            width: 70px; height: 70px;
             background: var(--accent-gradient);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 32px; color: #fff;
-            margin: 0 auto 12px auto;
+            font-size: 30px; color: #fff;
+            margin: 0 auto 10px auto;
             border: 3px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
         }
-        .profile-name { margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #fff; }
-        .profile-username { margin: 0 0 16px 0; font-size: 12px; color: #d8b4fe; opacity: 0.9; }
-        
-        /* Stats Grid Cards */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-            background: rgba(8, 11, 18, 0.4); border-radius: 16px; padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+        .profile-name { margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color: #fff; }
+        .profile-id-tag {
+            display: inline-block;
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 11px; color: #d8b4fe; font-weight: bold;
+            margin-top: 4px;
         }
-        .stat-box h4 { margin: 0 0 4px 0; font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        .stat-box p { margin: 0; font-size: 15px; font-weight: bold; color: #fbbf24; }
 
-        /* Section Title */
-        .section-header { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 4px; display: flex; align-items: center; gap: 6px; }
-
-        /* Premium Admin Banner Card */
+        /* Admin Control Panel Banner */
         .admin-banner-card {
             background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
             border: 1px solid rgba(236, 72, 153, 0.4);
-            border-radius: 18px; padding: 16px; margin-bottom: 20px;
+            border-radius: 18px; padding: 14px 16px; margin-bottom: 20px;
             display: flex; align-items: center; justify-content: space-between;
-            text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.1);
+            text-decoration: none; color: #fff; transition: 0.2s;
         }
         .admin-banner-card:active { transform: scale(0.98); }
-        .admin-info { display: flex; align-items: center; gap: 14px; }
+        .admin-info { display: flex; align-items: center; gap: 12px; }
         .admin-icon-box {
-            width: 44px; height: 44px; background: var(--accent-gradient);
+            width: 40px; height: 40px; background: var(--accent-gradient);
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: #fff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+            font-size: 18px; color: #fff;
         }
-        .admin-text h4 { margin: 0 0 2px 0; font-size: 14px; font-weight: 700; color: #fff; }
-        .admin-text p { margin: 0; font-size: 11px; color: #fbcfe8; }
+        .admin-text h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .admin-text p { margin: 0; font-size: 10px; color: #fbcfe8; }
 
-        /* Dashboard Cards Grid */
-        .dashboard-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;
-        }
-        .dash-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 18px; padding: 16px;
-            text-decoration: none; color: var(--text-main);
-            display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 90px; transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
-        }
-        .dash-card:hover, .dash-card:active {
-            border-color: #c084fc; transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.2);
-        }
-        .dash-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .dash-icon {
-            width: 38px; height: 38px; background: rgba(124, 58, 237, 0.15);
-            color: #c084fc; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-        }
-        .dash-badge { font-size: 10px; background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 3px 8px; border-radius: 8px; font-weight: bold; }
-        .dash-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #fff; }
-
-        /* Single Wide Card */
+        /* Wide Navigation Cards */
+        .section-header { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 4px; }
+        
         .wide-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 18px; padding: 14px 16px; margin-bottom: 12px;
+            border-radius: 16px; padding: 14px 16px; margin-bottom: 10px;
             display: flex; align-items: center; justify-content: space-between;
             text-decoration: none; color: var(--text-main); backdrop-filter: blur(10px);
             transition: 0.2s;
         }
-        .wide-card:active { transform: scale(0.98); }
+        .wide-card:active { transform: scale(0.98); border-color: #c084fc; }
         .wide-left { display: flex; align-items: center; gap: 14px; }
         .wide-icon {
-            width: 38px; height: 38px; background: rgba(124, 58, 237, 0.15); color: #c084fc;
-            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 15px;
+            width: 36px; height: 36px; background: rgba(124, 58, 237, 0.15); color: #c084fc;
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px;
         }
-        .wide-info h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
-        .wide-info p { margin: 0; font-size: 11px; color: var(--text-muted); }
+        .wide-info h4 { margin: 0; font-size: 13px; font-weight: 700; color: #fff; }
 
         /* Bottom Navigation Bar */
         .bottom-nav {
@@ -162,29 +125,14 @@
             <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> Home</a>
         </div>
 
-        <!-- Premium Profile Hero Card -->
+        <!-- Profile Hero with ID -->
         <div class="profile-hero">
-            <div class="profile-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+            <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
-            <p class="profile-username" id="userUsernameDisplay">@username</p>
-            
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <h4>Orders</h4>
-                    <p>3 Active</p>
-                </div>
-                <div class="stat-box">
-                    <h4>Rewards</h4>
-                    <p>250 FLW</p>
-                </div>
-                <div class="stat-box">
-                    <h4>Tier</h4>
-                    <p style="color: #34d399;">Gold VIP</p>
-                </div>
-            </div>
+            <div class="profile-id-tag" id="userIdDisplay">Telegram ID: #TG_------</div>
         </div>
 
-        <!-- Admin Control Panel Banner (Free Access) -->
+        <!-- Admin Control Panel Banner -->
         <a href="myadmin.html" class="admin-banner-card">
             <div class="admin-info">
                 <div class="admin-icon-box"><i class="fa-solid fa-user-shield"></i></div>
@@ -193,64 +141,58 @@
                     <p>Manage products, stock & support tickets</p>
                 </div>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #fbcfe8; font-size: 14px;"></i>
+            <i class="fa-solid fa-chevron-right" style="color: #fbcfe8; font-size: 12px;"></i>
         </a>
 
-        <!-- Dashboard Grid Cards -->
-        <div class="section-header"><i class="fa-solid fa-bag-shopping"></i> Quick Shopping Hub</div>
-        <div class="dashboard-grid">
-            <a href="orders.html" class="dash-card">
-                <div class="dash-card-top">
-                    <div class="dash-icon"><i class="fa-solid fa-box-archive"></i></div>
-                    <span class="dash-badge">History</span>
-                </div>
-                <h4 class="dash-title">My Orders</h4>
-            </a>
-            <a href="wishlist.html" class="dash-card">
-                <div class="dash-card-top">
-                    <div class="dash-icon" style="color: #ec4899;"><i class="fa-solid fa-heart"></i></div>
-                    <span class="dash-badge" style="color: #ec4899; background: rgba(236,72,153,0.15);">5 Saved</span>
-                </div>
-                <h4 class="dash-title">Wishlist</h4>
-            </a>
-            <a href="address.html" class="dash-card">
-                <div class="dash-card-top">
-                    <div class="dash-icon" style="color: #34d399;"><i class="fa-solid fa-location-dot"></i></div>
-                </div>
-                <h4 class="dash-title">Delivery Address</h4>
-            </a>
-            <a href="support.html" class="dash-card">
-                <div class="dash-card-top">
-                    <div class="dash-icon" style="color: #38bdf8;"><i class="fa-solid fa-headset"></i></div>
-                    <span class="dash-badge" style="color: #38bdf8; background: rgba(56,189,248,0.15);">24/7</span>
-                </div>
-                <h4 class="dash-title">Support</h4>
-            </a>
-        </div>
+        <!-- Menu Options -->
+        <div class="section-header">Dashboard Hub</div>
 
-        <!-- Account Settings & Extras -->
-        <div class="section-header"><i class="fa-solid fa-sliders"></i> Preferences & System</div>
-        
-        <a href="#" class="wide-card" onclick="tg.showAlert('Payment gateway (BKash/Nagad/Cards) ready.')">
+        <a href="orders.html" class="wide-card">
             <div class="wide-left">
-                <div class="wide-icon"><i class="fa-solid fa-wallet"></i></div>
-                <div class="wide-info">
-                    <h4>Payment Methods</h4>
-                    <p>Manage secure checkout options</p>
-                </div>
+                <div class="wide-icon"><i class="fa-solid fa-box-archive"></i></div>
+                <div class="wide-info"><h4>My Orders</h4></div>
             </div>
             <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
         </a>
 
-        <a href="#" class="wide-card" onclick="tg.showAlert('WhiteFlowery App v1.0.0 Pro Edition')">
+        <a href="cart.html" class="wide-card">
             <div class="wide-left">
-                <div class="wide-icon" style="color: #fbbf24;"><i class="fa-solid fa-circle-info"></i></div>
-                <div class="wide-info">
-                    <h4>About Application</h4>
-                    <p>Version 1.0.0 (Pro Edition)</p>
-                </div>
+                <div class="wide-icon" style="color: #38bdf8;"><i class="fa-solid fa-cart-shopping"></i></div>
+                <div class="wide-info"><h4>My Cart</h4></div>
             </div>
-            <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">v1.0.0</span>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
+        </a>
+
+        <a href="wishlist.html" class="wide-card">
+            <div class="wide-left">
+                <div class="wide-icon" style="color: #ec4899;"><i class="fa-solid fa-heart"></i></div>
+                <div class="wide-info"><h4>Wishlist</h4></div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
+        </a>
+
+        <a href="address.html" class="wide-card">
+            <div class="wide-left">
+                <div class="wide-icon" style="color: #34d399;"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="wide-info"><h4>Delivery Address</h4></div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
+        </a>
+
+        <a href="payment.html" class="wide-card">
+            <div class="wide-left">
+                <div class="wide-icon" style="color: #fbbf24;"><i class="fa-solid fa-wallet"></i></div>
+                <div class="wide-info"><h4>Payment Methods</h4></div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
+        </a>
+
+        <a href="support.html" class="wide-card">
+            <div class="wide-left">
+                <div class="wide-icon" style="color: #c084fc;"><i class="fa-solid fa-headset"></i></div>
+                <div class="wide-info"><h4>Customer Support</h4></div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
         </a>
     </div>
 
@@ -269,10 +211,10 @@
         let user = tg.initDataUnsafe.user;
         if (user) {
             document.getElementById('userNameDisplay').innerText = user.first_name || "Valued Customer";
-            document.getElementById('userUsernameDisplay').innerText = user.username ? `@${user.username}` : `@id_${user.id}`;
+            document.getElementById('userIdDisplay').innerText = `Telegram ID: #TG_${user.id}`;
         } else {
             document.getElementById('userNameDisplay').innerText = "Zoha";
-            document.getElementById('userUsernameDisplay').innerText = "@zoha_flowery";
+            document.getElementById('userIdDisplay').innerText = "Telegram ID: #TG_8849201";
         }
     </script>
 </body>
