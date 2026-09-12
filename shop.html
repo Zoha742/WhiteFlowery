@@ -45,7 +45,8 @@
         .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
         .product-img-box { width: 100%; height: 130px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .product-img-box:hover img { transform: scale(1.1); }
 
         .product-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
@@ -62,7 +63,7 @@
         
         .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
 
-        /* Modals */
+        /* Modals & Zoom */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
 
@@ -90,6 +91,7 @@
             <input type="text" id="searchInput" class="search-input" placeholder="Search dresses..." onkeyup="renderProducts()">
         </div>
 
+        <!-- Dynamic Category Chips -->
         <div class="categories-scroll" id="categoriesContainer">
             <div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>
             <div class="cat-chip" onclick="filterCategory('Gowns', this)">Gowns</div>
@@ -100,6 +102,15 @@
 
         <div class="products-grid" id="shopProductsGrid">
             <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <!-- Zoom Image Modal -->
+    <div id="zoomModal" class="modal-overlay">
+        <div class="modal-content" style="background:#0b0f19;">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px; margin-bottom:10px;">
+            <div id="zoomThumbnails" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
         </div>
     </div>
 
@@ -135,17 +146,22 @@
         let currentCategory = 'All';
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadDynamicCategories();
             loadShopProducts();
         });
 
+        function loadDynamicCategories() {
+            let container = document.getElementById('categoriesContainer');
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            
+            container.innerHTML = `<div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>`;
+            categories.forEach(cat => {
+                container.innerHTML += `<div class="cat-chip" onclick="filterCategory('${cat}', this)">${cat}</div>`;
+            });
+        }
+
         function loadShopProducts() {
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            if (dresses.length === 0) {
-                dresses = [
-                    { id: 'WF-1', name: 'Royal Silk Gown', category: 'Gowns', price: 8500, details: 'Pure silk gown with royal embroidery work.', image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp', video: '', sizes: { S: 3, M: 5, L: 2 } }
-                ];
-                localStorage.setItem('shopDresses', JSON.stringify(dresses));
-            }
             renderProducts();
         }
 
@@ -175,15 +191,24 @@
                 let sizePillsHtml = '';
                 sizeKeys.forEach((sizeKey, sIdx) => {
                     let cls = sIdx === 0 ? 'size-pill selected' : 'size-pill';
-                    sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${dress.name}', '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
+                    sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
                 });
+
+                // Safe Image handling (Checks array 'images' or string 'image')
+                let mainImg = dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300';
+                if (dress.images && dress.images.length > 0) {
+                    mainImg = dress.images[0];
+                }
 
                 let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
+                // Encode dress data safely for zoom modal
+                let dressImagesJson = encodeURIComponent(JSON.stringify(dress.images || [mainImg]));
+
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
-                        <div class="product-img-box">
-                            <img src="${dress.image}" alt="${dress.name}">
+                        <div class="product-img-box" onclick="openZoomModal('${dressImagesJson}')">
+                            <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'">
                         </div>
                         <div>
                             <h4 class="product-title">${dress.name}</h4>
@@ -205,13 +230,30 @@
             });
         }
 
-        function selectSize(pill, dressName, sizeKey, qty, cardIndex) {
+        function selectSize(pill, sizeKey, qty, cardIndex) {
             let parent = pill.parentElement;
             parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
             pill.classList.add('selected');
-            
-            // Update specific stock dynamically based on selected size
             document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${sizeKey}): ${qty} Pcs`;
+        }
+
+        function openZoomModal(encodedImages) {
+            let images = JSON.parse(decodeURIComponent(encodedImages));
+            let mainImageEl = document.getElementById('zoomedImg');
+            let thumbContainer = document.getElementById('zoomThumbnails');
+
+            mainImageEl.src = images[0];
+            thumbContainer.innerHTML = '';
+
+            if (images.length > 1) {
+                images.forEach((imgUrl) => {
+                    thumbContainer.innerHTML += `
+                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:45px; height:55px; object-fit:cover; border-radius:4px; border:1px solid #7c3aed; cursor:pointer;">
+                    `;
+                });
+            }
+
+            document.getElementById('zoomModal').style.display = 'flex';
         }
 
         function openDetailsModal(title, desc) {
