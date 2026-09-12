@@ -146,6 +146,8 @@
         tg.expand();
         let currentCategory = 'All';
         let currentFilteredDresses = [];
+        // cardIndex -> array of in-stock variants shown on that card: [{ color, images, sizes }]
+        let currentCardVariants = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             cleanOldDummyProducts();
@@ -172,17 +174,50 @@
             });
         }
 
+        // Normalize a dress into its list of color variants, whichever data
+        // shape it was saved with (new multi-color "variants" array, or the
+        // older flat single image-set + single size-list format), and drop
+        // any color whose sizes are all out of stock.
+        function getDressVariants(dress) {
+            let variants;
+            if (dress.variants && dress.variants.length > 0) {
+                variants = dress.variants;
+            } else {
+                variants = [{
+                    color: (dress.colors && dress.colors[0]) || '',
+                    images: (dress.images && dress.images.length > 0) ? dress.images : (dress.image ? [dress.image] : []),
+                    sizes: dress.sizes || {}
+                }];
+            }
+            return variants.filter(v => {
+                let sizes = v.sizes || {};
+                let total = Object.values(sizes).reduce((a, b) => a + Number(b), 0);
+                return total > 0;
+            });
+        }
+
+        function buildSizePillsHtml(sizesObj, cardIndex) {
+            let keys = Object.keys(sizesObj);
+            return keys.map((k, i) => {
+                let cls = i === 0 ? 'size-pill selected' : 'size-pill';
+                return `<span class="${cls}" onclick="selectSize(this, '${k}', ${sizesObj[k]}, ${cardIndex})">${k}</span>`;
+            }).join('');
+        }
+
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let searchVal = document.getElementById('searchInput').value.toLowerCase();
             
             grid.innerHTML = '';
+            currentCardVariants = {};
             
             currentFilteredDresses = dresses.filter(d => {
                 let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
                 let matchesSearch = d.name.toLowerCase().includes(searchVal);
-                return matchesCat && matchesSearch;
+                // Hide a product entirely once every one of its colors is out of stock
+                let hasStock = getDressVariants(d).length > 0;
+                return matchesCat && matchesSearch && hasStock;
             });
 
             if (currentFilteredDresses.length === 0) {
@@ -191,38 +226,34 @@
             }
 
             currentFilteredDresses.forEach((dress, index) => {
-                let sizesObj = dress.sizes || {};
+                let visibleVariants = getDressVariants(dress);
+                currentCardVariants[index] = visibleVariants;
+
+                let variant0 = visibleVariants[0];
+                let sizesObj = variant0.sizes || {};
                 let sizeKeys = Object.keys(sizesObj);
                 let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
                 let initialStock = firstSize ? sizesObj[firstSize] : 0;
-                
-                let sizePillsHtml = '';
-                sizeKeys.forEach((sizeKey, sIdx) => {
-                    let cls = sIdx === 0 ? 'size-pill selected' : 'size-pill';
-                    sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
-                });
 
-                let colorsArr = dress.colors || [];
-                let firstColor = colorsArr.length > 0 ? colorsArr[0] : '';
+                let sizePillsHtml = buildSizePillsHtml(sizesObj, index);
+
                 let colorPillsHtml = '';
-                colorsArr.forEach((color, cIdx) => {
-                    let cls = cIdx === 0 ? 'color-pill selected' : 'color-pill';
-                    let safeColor = color.replace(/'/g, "\\'");
-                    colorPillsHtml += `<span class="${cls}" onclick="selectColor(this, '${safeColor}', ${index})"><span class="swatch" style="background:${color};"></span>${color}</span>`;
-                });
-                let colorBoxHtml = colorsArr.length > 0 ? `<div class="color-box">${colorPillsHtml}</div>` : '';
-
-                let mainImg = dress.image || '';
-                if (dress.images && dress.images.length > 0) {
-                    mainImg = dress.images[0];
+                if (visibleVariants.length > 1 || (visibleVariants.length === 1 && visibleVariants[0].color)) {
+                    colorPillsHtml = visibleVariants.map((v, vIdx) => {
+                        let cls = vIdx === 0 ? 'color-pill selected' : 'color-pill';
+                        return `<span class="${cls}" onclick="selectColor(this, ${index}, ${vIdx})"><span class="swatch" style="background:${v.color || '#666'};"></span>${v.color || 'Default'}</span>`;
+                    }).join('');
                 }
+                let colorBoxHtml = colorPillsHtml ? `<div class="color-box" id="color-box-${index}">${colorPillsHtml}</div>` : '';
+
+                let mainImg = (variant0.images && variant0.images[0]) || '';
 
                 let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
                 grid.innerHTML += `
-                    <div class="product-card" id="card-${index}" data-selected-size="${firstSize}" data-selected-color="${firstColor}">
+                    <div class="product-card" id="card-${index}" data-selected-variant="0" data-selected-size="${firstSize}" data-selected-color="${variant0.color || ''}">
                         <div class="product-img-box" onclick="openZoomModal(${index})">
-                            <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
+                            <img id="card-img-${index}" src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
                         </div>
                         <div>
                             <h4 class="product-title">${dress.name}</h4>
@@ -230,7 +261,7 @@
                             <div class="meta-info">
                                 <span class="stock-badge" id="stock-text-${index}">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
                             </div>
-                            <div class="size-box">
+                            <div class="size-box" id="size-box-${index}">
                                 ${sizePillsHtml || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>'}
                             </div>
                             ${colorBoxHtml}
@@ -253,18 +284,43 @@
             document.getElementById(`card-${cardIndex}`).dataset.selectedSize = sizeKey;
         }
 
-        function selectColor(pill, colorName, cardIndex) {
+        // Switching color swaps this card's photo AND rebuilds its size pills
+        // to that color's own stock (since each color can have different sizes/qty).
+        function selectColor(pill, cardIndex, variantIdx) {
             let parent = pill.parentElement;
             parent.querySelectorAll('.color-pill').forEach(p => p.classList.remove('selected'));
             pill.classList.add('selected');
-            document.getElementById(`card-${cardIndex}`).dataset.selectedColor = colorName;
+
+            let variant = currentCardVariants[cardIndex][variantIdx];
+            let card = document.getElementById(`card-${cardIndex}`);
+            card.dataset.selectedVariant = variantIdx;
+            card.dataset.selectedColor = variant.color || '';
+
+            let imgEl = document.getElementById(`card-img-${cardIndex}`);
+            if (imgEl && variant.images && variant.images.length > 0) {
+                imgEl.src = variant.images[0];
+            }
+
+            let sizesObj = variant.sizes || {};
+            let sizeKeys = Object.keys(sizesObj);
+            let sizeBox = document.getElementById(`size-box-${cardIndex}`);
+            sizeBox.innerHTML = buildSizePillsHtml(sizesObj, cardIndex) || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>';
+
+            let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
+            let firstStock = firstSize ? sizesObj[firstSize] : 0;
+            document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${firstSize || 'N/A'}): ${firstStock} Pcs`;
+            card.dataset.selectedSize = firstSize;
         }
 
         function openZoomModal(index) {
             let dress = currentFilteredDresses[index];
             if (!dress) return;
 
-            let images = dress.images && dress.images.length > 0 ? dress.images : [dress.image];
+            let card = document.getElementById(`card-${index}`);
+            let variantIdx = card ? parseInt(card.dataset.selectedVariant || '0') : 0;
+            let variant = (currentCardVariants[index] && currentCardVariants[index][variantIdx]) || currentCardVariants[index][0];
+            let images = variant.images && variant.images.length > 0 ? variant.images : [dress.image];
+
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
