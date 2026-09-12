@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - My Invoices</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #080b12;
+            --card-bg: rgba(19, 28, 46, 0.85);
+            --card-border: rgba(124, 58, 237, 0.25);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 100px 0;
+            display: flex; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
+        }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
+
+        /* Invoice List / Chart */
+        .invoice-list { display: flex; flex-direction: column; gap: 14px; }
+        .invoice-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 18px; padding: 16px; backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+        }
+        .invoice-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
+        .invoice-id { font-size: 13px; font-weight: bold; color: #c084fc; }
+        .invoice-status { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .invoice-details { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
+        .invoice-details span b { color: #fff; }
+
+        .invoice-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; }
+        .invoice-total { font-size: 14px; font-weight: bold; color: #fbbf24; }
+        
+        .download-btn {
+            background: var(--primary-gradient); border: none; color: #fff;
+            padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+        .download-btn:active { transform: scale(0.96); }
+
+        .no-invoice { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 13px; }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
+        }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-file-invoice-dollar"></i> My Invoices</h3>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
+        </div>
+
+        <!-- Invoice Chart Container -->
+        <div class="invoice-list" id="invoiceContainer">
+            <!-- Dynamic Invoices will load here -->
+            <div class="no-invoice">No invoices generated yet! Admin will issue invoice upon order confirmation.</div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Load Invoices automatically saved when admin receives/confirms order
+        window.addEventListener('DOMContentLoaded', () => {
+            let container = document.getElementById('invoiceContainer');
+            let savedInvoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
+
+            if(savedInvoices.length > 0) {
+                container.innerHTML = '';
+                savedInvoices.forEach(inv => {
+                    container.innerHTML += `
+                        <div class="invoice-card">
+                            <div class="invoice-header">
+                                <span class="invoice-id">#${inv.orderId}</span>
+                                <span class="invoice-status">Paid & Confirmed</span>
+                            </div>
+                            <div class="invoice-details">
+                                <span><b>Item:</b> ${inv.itemName}</span>
+                                <span><b>Date:</b> ${inv.date}</span>
+                                <span><b>Payment:</b> ${inv.method}</span>
+                            </div>
+                            <div class="invoice-footer">
+                                <span class="invoice-total">৳ ${inv.amount.toLocaleString()}</span>
+                                <button class="download-btn" onclick="downloadInvoice('${inv.orderId}')"><i class="fa-solid fa-download"></i> Download</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        function downloadInvoice(orderId) {
+            tg.showAlert(`📥 Invoice #${orderId} downloaded successfully!`);
+        }
+    </script>
+</body>
+</html>
