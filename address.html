@@ -3,60 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Delivery Address</title>
+    <title>WhiteFlowery - Detailed Delivery Address</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
+            --bg-color: #080b12;
+            --card-bg: rgba(19, 28, 46, 0.75);
+            --card-border: rgba(124, 58, 237, 0.25);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-pink: #ec4899;
         }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0 0 90px 0; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        .form-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 90px 0;
+            display: flex; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
+        }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
+
+        .form-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 18px; padding: 18px; backdrop-filter: blur(10px);
+        }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 10px; box-sizing: border-box; font-size: 13px; outline: none; }
-        .action-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 10px; }
+        .form-control {
+            width: 100%; background: #0b0f19; border: 1px solid var(--card-border);
+            color: #fff; padding: 10px; border-radius: 10px; box-sizing: border-box;
+            font-size: 12px; outline: none;
+        }
+        .form-control:focus { border-color: #7c3aed; }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999; }
+        .action-btn {
+            background: var(--primary-gradient); color: #fff; border: none;
+            padding: 13px; border-radius: 12px; font-weight: 700; width: 100%;
+            cursor: pointer; font-size: 13px; margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+        }
+        .action-btn:active { transform: scale(0.98); }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
+        }
         .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
+
     <div class="container">
+        <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-location-dot"></i> Saved Address</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-location-dot"></i> Delivery Address</h3>
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
         </div>
 
+        <!-- Detailed Address Form -->
         <div class="form-card">
-            <div class="form-group"><label>Full Name</label><input type="text" id="savedName" class="form-control" placeholder="Your name"></div>
-            <div class="form-group"><label>Phone Number</label><input type="text" id="savedPhone" class="form-control" placeholder="Phone number"></div>
-            <div class="form-group"><label>Delivery Address</label><input type="text" id="savedAddr" class="form-control" placeholder="House, Area, City"></div>
-            <button class="action-btn" onclick="saveAddress()">Save Address</button>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" class="form-control" placeholder="Enter recipient name">
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" id="phoneNumber" class="form-control" placeholder="e.g. 017xxxxxxxx">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Division</label>
+                    <select id="division" class="form-control">
+                        <option value="" disabled selected>Select Division</option>
+                        <option value="Dhaka">Dhaka</option>
+                        <option value="Chittagong">Chittagong</option>
+                        <option value="Rajshahi">Rajshahi</option>
+                        <option value="Khulna">Khulna</option>
+                        <option value="Barisal">Barisal</option>
+                        <option value="Sylhet">Sylhet</option>
+                        <option value="Rangpur">Rangpur</option>
+                        <option value="Mymensingh">Mymensingh</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>District (Zilla)</label>
+                    <input type="text" id="district" class="form-control" placeholder="e.g. Dhaka / Jashore">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Thana / Upazila</label>
+                    <input type="text" id="thana" class="form-control" placeholder="e.g. Maheshpur / Gulshan">
+                </div>
+                <div class="form-group">
+                    <label>Post Code</label>
+                    <input type="text" id="postCode" class="form-control" placeholder="e.g. 7340">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Area & Detailed Address</label>
+                <input type="text" id="detailedArea" class="form-control" placeholder="House no, Road no, Village/Area">
+            </div>
+
+            <button class="action-btn" onclick="saveFullAddress()">Save Address</button>
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
         <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
+
     <script>
-        let tg = window.Telegram.WebApp; tg.expand();
-        function saveAddress() { tg.showAlert("✅ Address saved successfully!"); }
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function saveFullAddress() {
+            let name = document.getElementById('fullName').value.trim();
+            let phone = document.getElementById('phoneNumber').value.trim();
+            let division = document.getElementById('division').value;
+            let district = document.getElementById('district').value.trim();
+            let thana = document.getElementById('thana').value.trim();
+            let postCode = document.getElementById('postCode').value.trim();
+            let area = document.getElementById('detailedArea').value.trim();
+
+            if(!name || !phone || !division || !district || !thana || !postCode || !area) {
+                tg.showAlert("⚠️ Please fill up all address fields completely!");
+                return;
+            }
+
+            // LocalStorage এ সম্পূর্ণ ডাটা সেভ রাখা
+            let fullAddress = { name, phone, division, district, thana, postCode, area };
+            localStorage.setItem('userFullAddress', JSON.stringify(fullAddress));
+
+            tg.showAlert("✅ Address saved successfully! Redirecting to cart...", function() {
+                window.location.href = "cart.html";
+            });
+        }
     </script>
 </body>
 </html>
