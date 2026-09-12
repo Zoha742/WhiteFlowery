@@ -91,7 +91,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Division</label>
-                    <select id="division" class="form-control">
+                    <select id="division" class="form-control" onchange="loadDistricts()">
                         <option value="" disabled selected>Select Division</option>
                         <option value="Dhaka">Dhaka</option>
                         <option value="Chittagong">Chittagong</option>
@@ -105,14 +105,18 @@
                 </div>
                 <div class="form-group">
                     <label>District (Zilla)</label>
-                    <input type="text" id="district" class="form-control" placeholder="e.g. Dhaka / Jashore">
+                    <select id="district" class="form-control" onchange="loadThanas()">
+                        <option value="" disabled selected>Select District</option>
+                    </select>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label>Thana / Upazila</label>
-                    <input type="text" id="thana" class="form-control" placeholder="e.g. Maheshpur / Gulshan">
+                    <select id="thana" class="form-control">
+                        <option value="" disabled selected>Select Thana</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Post Code</label>
@@ -141,12 +145,131 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
+        // Data for Districts and Thanas based on Divisions
+        const bdData = {
+            "Dhaka": {
+                "Dhaka": ["Gulshan", "Banani", "Dhanmondi", "Mirpur", "Uttara", "Motijheel", "Tejgaon", "Savar", "Keraniganj", "Nawabganj", "Dohar"],
+                "Gazipur": ["Gazipur Sadar", "Kaliakair", "Kapasia", "Sreepur", "Kaliganj"],
+                "Narayanganj": ["Narayanganj Sadar", "Bandar", "Rupganj", "Sonargaon", "Araihazar"],
+                "Tangail": ["Tangail Sadar", "Basail", "Bhuapur", "Delduar", "Ghatail", "Gopalpur", "Madhupur", "Mirzapur", "Nagarpur", "Sakhipur"],
+                "Faridpur": ["Faridpur Sadar", "Boalmari", "Bhanga", "Madhukhali", "Nagarkanda", "Sadarpur", "Alfadanga"],
+                "Kishoreganj": ["Kishoreganj Sadar", "Hossainpur", "Itna", "Karimganj", "Katiadi", "Kuliarchar", "Mithamain", "Nikli", "Pakundia", "Itna"],
+                "Manikganj": ["Manikganj Sadar", "Singair", "Shibalaya", "Saturia", "Harirampur", "Ghior", "Daulatpur"],
+                "Munshiganj": ["Munshiganj Sadar", "Sreenagar", "Sirajdikhan", "Lohajang", "Gajaria", "Tongibari"],
+                "Narsingdi": ["Narsingdi Sadar", "Belabo", "Monohardi", "Palash", "Raipura", "Shibpur"],
+                "Rajbari": ["Rajbari Sadar", "Goalundo", "Pangsha", "Baliakandi", "Kalukhali"],
+                "Shariatpur": ["Shariatpur Sadar", "Naria", "Zajira", "Gosairhat", "Bhedarganj", "Damudya"],
+                "Madaripur": ["Madaripur Sadar", "Shibchar", "Kalkini", "Rajoir"],
+                "Gopalganj": ["Gopalganj Sadar", "Kashiani", "Kotalipara", "Muksudpur", "Tungipara"]
+            },
+            "Chittagong": {
+                "Chittagong": ["Kotwali", "Pahartali", "Double Mooring", "Bayazid", "Chandgaon", "Patiya", "Banshkhali", "Boalkhali", "Anwara", "Rangunia", "Raozan", "Sitakunda", "Mirsharai", "Sandwip", "Satkania", "Lohagara", "Fatikchhari"],
+                "Cox's Bazar": ["Cox's Bazar Sadar", "Chakaria", "Kutubdia", "Ukhiya", "Moheshkhali", "Pekua", "Teknaf", "Ramu"],
+                "Comilla": ["Comilla Sadar", "Barura", "Brahmanpara", "Burichong", "Chandina", "Chauddagram", "Daudkandi", "Hajiganj", "Homna", "Laksam", "Muradnagar", "Nangalkot"],
+                "Sylhet": [], // Separate div
+                "Noakhali": ["Noakhali Sadar", "Begumganj", "Chatkhil", "Companyganj", "Hatia", "Senbagh", "Subarnachar", "Kabirhat"],
+                "Feni": ["Feni Sadar", "Chhagalnaiya", "Daganbhuiyan", "Parshuram", "Sonagazi", "Fulgazi"],
+                "Brahmanbaria": ["Brahmanbaria Sadar", "Ashuganj", "Nasirnagar", "Nabinagar", "Bancharampur", "Kasba", "Akhaura", "Sarail"],
+                "Chandpur": ["Chandpur Sadar", "Haimchar", "Kachua", "Faridganj", "Shahrasti", "Matlab North", "Matlab South"],
+                "Lakshmipur": ["Lakshmipur Sadar", "Raipur", "Ramganj", "Ramgati", "Kamalnagar"]
+            },
+            "Rajshahi": {
+                "Rajshahi": ["Boalia", "Rajpara", "Motihar", "Shah Makhdum", "Paba", "Durgapur", "Mohanpur", "Charghat", "Puthia", "Bagha", "Tanore", "Godagari"],
+                "Bogra": ["Bogra Sadar", "Shajahanpur", "Sherpur", "Dhunat", "Gabtali", "Kahaloo", "Nandigram", "Sariakandi", "Shibganj", "Sonatala"],
+                "Pabna": ["Pabna Sadar", "Atgharia", "Bera", "Chatmohar", "Faridpur", "Ishwardi", "Santhia", "Sujanagar"],
+                "Sirajganj": ["Sirajganj Sadar", "Belkuchi", "Chauhali", "Kamarkhanda", "Kazipur", "Shahjadpur", "Tarash", "Ullahpara"],
+                "Naogaon": ["Naogaon Sadar", "Atrai", "Badalgachhi", "Manda", "Dhamoirhat", "Mohadevpur", "Niamatpur", "Patnitala", "Porsha", "Raninagar", "Sapahar"],
+                "Natore": ["Natore Sadar", "Baraigram", "Gurudaspur", "Lalpur", "Singra", "Bagatipara"],
+                "Chapai Nawabganj": ["Chapai Nawabganj Sadar", "Gomastapur", "Nachole", "Bholahat", "Shibganj"],
+                "Joypurhat": ["Joypurhat Sadar", "Akkelpur", "Kalai", "Khetlal", "Panchbibi"]
+            },
+            "Khulna": {
+                "Khulna": ["Sonadanga", "Khalishpur", "Daulatpur", "Khan Jahan Ali", "Batiaghata", "Dacope", "Dumuria", "Dighalia", "Koyra", "Paikgachha", "Phultala", "Rupsa"],
+                "Jessore": ["Jessore Sadar", "Abhaynagar", "Bagherpara", "Chaugachha", "Jhikargachha", "Keshabpur", "Manirampur", "Sharsha"],
+                "Satkhira": ["Satkhira Sadar", "Assasuni", "Debhata", "Kalaroa", "Kaliganj", "Shyamnagar", "Tala"],
+                "Kushtia": ["Kushtia Sadar", "Bheramara", "Kumarkhali", "Khoksa", "Mirpur", "Daulatpur"],
+                "Jhenaidah": ["Jhenaidah Sadar", "Harinakundu", "Kaliganj", "Kotchandpur", "Maheshpur", "Shailkupa"],
+                "Magura": ["Magura Sadar", "Mohammadpur", "Shalikha", "Sreepur"],
+                "Narail": ["Narail Sadar", "Kalia", "Lohagara"],
+                "Bagerhat": ["Bagerhat Sadar", "Chitalmari", "Fakirhat", "Kachua", "Mollahat", "Mongla", "Morrelganj", "Rampal", "Sarankhola"],
+                "Chuadanga": ["Chuadanga Sadar", "Alamdanga", "Damurhuda", " জীবননগর"],
+                "Meherpur": ["Meherpur Sadar", "Gangni", "Mujibnagar"]
+            },
+            "Barisal": {
+                "Barisal": ["Barisal Sadar", "Bakerganj", "Babuganj", "Wazirpur", "Banaripara", "Agailjhara", "Gournadi", "Muladi", "Mehendiganj", "Hizla"],
+                "Patuakhali": ["Patuakhali Sadar", "Bauphal", "Dashmina", "Galachipa", "Kalapara", "Mirzaganj", "Rangabali", "Dumki"],
+                "Bhola": ["Bhola Sadar", "Burhanuddin", "Char Fasson", "Daulatkhan", "Lalmohan", "Tazumuddin", "Manpura"],
+                "Pirojpur": ["Pirojpur Sadar", "Bhandaria", "Kawkhali", "Mathbaria", "Nazirpur", "Nesarabad", "Zianagar"],
+                "Barguna": ["Barguna Sadar", "Amtali", "Bamna", "Betagi", "Patharghata", "Taltali"],
+                "Jhalokati": ["Jhalokati Sadar", "Kathalia", "Nalchity", "Rajapur"]
+            },
+            "Sylhet": {
+                "Sylhet": ["Sylhet Sadar", "Beanibazar", "Bishwanath", "Companiganj", "Fenchuganj", "Golapganj", "Gowainghat", "Jaintiapur", "Kanaighat", "Zakiganj", "South Surma"],
+                "Moulvibazar": ["Moulvibazar Sadar", "Barlekha", "Juri", "Kulaura", "Rajnagar", "Sreemangal", "Kamalganj"],
+                "Habiganj": ["Habiganj Sadar", "Ajmiriganj", "Bahubal", "Baniachong", "Chunarughat", "Lakhai", "Madhabpur", "Nabiganj", "Shayestaganj"],
+                "Sunamganj": ["Sunamganj Sadar", "Bishwambharpur", "Chhatak", "Derai", "Dharamapasha", "Dowarabazar", "Jagannathpur", "Jamalganj", "Sullah", "Tahirpur", "Madhyanagar"]
+            },
+            "Rangpur": {
+                "Rangpur": ["Rangpur Sadar", "Badarganj", "Gangachara", "Kaunia", "Mithapukur", "Pirgachha", "Pirganj", "Taraganj"],
+                "Dinajpur": ["Dinajpur Sadar", "Birampur", "Birganj", "Biral", "Bochaganj", "Chirirbandar", "Fulbari", "Ghoraghat", "Hakimpur", "Kaharole", "Khansama", "Nawabganj", "Parbatipur"],
+                "Gaibandha": ["Gaibandha Sadar", "Fulchhari", "Gobindaganj", "Palashbari", "Sadullapur", "Saghata", "Sundarganj"],
+                "Kurigram": ["Kurigram Sadar", "Bhurungamari", "Char Rajibpur", "Chilmari", "Phulbari", "Rajarhat", "Roumari", "Ulipur", "Nageshwari"],
+                "Lalmonirhat": ["Lalmonirhat Sadar", "Aditmari", "Kaliganj", "Hatibandha", "Patgram"],
+                "Nilphamari": ["Nilphamari Sadar", "Jaldhaka", "Kishoreganj", "Dimla", "Domar", "Saidpur"],
+                "Panchagarh": ["Panchagarh Sadar", "Boda", "Debiganj", "Atwari", "Tetulia"],
+                "Thakurgaon": ["Thakurgaon Sadar", "Baliadangi", "Haripur", "Ranisankail", "Pirganj"]
+            },
+            "Mymensingh": {
+                "Mymensingh": ["Mymensingh Sadar", "Bhaluka", "Dhobaura", "Fulbaria", "Gaffargaon", "Gauripur", "Haluaghat", "Ishwarganj", "Nandail", "Phulpur", "Trishal", "Karakhali"],
+                "Jamalpur": ["Jamalpur Sadar", "Baksiganj", "Dewanganj", "Islampur", "Madarganj", "Melandaha", "Sarishabari"],
+                "Netrokona": ["Netrokona Sadar", "Atpara", "Barhatta", "Durgapur", "Kalmakanda", "Kendua", "Madan", "Mohanganj", "Purbadhala", "Khaliajuri"],
+                "Sherpur": ["Sherpur Sadar", "Jhenaigati", "Nakla", "Nalitabari", "Sreebardi"]
+            }
+        };
+
+        function loadDistricts() {
+            let divSelect = document.getElementById('division').value;
+            let distSelect = document.getElementById('district');
+            let thanaSelect = document.getElementById('thana');
+
+            distSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+            thanaSelect.innerHTML = '<option value="" disabled selected>Select Thana</option>';
+
+            if (bdData[divSelect]) {
+                let districts = Object.keys(bdData[divSelect]);
+                districts.forEach(dist => {
+                    let opt = document.createElement('option');
+                    opt.value = dist;
+                    opt.innerHTML = dist;
+                    distSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function loadThanas() {
+            let divSelect = document.getElementById('division').value;
+            let distSelect = document.getElementById('district').value;
+            let thanaSelect = document.getElementById('thana');
+
+            thanaSelect.innerHTML = '<option value="" disabled selected>Select Thana</option>';
+
+            if (bdData[divSelect] && bdData[divSelect][distSelect]) {
+                let thanas = bdData[divSelect][distSelect];
+                thanas.forEach(thana => {
+                    let opt = document.createElement('option');
+                    opt.value = thana;
+                    opt.innerHTML = thana;
+                    thanaSelect.appendChild(opt);
+                });
+            }
+        }
+
         function saveFullAddress() {
             let name = document.getElementById('fullName').value.trim();
             let phone = document.getElementById('phoneNumber').value.trim();
             let division = document.getElementById('division').value;
-            let district = document.getElementById('district').value.trim();
-            let thana = document.getElementById('thana').value.trim();
+            let district = document.getElementById('district').value;
+            let thana = document.getElementById('thana').value;
             let postCode = document.getElementById('postCode').value.trim();
             let area = document.getElementById('detailedArea').value.trim();
 
@@ -155,7 +278,6 @@
                 return;
             }
 
-            // LocalStorage এ সম্পূর্ণ ডাটা সেভ রাখা
             let fullAddress = { name, phone, division, district, thana, postCode, area };
             localStorage.setItem('userFullAddress', JSON.stringify(fullAddress));
 
