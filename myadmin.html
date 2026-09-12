@@ -17,43 +17,21 @@
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
             --accent-pink: #ec4899;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0; padding: 16px;
-            display: flex; justify-content: center;
-        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
-
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        /* Admin Grid Hub */
         .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
-        
         .admin-card-btn {
             background: linear-gradient(135deg, rgba(19, 28, 46, 0.9) 0%, rgba(30, 27, 75, 0.8) 100%);
-            border: 1px solid var(--card-border);
-            border-radius: 18px; padding: 20px 16px;
-            text-decoration: none; color: var(--text-main);
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            gap: 12px; transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border); border-radius: 18px; padding: 20px 16px;
+            text-decoration: none; color: var(--text-main); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
-        .admin-card-btn:active { transform: scale(0.96); border-color: #c084fc; }
-        
-        .card-icon {
-            width: 45px; height: 45px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
+        .card-icon { width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .card-title { margin: 0; font-size: 13px; font-weight: 700; color: #fff; }
 
-        /* Notification Card Styles */
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
@@ -64,53 +42,35 @@
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin Hub</h3>
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-user"></i> Profile</a>
         </div>
 
-        <!-- Admin Navigation Grid -->
         <div class="admin-grid">
-            <!-- 1. Dress List & Customize -->
             <a href="dresslist.html" class="admin-card-btn">
-                <div class="card-icon" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);">
-                    <i class="fa-solid fa-shirt"></i>
-                </div>
+                <div class="card-icon" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);"><i class="fa-solid fa-shirt"></i></div>
                 <h4 class="card-title">Dress List & Edit</h4>
             </a>
-
-            <!-- 2. Order Management & History -->
             <a href="ordermanage.html" class="admin-card-btn">
-                <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);">
-                    <i class="fa-solid fa-box-archive"></i>
-                </div>
+                <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);"><i class="fa-solid fa-box-archive"></i></div>
                 <h4 class="card-title">Order Management</h4>
             </a>
-
-            <!-- 3. Add New Dress (Full Width) -->
             <a href="dressadd.html" class="admin-card-btn" style="grid-column: span 2;">
-                <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
-                    <i class="fa-solid fa-plus-circle"></i>
-                </div>
+                <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);"><i class="fa-solid fa-plus-circle"></i></div>
                 <h4 class="card-title">Add New Dress</h4>
             </a>
         </div>
 
-        <!-- Admin Broadcast Notification Section -->
+        <!-- Notification with Photo Upload -->
         <div class="admin-card">
             <h4 style="font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-bullhorn" style="color: var(--accent-pink);"></i> Send Broadcast Notification
+                <i class="fa-solid fa-bullhorn" style="color: var(--accent-pink);"></i> Broadcast Notification (With Photo)
             </h4>
-            <div class="form-group">
-                <label>Notification Title</label>
-                <input type="text" id="notifTitle" class="form-control" placeholder="Special Offer / Update!">
-            </div>
-            <div class="form-group">
-                <label>Message Details</label>
-                <textarea id="notifMsg" class="form-control" placeholder="Write message for users..." style="height:60px; resize:none;"></textarea>
-            </div>
-            <button class="submit-btn" onclick="sendBroadcastNotification()">Send Notification to All Users</button>
+            <div class="form-group"><label>Title</label><input type="text" id="notifTitle" class="form-control" placeholder="Special Offer!"></div>
+            <div class="form-group"><label>Message</label><textarea id="notifMsg" class="form-control" placeholder="Write message..." style="height:60px; resize:none;"></textarea></div>
+            <div class="form-group"><label>Upload Banner Image</label><input type="file" id="notifImgFile" class="form-control" accept="image/*" style="color: var(--text-muted);"></div>
+            <button class="submit-btn" onclick="sendBroadcastNotification()">Send Notification with Photo</button>
         </div>
     </div>
 
@@ -121,24 +81,27 @@
         function sendBroadcastNotification() {
             let title = document.getElementById('notifTitle').value.trim();
             let msg = document.getElementById('notifMsg').value.trim();
+            let imgInput = document.getElementById('notifImgFile');
 
-            if(!title || !msg) {
-                tg.showAlert("⚠️ Please enter both title and message!");
-                return;
+            if(!title || !msg) { tg.showAlert("⚠️ Please enter both title and message!"); return; }
+
+            if(imgInput.files.length > 0) {
+                let reader = new FileReader();
+                reader.onloadend = () => saveAndBroadcast(title, msg, reader.result);
+                reader.readAsDataURL(imgInput.files[0]);
+            } else {
+                saveAndBroadcast(title, msg, "");
             }
+        }
 
-            // Save notification to localStorage for users to receive
+        function saveAndBroadcast(title, msg, imgUrl) {
             let notifs = JSON.parse(localStorage.getItem('globalUserNotifications')) || [];
-            notifs.unshift({
-                title: title,
-                message: msg,
-                date: new Date().toLocaleString()
-            });
+            notifs.unshift({ title, message: msg, image: imgUrl, date: new Date().toLocaleString() });
             localStorage.setItem('globalUserNotifications', JSON.stringify(notifs));
-
-            tg.showAlert("🔔 Broadcast notification sent to all users successfully!");
+            tg.showAlert("🔔 Photo Notification broadcasted successfully!");
             document.getElementById('notifTitle').value = '';
             document.getElementById('notifMsg').value = '';
+            document.getElementById('notifImgFile').value = '';
         }
     </script>
 </body>
