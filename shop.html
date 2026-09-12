@@ -140,12 +140,22 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let currentCategory = 'All';
-        let currentFilteredDresses = []; // Global storage for active filtered products
+        let currentFilteredDresses = [];
 
         window.addEventListener('DOMContentLoaded', () => {
+            cleanOldDummyProducts();
             loadDynamicCategories();
             renderProducts();
         });
+
+        function cleanOldDummyProducts() {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let cleanDresses = dresses.filter(d => {
+                let isDummy = (d.id === 'WF-1' || d.name === 'Royal Silk Gown' || (d.image && d.image.includes('unsplash.com')));
+                return !isDummy;
+            });
+            localStorage.setItem('shopDresses', JSON.stringify(cleanDresses));
+        }
 
         function loadDynamicCategories() {
             let container = document.getElementById('categoriesContainer');
@@ -164,7 +174,6 @@
             
             grid.innerHTML = '';
             
-            // Filter by Category and Search query
             currentFilteredDresses = dresses.filter(d => {
                 let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
                 let matchesSearch = d.name.toLowerCase().includes(searchVal);
@@ -188,8 +197,7 @@
                     sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
                 });
 
-                // Image handling: supports multiple images array or single image string
-                let mainImg = dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300';
+                let mainImg = dress.image || '';
                 if (dress.images && dress.images.length > 0) {
                     mainImg = dress.images[0];
                 }
@@ -199,7 +207,7 @@
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
                         <div class="product-img-box" onclick="openZoomModal(${index})">
-                            <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'">
+                            <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
                         </div>
                         <div>
                             <h4 class="product-title">${dress.name}</h4>
@@ -232,7 +240,7 @@
             let dress = currentFilteredDresses[index];
             if (!dress) return;
 
-            let images = dress.images && dress.images.length > 0 ? dress.images : [dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'];
+            let images = dress.images && dress.images.length > 0 ? dress.images : [dress.image];
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
