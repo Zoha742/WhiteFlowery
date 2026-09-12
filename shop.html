@@ -44,7 +44,7 @@
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
-        .product-img-box { width: 100%; height: 130px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box { width: 100%; height: 140px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.1); }
 
@@ -94,10 +94,6 @@
         <!-- Dynamic Category Chips -->
         <div class="categories-scroll" id="categoriesContainer">
             <div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>
-            <div class="cat-chip" onclick="filterCategory('Gowns', this)">Gowns</div>
-            <div class="cat-chip" onclick="filterCategory('Party Wear', this)">Party Wear</div>
-            <div class="cat-chip" onclick="filterCategory('Casual Sets', this)">Casual Sets</div>
-            <div class="cat-chip" onclick="filterCategory('Bridal', this)">Bridal</div>
         </div>
 
         <div class="products-grid" id="shopProductsGrid">
@@ -109,7 +105,7 @@
     <div id="zoomModal" class="modal-overlay">
         <div class="modal-content" style="background:#0b0f19;">
             <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
-            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px; margin-bottom:10px;">
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:320px; object-fit:contain; border-radius:8px; margin-bottom:10px;">
             <div id="zoomThumbnails" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
         </div>
     </div>
@@ -144,10 +140,11 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let currentCategory = 'All';
+        let currentFilteredDresses = []; // Global storage for active filtered products
 
         window.addEventListener('DOMContentLoaded', () => {
             loadDynamicCategories();
-            loadShopProducts();
+            renderProducts();
         });
 
         function loadDynamicCategories() {
@@ -160,29 +157,26 @@
             });
         }
 
-        function loadShopProducts() {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            renderProducts();
-        }
-
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let searchVal = document.getElementById('searchInput').value.toLowerCase();
             
             grid.innerHTML = '';
-            let filtered = dresses.filter(d => {
+            
+            // Filter by Category and Search query
+            currentFilteredDresses = dresses.filter(d => {
                 let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
                 let matchesSearch = d.name.toLowerCase().includes(searchVal);
                 return matchesCat && matchesSearch;
             });
 
-            if (filtered.length === 0) {
+            if (currentFilteredDresses.length === 0) {
                 grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 30px; font-size: 12px;">No dresses found.</div>`;
                 return;
             }
 
-            filtered.forEach((dress, index) => {
+            currentFilteredDresses.forEach((dress, index) => {
                 let sizesObj = dress.sizes || {};
                 let sizeKeys = Object.keys(sizesObj);
                 let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
@@ -194,7 +188,7 @@
                     sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
                 });
 
-                // Safe Image handling (Checks array 'images' or string 'image')
+                // Image handling: supports multiple images array or single image string
                 let mainImg = dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300';
                 if (dress.images && dress.images.length > 0) {
                     mainImg = dress.images[0];
@@ -202,12 +196,9 @@
 
                 let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
-                // Encode dress data safely for zoom modal
-                let dressImagesJson = encodeURIComponent(JSON.stringify(dress.images || [mainImg]));
-
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
-                        <div class="product-img-box" onclick="openZoomModal('${dressImagesJson}')">
+                        <div class="product-img-box" onclick="openZoomModal(${index})">
                             <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'">
                         </div>
                         <div>
@@ -237,8 +228,11 @@
             document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${sizeKey}): ${qty} Pcs`;
         }
 
-        function openZoomModal(encodedImages) {
-            let images = JSON.parse(decodeURIComponent(encodedImages));
+        function openZoomModal(index) {
+            let dress = currentFilteredDresses[index];
+            if (!dress) return;
+
+            let images = dress.images && dress.images.length > 0 ? dress.images : [dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'];
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
