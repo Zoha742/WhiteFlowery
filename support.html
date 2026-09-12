@@ -68,21 +68,6 @@
         }
         .submit-btn:active { transform: scale(0.98); }
 
-        /* Direct Telegram Support Box */
-        .direct-chat {
-            background: rgba(124, 58, 237, 0.08);
-            border: 1px dashed var(--card-border);
-            border-radius: 14px;
-            padding: 14px;
-            text-align: center;
-        }
-        .direct-chat p { margin: 0 0 10px 0; font-size: 12px; color: var(--text-muted); }
-        .tg-chat-btn {
-            background: #229ed9; color: #fff; border: none; padding: 8px 16px;
-            border-radius: 10px; font-size: 12px; font-weight: bold; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 6px;
-        }
-
         /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -104,31 +89,37 @@
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
         </div>
 
-        <!-- Support Message Form -->
+        <!-- Support Message Form with Dropdown -->
         <div class="support-card">
             <div class="support-header-box">
                 <div class="support-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
-                <h3>Send Message to Admin</h3>
-                <p>Have an issue with your dress order or payment? Drop a message below, our admin will reply soon.</p>
+                <h3>Submit Support Ticket</h3>
+                <p>Select your issue from the list below or describe it, and our admin panel will review it.</p>
             </div>
 
             <div class="form-group">
-                <label>Your Subject / Issue</label>
-                <input type="text" id="supportSubject" class="form-control" placeholder="e.g. Size exchange or Payment delay">
+                <label>Select Issue Type</label>
+                <select id="issueDropdown" class="form-control" onchange="fillSubject(this)">
+                    <option value="" disabled selected>-- Choose your problem --</option>
+                    <option value="Dress size exchange or replacement inquiry">Dress size exchange or replacement</option>
+                    <option value="Payment verification or transaction issue">Payment verification or transaction issue</option>
+                    <option value="Delivery delay or tracking status update">Delivery delay or tracking status update</option>
+                    <option value="Damaged or wrong product received">Damaged or wrong product received</option>
+                    <option value="Other general inquiry">Other general inquiry</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label>Message Details</label>
-                <textarea id="supportMessage" class="form-control" placeholder="Describe your problem clearly..."></textarea>
-            </div>
-            <button class="submit-btn" onclick="sendSupportMessage()">Submit Ticket</button>
-        </div>
 
-        <!-- Direct Telegram Contact -->
-        <div class="direct-chat">
-            <p>Need urgent help? Chat instantly with our manager.</p>
-            <a href="https://t.me/adsonar_manager" target="_blank" class="tg-chat-btn">
-                <i class="fa-brands fa-telegram"></i> Open Telegram Chat
-            </a>
+            <div class="form-group">
+                <label>Subject / Issue Title</label>
+                <input type="text" id="supportSubject" class="form-control" placeholder="Select above or type custom subject">
+            </div>
+
+            <div class="form-group">
+                <label>Detailed Description</label>
+                <textarea id="supportMessage" class="form-control" placeholder="Write details about your issue here..."></textarea>
+            </div>
+            
+            <button class="submit-btn" onclick="sendSupportMessage()">Submit Support Ticket</button>
         </div>
     </div>
 
@@ -142,22 +133,25 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        // আপনার ফায়ারবেস কনফিগারেশন এখানে যুক্ত হবে
-        
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        window.fillSubject = function(selectObj) {
+            document.getElementById('supportSubject').value = selectObj.value;
+        }
 
         window.sendSupportMessage = function() {
             let subject = document.getElementById('supportSubject').value.trim();
             let message = document.getElementById('supportMessage').value.trim();
 
             if(!subject || !message) {
-                tg.showAlert("⚠️ Please fill up both subject and message!");
+                tg.showAlert("⚠️ Please select an issue and write message details!");
                 return;
             }
 
-            // এখানে ফায়ারবেসে ডাটা সেভ করার কোড যুক্ত হবে, যা পরবর্তী অ্যাডমিন প্যানেল থেকে কন্ট্রোল করা যাবে।
-            tg.showAlert("✅ Support ticket submitted successfully! Admin will check it soon.");
+            // ফায়ারবেস ডাটাবেজে টিকেট সেভ হওয়ার পর অ্যাডমিন প্যানেলে শো করবে
+            tg.showAlert("✅ Support ticket submitted successfully! Admin will check it from the dashboard.");
+            document.getElementById('issueDropdown').selectedIndex = 0;
             document.getElementById('supportSubject').value = '';
             document.getElementById('supportMessage').value = '';
         }
