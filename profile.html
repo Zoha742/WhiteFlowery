@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Pro Profile</title>
+    <title>WhiteFlowery - Premium Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
+            --bg-color: #080b12;
+            --card-bg: linear-gradient(135deg, rgba(19, 28, 46, 0.8) 0%, rgba(11, 15, 25, 0.9) 100%);
+            --card-border: rgba(124, 58, 237, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-pink: #ec4899;
+            --accent-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
         body {
@@ -24,91 +25,125 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 100px 0;
             display: flex; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 60%);
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
         /* Top Header */
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .back-btn { background: rgba(19, 28, 46, 0.9); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); }
 
-        /* User Profile Card */
-        .profile-card {
-            background: var(--primary-gradient);
-            border-radius: 20px;
-            padding: 20px;
+        /* Premium User Profile Hero Card */
+        .profile-hero {
+            background: linear-gradient(135deg, #131c2e 0%, #1e1b4b 100%);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 24px;
+            padding: 24px 20px;
             text-align: center;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.25);
             position: relative;
+            overflow: hidden;
+        }
+        .profile-hero::before {
+            content: ''; position: absolute; top: -50px; right: -50px; width: 120px; height: 120px;
+            background: rgba(236, 72, 153, 0.15); border-radius: 50%; filter: blur(30px);
         }
         .profile-avatar {
-            width: 70px; height: 70px;
-            background: rgba(255, 255, 255, 0.2);
+            width: 75px; height: 75px;
+            background: var(--accent-gradient);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 30px; color: #fff;
-            margin: 0 auto 10px auto;
-            border: 2px solid rgba(255, 255, 255, 0.4);
+            font-size: 32px; color: #fff;
+            margin: 0 auto 12px auto;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
         }
-        .profile-name { margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color: #fff; }
-        .profile-username { margin: 0 0 14px 0; font-size: 12px; color: #f3e8ff; opacity: 0.85; }
+        .profile-name { margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #fff; }
+        .profile-username { margin: 0 0 16px 0; font-size: 12px; color: #d8b4fe; opacity: 0.9; }
         
-        .wallet-stats {
-            display: flex;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 14px;
-            padding: 10px;
-            justify-content: space-around;
-            backdrop-filter: blur(5px);
+        /* Stats Grid Cards */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            background: rgba(8, 11, 18, 0.4); border-radius: 16px; padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
         }
-        .stat-item h4 { margin: 0 0 2px 0; font-size: 11px; color: #d8b4fe; font-weight: 600; }
-        .stat-item p { margin: 0; font-size: 14px; font-weight: bold; color: #fbbf24; }
+        .stat-box h4 { margin: 0 0 4px 0; font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .stat-box p { margin: 0; font-size: 15px; font-weight: bold; color: #fbbf24; }
 
-        /* Menu Section Groups */
-        .menu-section {
+        /* Section Title */
+        .section-header { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 4px; display: flex; align-items: center; gap: 6px; }
+
+        /* Premium Admin Banner Card */
+        .admin-banner-card {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            border-radius: 18px; padding: 16px; margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.1);
+        }
+        .admin-banner-card:active { transform: scale(0.98); }
+        .admin-info { display: flex; align-items: center; gap: 14px; }
+        .admin-icon-box {
+            width: 44px; height: 44px; background: var(--accent-gradient);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #fff; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+        }
+        .admin-text h4 { margin: 0 0 2px 0; font-size: 14px; font-weight: 700; color: #fff; }
+        .admin-text p { margin: 0; font-size: 11px; color: #fbcfe8; }
+
+        /* Dashboard Cards Grid */
+        .dashboard-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;
+        }
+        .dash-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 18px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-        .section-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 0 0 8px 4px;
-        }
-        .menu-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 13px 16px;
-            border-bottom: 1px solid var(--card-border);
+            border-radius: 18px; padding: 16px;
             text-decoration: none; color: var(--text-main);
-            transition: background 0.2s;
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 90px; transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
         }
-        .menu-item:last-child { border-bottom: none; }
-        .menu-item:hover { background: rgba(124, 58, 237, 0.08); }
-        
-        .menu-left { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; }
-        .menu-left i {
-            width: 32px; height: 32px;
-            background: rgba(124, 58, 237, 0.15);
-            color: #c084fc;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px;
+        .dash-card:hover, .dash-card:active {
+            border-color: #c084fc; transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.2);
         }
-        .menu-right { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .dash-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .dash-icon {
+            width: 38px; height: 38px; background: rgba(124, 58, 237, 0.15);
+            color: #c084fc; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .dash-badge { font-size: 10px; background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 3px 8px; border-radius: 8px; font-weight: bold; }
+        .dash-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #fff; }
+
+        /* Single Wide Card */
+        .wide-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 18px; padding: 14px 16px; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            text-decoration: none; color: var(--text-main); backdrop-filter: blur(10px);
+            transition: 0.2s;
+        }
+        .wide-card:active { transform: scale(0.98); }
+        .wide-left { display: flex; align-items: center; gap: 14px; }
+        .wide-icon {
+            width: 38px; height: 38px; background: rgba(124, 58, 237, 0.15); color: #c084fc;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 15px;
+        }
+        .wide-info h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .wide-info p { margin: 0; font-size: 11px; color: var(--text-muted); }
 
         /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: var(--card-bg);
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
         }
         .nav-item {
             text-align: center; color: var(--text-muted);
@@ -123,74 +158,100 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-user-gear"></i> Pro Profile</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-crown"></i> WhiteFlowery Pro</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> Home</a>
         </div>
 
-        <!-- Profile Card -->
-        <div class="profile-card">
-            <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+        <!-- Premium Profile Hero Card -->
+        <div class="profile-hero">
+            <div class="profile-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
             <p class="profile-username" id="userUsernameDisplay">@username</p>
             
-            <div class="wallet-stats">
-                <div class="stat-item">
+            <div class="stats-grid">
+                <div class="stat-box">
                     <h4>Orders</h4>
-                    <p id="totalOrdersCount">3</p>
+                    <p>3 Active</p>
                 </div>
-                <div class="stat-item">
+                <div class="stat-box">
                     <h4>Rewards</h4>
                     <p>250 FLW</p>
                 </div>
-                <div class="stat-item">
-                    <h4>VIP Level</h4>
-                    <p style="color: #34d399;">Gold Tier</p>
+                <div class="stat-box">
+                    <h4>Tier</h4>
+                    <p style="color: #34d399;">Gold VIP</p>
                 </div>
             </div>
         </div>
 
-        <!-- Section: Shopping & Orders -->
-        <div class="section-label">Shopping Activity</div>
-        <div class="menu-section">
-            <a href="orders.html" class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-box-archive"></i> My Orders</div>
-                <div class="menu-right"><span>View All</span><i class="fa-solid fa-chevron-right"></i></div>
+        <!-- Admin Control Panel Banner (Free Access) -->
+        <a href="myadmin.html" class="admin-banner-card">
+            <div class="admin-info">
+                <div class="admin-icon-box"><i class="fa-solid fa-user-shield"></i></div>
+                <div class="admin-text">
+                    <h4>Admin Control Panel</h4>
+                    <p>Manage products, stock & support tickets</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #fbcfe8; font-size: 14px;"></i>
+        </a>
+
+        <!-- Dashboard Grid Cards -->
+        <div class="section-header"><i class="fa-solid fa-bag-shopping"></i> Quick Shopping Hub</div>
+        <div class="dashboard-grid">
+            <a href="orders.html" class="dash-card">
+                <div class="dash-card-top">
+                    <div class="dash-icon"><i class="fa-solid fa-box-archive"></i></div>
+                    <span class="dash-badge">History</span>
+                </div>
+                <h4 class="dash-title">My Orders</h4>
             </a>
-            <a href="wishlist.html" class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-heart"></i> Wishlist</div>
-                <div class="menu-right"><span>5 Items</span><i class="fa-solid fa-chevron-right"></i></div>
+            <a href="wishlist.html" class="dash-card">
+                <div class="dash-card-top">
+                    <div class="dash-icon" style="color: #ec4899;"><i class="fa-solid fa-heart"></i></div>
+                    <span class="dash-badge" style="color: #ec4899; background: rgba(236,72,153,0.15);">5 Saved</span>
+                </div>
+                <h4 class="dash-title">Wishlist</h4>
             </a>
-            <a href="address.html" class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-location-dot"></i> Delivery Address</div>
-                <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+            <a href="address.html" class="dash-card">
+                <div class="dash-card-top">
+                    <div class="dash-icon" style="color: #34d399;"><i class="fa-solid fa-location-dot"></i></div>
+                </div>
+                <h4 class="dash-title">Delivery Address</h4>
+            </a>
+            <a href="support.html" class="dash-card">
+                <div class="dash-card-top">
+                    <div class="dash-icon" style="color: #38bdf8;"><i class="fa-solid fa-headset"></i></div>
+                    <span class="dash-badge" style="color: #38bdf8; background: rgba(56,189,248,0.15);">24/7</span>
+                </div>
+                <h4 class="dash-title">Support</h4>
             </a>
         </div>
 
-        <!-- Section: Wallet & Settings -->
-        <div class="section-label">Account & Preferences</div>
-        <div class="menu-section">
-            <a href="#" class="menu-item" onclick="tg.showAlert('Payment methods integration active.')">
-                <div class="menu-left"><i class="fa-solid fa-wallet"></i> Payment Methods</div>
-                <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
-            </a>
-            <a href="#" class="menu-item" onclick="tg.showAlert('Referral program coming soon!')">
-                <div class="menu-left"><i class="fa-solid fa-share-nodes"></i> Invite Friends</div>
-                <div class="menu-right"><span style="color: #fbbf24;">Earn 50 FLW</span><i class="fa-solid fa-chevron-right"></i></div>
-            </a>
-        </div>
+        <!-- Account Settings & Extras -->
+        <div class="section-header"><i class="fa-solid fa-sliders"></i> Preferences & System</div>
+        
+        <a href="#" class="wide-card" onclick="tg.showAlert('Payment gateway (BKash/Nagad/Cards) ready.')">
+            <div class="wide-left">
+                <div class="wide-icon"><i class="fa-solid fa-wallet"></i></div>
+                <div class="wide-info">
+                    <h4>Payment Methods</h4>
+                    <p>Manage secure checkout options</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
+        </a>
 
-        <!-- Section: Support & Info -->
-        <div class="section-label">Support & System</div>
-        <div class="menu-section">
-            <a href="support.html" class="menu-item">
-                <div class="menu-left"><i class="fa-solid fa-headset"></i> Customer Support</div>
-                <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
-            </a>
-            <a href="#" class="menu-item" onclick="tg.showAlert('WhiteFlowery Version 1.0.0 (Pro)')">
-                <div class="menu-left"><i class="fa-solid fa-circle-info"></i> About App</div>
-                <div class="menu-right"><span>v1.0.0</span></div>
-            </a>
-        </div>
+        <a href="#" class="wide-card" onclick="tg.showAlert('WhiteFlowery App v1.0.0 Pro Edition')">
+            <div class="wide-left">
+                <div class="wide-icon" style="color: #fbbf24;"><i class="fa-solid fa-circle-info"></i></div>
+                <div class="wide-info">
+                    <h4>About Application</h4>
+                    <p>Version 1.0.0 (Pro Edition)</p>
+                </div>
+            </div>
+            <span style="font-size: 11px; color: #fbbf24; font-weight: bold;">v1.0.0</span>
+        </a>
     </div>
 
     <!-- Bottom Navigation Bar -->
