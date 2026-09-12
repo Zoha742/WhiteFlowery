@@ -9,7 +9,7 @@
     
     <style>
         :root {
-            --bg-color: #0b0f19;
+            --bg-color: #080b12;
             --card-bg: #131c2e;
             --card-border: #2a1b4e;
             --text-main: #f8fafc;
@@ -22,209 +22,81 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            padding: 0 0 90px 0;
-            display: flex;
-            justify-content: center;
-            overflow-x: hidden;
+            margin: 0; padding: 0 0 90px 0;
+            display: flex; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 60%);
         }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            padding: 16px;
-            box-sizing: border-box;
-        }
-
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .brand-title {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #c084fc, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* Header */
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .brand-title { margin: 0; font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .icon-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            font-size: 14px;
+            background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main);
+            width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; font-size: 15px; transition: 0.2s;
         }
+        .icon-btn:active { transform: scale(0.92); }
 
-        .search-box {
-            position: relative;
-            margin-bottom: 16px;
-        }
-        .search-input {
-            width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 12px 16px 12px 42px;
-            border-radius: 14px;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-            box-sizing: border-box;
-        }
-        .search-input:focus { border-color: #7c3aed; }
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
+        /* Promo Banner */
         .promo-banner {
             background: var(--primary-gradient);
-            border-radius: 18px;
-            padding: 20px;
-            color: #fff;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+            border-radius: 20px; padding: 20px; color: #fff; margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4); position: relative; overflow: hidden;
         }
         .promo-banner h2 { margin: 0 0 6px 0; font-size: 18px; font-weight: 800; }
-        .promo-banner p { margin: 0 0 12px 0; font-size: 12px; opacity: 0.9; }
+        .promo-banner p { margin: 0 0 14px 0; font-size: 12px; opacity: 0.9; }
         .shop-now-btn {
-            background: #fff;
-            color: #4c1d95;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
+            background: #fff; color: #4c1d95; border: none; padding: 8px 18px;
+            border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer;
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+        /* 4 Action Buttons Grid */
+        .action-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px;
         }
-        .section-title { font-size: 15px; font-weight: 700; color: #fff; }
+        .action-item {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 12px 6px; text-align: center; text-decoration: none;
+            color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .action-item:active { transform: scale(0.95); border-color: #c084fc; }
+        .action-icon {
+            width: 42px; height: 42px; background: rgba(124, 58, 237, 0.15); color: #c084fc;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px;
+        }
+        .action-item span { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+
+        /* Section Header */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .section-title { font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
         .see-all { font-size: 12px; color: #c084fc; text-decoration: none; font-weight: 600; cursor: pointer; }
 
-        .categories-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 6px;
-            margin-bottom: 20px;
-            scrollbar-width: none;
-        }
-        .categories-scroll::-webkit-scrollbar { display: none; }
-        
-        .cat-item {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 10px 16px;
-            border-radius: 14px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-muted);
-        }
-        .cat-item.active, .cat-item:hover {
-            background: #7c3aed;
-            color: #fff;
-            border-color: #7c3aed;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
+        /* New Dresses Grid */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .product-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
+            text-decoration: none; color: var(--text-main); cursor: pointer; transition: 0.2s;
         }
+        .product-card:active { transform: scale(0.97); border-color: #c084fc; }
         .product-img-box {
-            width: 100%;
-            height: 120px;
-            background: #0b0f19;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin-bottom: 10px;
-            color: #ec4899;
+            width: 100%; height: 130px; background: #0b0f19; border-radius: 12px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
         }
-        .product-title {
-            margin: 0 0 4px 0;
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .product-price {
-            margin: 0 0 10px 0;
-            font-size: 13px;
-            font-weight: bold;
-            color: #fbbf24;
-        }
-        .add-to-cart-btn {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            color: #fff;
-            border: none;
-            padding: 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-        }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { margin: 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
 
+        /* Bottom Navigation Bar */
         .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 50%;
-            transform: translateX(-50%);
-            width: 100%; max-width: 480px;
-            background: var(--card-bg);
-            border-top: 1px solid var(--card-border);
-            display: flex; justify-content: space-around;
-            padding: 10px 0 14px 0;
-            box-sizing: border-box;
-            z-index: 9999;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
         }
-        .nav-item {
-            text-align: center; color: var(--text-muted);
-            text-decoration: none; font-size: 11px; font-weight: 600;
-            flex: 1; transition: 0.2s;
-        }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; transition: 0.2s; }
         .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
@@ -232,75 +104,99 @@
 <body>
 
     <div class="container">
+        <!-- Header with Notification Bell -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-spa"></i> WhiteFlowery</h3>
-            <div class="icon-btn" onclick="location.href='profile.html'"><i class="fa-regular fa-bell"></i></div>
+            <a href="notification.html" class="icon-btn"><i class="fa-regular fa-bell"></i></a>
         </div>
 
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search floral items, bouquets...">
-        </div>
-
+        <!-- Promo Banner -->
         <div class="promo-banner">
-            <h2>🌸 Special Spring Offer</h2>
-            <p>Get up to 30% off on all fresh white floral arrangements.</p>
-            <button class="shop-now-btn" onclick="location.href='shop.html'">Explore Now</button>
+            <h2>🌸 New Arrival Collection</h2>
+            <p>Explore exclusive luxury white dresses with premium quality fabric.</p>
+            <button class="shop-now-btn" onclick="location.href='shop.html'">Shop Now</button>
         </div>
 
+        <!-- 4 Action Buttons -->
+        <div class="action-grid">
+            <a href="shop.html" class="action-item">
+                <div class="action-icon"><i class="fa-solid fa-store"></i></div>
+                <span>Shop</span>
+            </a>
+            <a href="orders.html" class="action-item">
+                <div class="action-icon" style="color: #38bdf8;"><i class="fa-solid fa-box-archive"></i></div>
+                <span>Orders</span>
+            </a>
+            <a href="wishlist.html" class="action-item">
+                <div class="action-icon" style="color: #ec4899;"><i class="fa-solid fa-heart"></i></div>
+                <span>Wishlist</span>
+            </a>
+            <a href="support.html" class="action-item">
+                <div class="action-icon" style="color: #34d399;"><i class="fa-solid fa-headset"></i></div>
+                <span>Support</span>
+            </a>
+        </div>
+
+        <!-- New Dresses Section (Clicking takes to shop) -->
         <div class="section-header">
-            <span class="section-title">Categories</span>
+            <span class="section-title"><i class="fa-solid fa-fire" style="color: #fbbf24;"></i> New Dresses</span>
             <span class="see-all" onclick="location.href='shop.html'">See All</span>
         </div>
-        <div class="categories-scroll">
-            <div class="cat-item active" onclick="location.href='shop.html'"><i class="fa-solid fa-seedling"></i> All</div>
-            <div class="cat-item" onclick="location.href='shop.html'"><i class="fa-solid fa-bouquet"></i> Bouquets</div>
-            <div class="cat-item" onclick="location.href='shop.html'"><i class="fa-solid fa-gift"></i> Gift Boxes</div>
-            <div class="cat-item" onclick="location.href='shop.html'"><i class="fa-solid fa-leaf"></i> Indoor Plants</div>
-        </div>
 
-        <div class="section-header">
-            <span class="section-title">Featured Items</span>
-            <span class="see-all" onclick="location.href='shop.html'">More</span>
-        </div>
         <div class="products-grid">
-            <div class="product-card">
+            <a href="shop.html" class="product-card">
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-bouquet"></i></div>
-                    <h4 class="product-title">White Rose Bouquet</h4>
-                    <p class="product-price">$25.00</p>
+                    <div class="product-img-box">
+                        <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress1.jpg" alt="Royal Silk Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Gown'">
+                    </div>
+                    <h4 class="product-title">Royal Silk Gown</h4>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('White Rose Bouquet', 25)">Add to Cart</button>
-            </div>
-            <div class="product-card">
+                <p class="product-price">৳ 8,500</p>
+            </a>
+
+            <a href="shop.html" class="product-card">
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-seedling"></i></div>
-                    <h4 class="product-title">Orchid Elegance</h4>
-                    <p class="product-price">$40.00</p>
+                    <div class="product-img-box">
+                        <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress2.jpg" alt="White Floral Maxi" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Maxi'">
+                    </div>
+                    <h4 class="product-title">White Floral Maxi</h4>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Orchid Elegance', 40)">Add to Cart</button>
-            </div>
+                <p class="product-price">৳ 3,500</p>
+            </a>
+
+            <a href="shop.html" class="product-card">
+                <div>
+                    <div class="product-img-box">
+                        <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress3.jpg" alt="Designer Party Frock" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Frock'">
+                    </div>
+                    <h4 class="product-title">Designer Party Frock</h4>
+                </div>
+                <p class="product-price">৳ 6,200</p>
+            </a>
+
+            <a href="shop.html" class="product-card">
+                <div>
+                    <div class="product-img-box">
+                        <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress4.jpg" alt="Chiffon Ethnic Set" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Set'">
+                    </div>
+                    <h4 class="product-title">Chiffon Ethnic Set</h4>
+                </div>
+                <p class="product-price">৳ 4,800</p>
+            </a>
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item active" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
-    <!-- Firebase SDK (আপনার ফায়ারবেস কনফিগার কোড এখানে বসাবেন) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        // const firebaseConfig = { ... };
-        // initializeApp(firebaseConfig);
-
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-
-        window.addToCart = function(itemName, price) {
-            tg.showAlert(`✅ Added "${itemName}" to cart! ($${price})`);
-        }
     </script>
 </body>
 </html>
