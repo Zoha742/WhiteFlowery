@@ -145,7 +145,6 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Data for Districts and Thanas based on Divisions
         const bdData = {
             "Dhaka": {
                 "Dhaka": ["Gulshan", "Banani", "Dhanmondi", "Mirpur", "Uttara", "Motijheel", "Tejgaon", "Savar", "Keraniganj", "Nawabganj", "Dohar"],
@@ -153,7 +152,7 @@
                 "Narayanganj": ["Narayanganj Sadar", "Bandar", "Rupganj", "Sonargaon", "Araihazar"],
                 "Tangail": ["Tangail Sadar", "Basail", "Bhuapur", "Delduar", "Ghatail", "Gopalpur", "Madhupur", "Mirzapur", "Nagarpur", "Sakhipur"],
                 "Faridpur": ["Faridpur Sadar", "Boalmari", "Bhanga", "Madhukhali", "Nagarkanda", "Sadarpur", "Alfadanga"],
-                "Kishoreganj": ["Kishoreganj Sadar", "Hossainpur", "Itna", "Karimganj", "Katiadi", "Kuliarchar", "Mithamain", "Nikli", "Pakundia", "Itna"],
+                "Kishoreganj": ["Kishoreganj Sadar", "Hossainpur", "Itna", "Karimganj", "Katiadi", "Kuliarchar", "Mithamain", "Nikli", "Pakundia"],
                 "Manikganj": ["Manikganj Sadar", "Singair", "Shibalaya", "Saturia", "Harirampur", "Ghior", "Daulatpur"],
                 "Munshiganj": ["Munshiganj Sadar", "Sreenagar", "Sirajdikhan", "Lohajang", "Gajaria", "Tongibari"],
                 "Narsingdi": ["Narsingdi Sadar", "Belabo", "Monohardi", "Palash", "Raipura", "Shibpur"],
@@ -166,7 +165,6 @@
                 "Chittagong": ["Kotwali", "Pahartali", "Double Mooring", "Bayazid", "Chandgaon", "Patiya", "Banshkhali", "Boalkhali", "Anwara", "Rangunia", "Raozan", "Sitakunda", "Mirsharai", "Sandwip", "Satkania", "Lohagara", "Fatikchhari"],
                 "Cox's Bazar": ["Cox's Bazar Sadar", "Chakaria", "Kutubdia", "Ukhiya", "Moheshkhali", "Pekua", "Teknaf", "Ramu"],
                 "Comilla": ["Comilla Sadar", "Barura", "Brahmanpara", "Burichong", "Chandina", "Chauddagram", "Daudkandi", "Hajiganj", "Homna", "Laksam", "Muradnagar", "Nangalkot"],
-                "Sylhet": [], // Separate div
                 "Noakhali": ["Noakhali Sadar", "Begumganj", "Chatkhil", "Companyganj", "Hatia", "Senbagh", "Subarnachar", "Kabirhat"],
                 "Feni": ["Feni Sadar", "Chhagalnaiya", "Daganbhuiyan", "Parshuram", "Sonagazi", "Fulgazi"],
                 "Brahmanbaria": ["Brahmanbaria Sadar", "Ashuganj", "Nasirnagar", "Nabinagar", "Bancharampur", "Kasba", "Akhaura", "Sarail"],
@@ -192,7 +190,7 @@
                 "Magura": ["Magura Sadar", "Mohammadpur", "Shalikha", "Sreepur"],
                 "Narail": ["Narail Sadar", "Kalia", "Lohagara"],
                 "Bagerhat": ["Bagerhat Sadar", "Chitalmari", "Fakirhat", "Kachua", "Mollahat", "Mongla", "Morrelganj", "Rampal", "Sarankhola"],
-                "Chuadanga": ["Chuadanga Sadar", "Alamdanga", "Damurhuda", " জীবননগর"],
+                "Chuadanga": ["Chuadanga Sadar", "Alamdanga", "Damurhuda", "Jibannagar"],
                 "Meherpur": ["Meherpur Sadar", "Gangni", "Mujibnagar"]
             },
             "Barisal": {
@@ -207,7 +205,7 @@
                 "Sylhet": ["Sylhet Sadar", "Beanibazar", "Bishwanath", "Companiganj", "Fenchuganj", "Golapganj", "Gowainghat", "Jaintiapur", "Kanaighat", "Zakiganj", "South Surma"],
                 "Moulvibazar": ["Moulvibazar Sadar", "Barlekha", "Juri", "Kulaura", "Rajnagar", "Sreemangal", "Kamalganj"],
                 "Habiganj": ["Habiganj Sadar", "Ajmiriganj", "Bahubal", "Baniachong", "Chunarughat", "Lakhai", "Madhabpur", "Nabiganj", "Shayestaganj"],
-                "Sunamganj": ["Sunamganj Sadar", "Bishwambharpur", "Chhatak", "Derai", "Dharamapasha", "Dowarabazar", "Jagannathpur", "Jamalganj", "Sullah", "Tahirpur", "Madhyanagar"]
+                "Sunamganj": ["Sunamganj Sadar", "Bishwambharpur", "Chhatak", "Derai", "Dharamapasha", "Dowarabazar", "Jagannathpur", "Jamalganj", "Sullah", "Tahirpur"]
             },
             "Rangpur": {
                 "Rangpur": ["Rangpur Sadar", "Badarganj", "Gangachara", "Kaunia", "Mithapukur", "Pirgachha", "Pirganj", "Taraganj"],
@@ -220,12 +218,36 @@
                 "Thakurgaon": ["Thakurgaon Sadar", "Baliadangi", "Haripur", "Ranisankail", "Pirganj"]
             },
             "Mymensingh": {
-                "Mymensingh": ["Mymensingh Sadar", "Bhaluka", "Dhobaura", "Fulbaria", "Gaffargaon", "Gauripur", "Haluaghat", "Ishwarganj", "Nandail", "Phulpur", "Trishal", "Karakhali"],
+                "Mymensingh": ["Mymensingh Sadar", "Bhaluka", "Dhobaura", "Fulbaria", "Gaffargaon", "Gauripur", "Haluaghat", "Ishwarganj", "Nandail", "Phulpur", "Trishal"],
                 "Jamalpur": ["Jamalpur Sadar", "Baksiganj", "Dewanganj", "Islampur", "Madarganj", "Melandaha", "Sarishabari"],
                 "Netrokona": ["Netrokona Sadar", "Atpara", "Barhatta", "Durgapur", "Kalmakanda", "Kendua", "Madan", "Mohanganj", "Purbadhala", "Khaliajuri"],
                 "Sherpur": ["Sherpur Sadar", "Jhenaigati", "Nakla", "Nalitabari", "Sreebardi"]
             }
         };
+
+        // Page load er somoy agar save kora thakle auto-fill korbe
+        window.addEventListener('DOMContentLoaded', () => {
+            let saved = localStorage.getItem('userFullAddress');
+            if(saved) {
+                let data = JSON.parse(saved);
+                document.getElementById('fullName').value = data.name || '';
+                document.getElementById('phoneNumber').value = data.phone || '';
+                
+                let divEl = document.getElementById('division');
+                divEl.value = data.division || '';
+                loadDistricts();
+
+                let distEl = document.getElementById('district');
+                distEl.value = data.district || '';
+                loadThanas();
+
+                let thanaEl = document.getElementById('thana');
+                thanaEl.value = data.thana || '';
+
+                document.getElementById('postCode').value = data.postCode || '';
+                document.getElementById('detailedArea').value = data.area || '';
+            }
+        });
 
         function loadDistricts() {
             let divSelect = document.getElementById('division').value;
@@ -281,7 +303,7 @@
             let fullAddress = { name, phone, division, district, thana, postCode, area };
             localStorage.setItem('userFullAddress', JSON.stringify(fullAddress));
 
-            tg.showAlert("✅ Address saved successfully! Redirecting to cart...", function() {
+            tg.showAlert("✅ Address saved successfully!", function() {
                 window.location.href = "cart.html";
             });
         }
