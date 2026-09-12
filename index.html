@@ -36,7 +36,6 @@
             box-sizing: border-box;
         }
 
-        /* Top Header */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -54,10 +53,6 @@
             align-items: center;
             gap: 8px;
         }
-        .header-icons {
-            display: flex;
-            gap: 12px;
-        }
         .icon-btn {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -72,19 +67,7 @@
             position: relative;
             font-size: 14px;
         }
-        .badge {
-            position: absolute;
-            top: -3px;
-            right: -3px;
-            background: var(--accent-pink);
-            color: white;
-            font-size: 9px;
-            padding: 2px 5px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
 
-        /* Search Bar */
         .search-box {
             position: relative;
             margin-bottom: 16px;
@@ -110,7 +93,6 @@
             font-size: 14px;
         }
 
-        /* Promo Banner */
         .promo-banner {
             background: var(--primary-gradient);
             border-radius: 18px;
@@ -118,8 +100,6 @@
             color: #fff;
             margin-bottom: 20px;
             box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
-            position: relative;
-            overflow: hidden;
         }
         .promo-banner h2 { margin: 0 0 6px 0; font-size: 18px; font-weight: 800; }
         .promo-banner p { margin: 0 0 12px 0; font-size: 12px; opacity: 0.9; }
@@ -132,11 +112,8 @@
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .shop-now-btn:active { transform: scale(0.95); }
 
-        /* Categories */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -169,7 +146,6 @@
             align-items: center;
             gap: 6px;
             color: var(--text-muted);
-            transition: 0.2s;
         }
         .cat-item.active, .cat-item:hover {
             background: #7c3aed;
@@ -177,7 +153,6 @@
             border-color: #7c3aed;
         }
 
-        /* Products Grid */
         .products-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -192,7 +167,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            position: relative;
         }
         .product-img-box {
             width: 100%;
@@ -231,91 +205,65 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: 0.2s;
         }
-        .add-to-cart-btn:active { transform: scale(0.96); }
 
-        /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 50%;
+            bottom: 0; left: 50%;
             transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
+            width: 100%; max-width: 480px;
             background: var(--card-bg);
             border-top: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-around;
+            display: flex; justify-content: space-around;
             padding: 10px 0 14px 0;
             box-sizing: border-box;
             z-index: 9999;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
         }
         .nav-item {
-            text-align: center;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            flex: 1;
-            transition: color 0.2s, transform 0.2s;
+            text-align: center; color: var(--text-muted);
+            text-decoration: none; font-size: 11px; font-weight: 600;
+            flex: 1; transition: 0.2s;
         }
-        .nav-item.active {
-            color: #c084fc;
-            transform: translateY(-2px);
-        }
-        .nav-item i {
-            font-size: 20px;
-            display: block;
-            margin-bottom: 4px;
-        }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-spa"></i> WhiteFlowery</h3>
-            <div class="header-icons">
-                <div class="icon-btn" onclick="alert('Notifications')"><i class="fa-regular fa-bell"></i></div>
-            </div>
+            <div class="icon-btn" onclick="location.href='profile.html'"><i class="fa-regular fa-bell"></i></div>
         </div>
 
-        <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" class="search-input" placeholder="Search floral items, bouquets...">
         </div>
 
-        <!-- Promo Banner -->
         <div class="promo-banner">
             <h2>🌸 Special Spring Offer</h2>
             <p>Get up to 30% off on all fresh white floral arrangements.</p>
-            <button class="shop-now-btn" onclick="alert('Explore collections!')">Explore Now</button>
+            <button class="shop-now-btn" onclick="location.href='shop.html'">Explore Now</button>
         </div>
 
-        <!-- Categories -->
         <div class="section-header">
             <span class="section-title">Categories</span>
-            <span class="see-all">See All</span>
+            <span class="see-all" onclick="location.href='shop.html'">See All</span>
         </div>
         <div class="categories-scroll">
-            <div class="cat-item active"><i class="fa-solid fa-seedling"></i> All</div>
-            <div class="cat-item"><i class="fa-solid fa-bouquet"></i> Bouquets</div>
-            <div class="cat-item"><i class="fa-solid fa-gift"></i> Gift Boxes</div>
-            <div class="cat-item"><i class="fa-solid fa-leaf"></i> Indoor Plants</div>
+            <div class="cat-item active" onclick="location.href='shop.html'"><i class="fa-solid fa-seedling"></i> All</div>
+            <div class="cat-item" onclick="location.href='shop.html'"><i class="fa-solid fa-bouquet"></i> Bouquets</div>
+            <div class="cat-item" onclick="location.href='shop.html'"><i class="fa-solid fa-gift"></i> Gift Boxes</div>
+            <div class="cat-item" onclick="location.href='shop.html'"><i class="fa-solid fa-leaf"></i> Indoor Plants</div>
         </div>
 
-        <!-- Products Grid -->
         <div class="section-header">
             <span class="section-title">Featured Items</span>
-            <span class="see-all">More</span>
+            <span class="see-all" onclick="location.href='shop.html'">More</span>
         </div>
-        <div class="products-grid" id="productGrid">
-            <!-- Product 1 -->
+        <div class="products-grid">
             <div class="product-card">
                 <div>
                     <div class="product-img-box"><i class="fa-solid fa-bouquet"></i></div>
@@ -324,8 +272,6 @@
                 </div>
                 <button class="add-to-cart-btn" onclick="addToCart('White Rose Bouquet', 25)">Add to Cart</button>
             </div>
-
-            <!-- Product 2 -->
             <div class="product-card">
                 <div>
                     <div class="product-img-box"><i class="fa-solid fa-seedling"></i></div>
@@ -334,42 +280,25 @@
                 </div>
                 <button class="add-to-cart-btn" onclick="addToCart('Orchid Elegance', 40)">Add to Cart</button>
             </div>
-
-            <!-- Product 3 -->
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-gift"></i></div>
-                    <h4 class="product-title">Floral Gift Box</h4>
-                    <p class="product-price">$35.00</p>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Floral Gift Box', 35)">Add to Cart</button>
-            </div>
-
-            <!-- Product 4 -->
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-spa"></i></div>
-                    <h4 class="product-title">Pure Jasmine Set</h4>
-                    <p class="product-price">$20.00</p>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Pure Jasmine Set', 20)">Add to Cart</button>
-            </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item active" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
-    <script>
+    <!-- Firebase SDK (আপনার ফায়ারবেস কনফিগার কোড এখানে বসাবেন) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        // const firebaseConfig = { ... };
+        // initializeApp(firebaseConfig);
+
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function addToCart(itemName, price) {
+        window.addToCart = function(itemName, price) {
             tg.showAlert(`✅ Added "${itemName}" to cart! ($${price})`);
         }
     </script>
