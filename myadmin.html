@@ -32,7 +32,7 @@
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        /* Full Navigation Tabs (All 4 options kept) */
+        /* 4 Navigation Tabs */
         .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
         .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 8px 2px; border-radius: 8px; font-size: 9px; font-weight: 700; cursor: pointer; text-align: center; }
         .tab-btn.active { background: var(--primary-gradient); color: #fff; border-color: transparent; }
@@ -80,7 +80,7 @@
             <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID (e.g. 884920)..." onkeyup="filterOrdersByUserId()">
         </div>
 
-        <!-- 4 Navigation Tabs (All Options Restored & Updated) -->
+        <!-- 4 Navigation Tabs -->
         <div class="admin-tabs">
             <div class="tab-btn active" onclick="switchTable('table1')"><i class="fa-solid fa-shirt"></i> Dress List</div>
             <div class="tab-btn" onclick="switchTable('table2')"><i class="fa-solid fa-box"></i> Orders</div>
@@ -133,9 +133,9 @@
                                 <b>Customer:</b> Zoha (017xxxxxxxx)
                             </div>
                             <div class="action-row">
-                                <!-- Pass actual payment screenshot image link or base64 here -->
-                                <button class="btn-sm btn-screenshot" onclick="viewPaymentScreenshot('https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp')"><i class="fa-solid fa-receipt"></i> View Payment Slip</button>
-                                <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept</button>
+                                <!-- View Payment Slip / Screenshot Button -->
+                                <button class="btn-sm btn-screenshot" onclick="viewPaymentScreenshot('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')"><i class="fa-solid fa-receipt"></i> View Payment Slip</button>
+                                <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept & Make Invoice</button>
                                 <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
                             </div>
                         </div>
@@ -196,11 +196,11 @@
         </div>
     </div>
 
-    <!-- MODAL: View Actual Payment Screenshot -->
+    <!-- MODAL: View Payment Screenshot -->
     <div id="screenshotModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
             <span style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;" onclick="closeModal('screenshotModal')">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;">User Payment Slip / Screenshot</h4>
+            <h4 style="color:#fff; margin-bottom:10px;">Payment Slip / Screenshot</h4>
             <img id="modalReceiptImg" src="" alt="Payment Receipt" style="width:100%; max-height:350px; object-fit:contain; border-radius:10px; border:1px solid var(--card-border);">
             <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">Verified transaction receipt uploaded by user.</p>
         </div>
@@ -251,34 +251,41 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // View Actual Payment Screenshot Modal (Separated from product images)
+        // View Payment Screenshot Slip Modal
         window.viewPaymentScreenshot = function(imgUrl) {
             document.getElementById('modalReceiptImg').src = imgUrl;
             document.getElementById('screenshotModal').style.display = 'flex';
         }
 
-        // Move order to Accepted or Rejected History & Generate Invoice if accepted
+        // Move order to Accepted/Rejected history, Auto Generate Invoice & Update Profile Badge
         window.moveOrder = function(btn, type, orderId, userId, itemName, amount) {
             let itemCard = btn.closest('.list-item');
-            itemCard.querySelector('.action-row').remove(); // Remove action buttons
+            itemCard.querySelector('.action-row').remove();
 
             let badge = itemCard.querySelector('.item-badge');
             if(type === 'accepted') {
-                badge.innerText = "Accepted";
+                badge.innerText = "Accepted & Invoiced";
                 badge.style.color = "#10b981";
                 badge.style.background = "rgba(16, 185, 129, 0.15)";
                 
                 document.getElementById('acceptedOrdersContainer').appendChild(itemCard);
 
-                // Update Profile Delivered Badge Count & Invoices
+                // Update Profile Delivered Orders Counter Badge
                 let currentCount = parseInt(localStorage.getItem('deliveredOrdersCount') || 0) + 1;
                 localStorage.setItem('deliveredOrdersCount', currentCount);
 
+                // Auto Generate Invoice for User
                 let invoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
-                invoices.unshift({ orderId, itemName, amount, method: 'bKash/Nagad', date: new Date().toLocaleDateString() });
+                invoices.unshift({ 
+                    orderId: orderId, 
+                    itemName: itemName, 
+                    amount: amount, 
+                    method: 'bKash / Nagad', 
+                    date: new Date().toLocaleDateString() 
+                });
                 localStorage.setItem('userInvoices', JSON.stringify(invoices));
 
-                tg.showAlert(`✅ Order #${orderId} Accepted! Moved to Accepted History & Invoice generated.`);
+                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice automatically generated and saved for user.`);
             } else {
                 badge.innerText = "Rejected";
                 badge.style.color = "#ef4444";
