@@ -7,46 +7,154 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg-color: #080b12; --card-bg: #131c2e; --card-border: #2a1b4e; --text-main: #f8fafc; --text-muted: #94a3b8; --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
+        :root {
+            --bg-color: #080b12;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
-        .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
-        .size-box label { font-size: 9px; text-align: center; }
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
+        
+        .size-row-input { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
+        .add-size-btn { background: #3b82f6; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
+
+        /* Small Table for Sizes */
+        .size-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; background: #0b0f19; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
+        .size-table th, .size-table td { padding: 8px; font-size: 11px; text-align: center; border-bottom: 1px solid var(--card-border); }
+        .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
+        .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
+
+        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
     </style>
 </head>
 <body>
+
     <div class="container">
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Dress</h3>
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
+
         <div class="admin-card">
-            <div class="form-group"><label>Dress Name</label><input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock"></div>
-            <div class="form-group"><label>Category</label><input type="text" id="newCat" class="form-control" placeholder="e.g. Gowns"></div>
-            <div class="form-group"><label>Price (৳)</label><input type="number" id="newPrice" class="form-control" placeholder="4500"></div>
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Size Setup</h4>
             
-            <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
-            <div class="size-grid">
-                <div class="size-box"><label>S Size</label><input type="number" id="sizeS" class="form-control" value="0"></div>
-                <div class="size-box"><label>M Size</label><input type="number" id="sizeM" class="form-control" value="0"></div>
-                <div class="size-box"><label>L Size</label><input type="number" id="sizeL" class="form-control" value="0"></div>
-                <div class="size-box"><label>XL Size</label><input type="number" id="sizeXL" class="form-control" value="0"></div>
+            <div class="form-group">
+                <label>Dress Name</label>
+                <input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock">
             </div>
 
-            <div class="form-group"><label>Product Image Link / URL</label><input type="text" id="newImg" class="form-control" placeholder="https://image-url.com/dress.jpg"></div>
-            <button class="submit-btn" onclick="publishDress()">Publish Dress to Shop</button>
+            <div class="form-group">
+                <label>Category</label>
+                <input type="text" id="newCat" class="form-control" placeholder="e.g. Gowns / Party Wear">
+            </div>
+
+            <div class="form-group">
+                <label>Price (৳)</label>
+                <input type="number" id="newPrice" class="form-control" placeholder="4500">
+            </div>
+
+            <!-- Size Dropdown & Quantity Input -->
+            <div class="size-row-input">
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
+                    <select id="sizeDropdown" class="form-control">
+                        <option value="S">S Size</option>
+                        <option value="M">M Size</option>
+                        <option value="L">L Size</option>
+                        <option value="XL">XL Size</option>
+                        <option value="XXL">XXL Size</option>
+                        <option value="Free Size">Free Size</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
+                    <input type="number" id="sizeQty" class="form-control" placeholder="10" value="1">
+                </div>
+                <button type="button" class="add-size-btn" onclick="addSizeToTable()"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+
+            <!-- Small Table for Added Sizes -->
+            <table class="size-table">
+                <thead>
+                    <tr>
+                        <th>Size</th>
+                        <th>Pieces</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="sizeTableBody">
+                    <tr>
+                        <td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet. Select and add above.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="form-group">
+                <label>Product Image Link / URL</label>
+                <input type="text" id="newImg" class="form-control" placeholder="https://image-url.com/dress.jpg">
+            </div>
+
+            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Publish to Shop</button>
         </div>
     </div>
+
     <script>
-        let tg = window.Telegram.WebApp; tg.expand();
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let addedSizesList = {}; // Store size and pieces mapping
+
+        function addSizeToTable() {
+            let size = document.getElementById('sizeDropdown').value;
+            let qty = parseInt(document.getElementById('sizeQty').value) || 0;
+
+            if (qty <= 0) {
+                tg.showAlert("⚠️ Please enter valid pieces quantity!");
+                return;
+            }
+
+            addedSizesList[size] = qty;
+            renderSizeTable();
+        }
+
+        function removeSize(sizeKey) {
+            delete addedSizesList[sizeKey];
+            renderSizeTable();
+        }
+
+        function renderSizeTable() {
+            let tbody = document.getElementById('sizeTableBody');
+            let keys = Object.keys(addedSizesList);
+
+            if (keys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet. Select and add above.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            keys.forEach(size => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${size}</b></td>
+                        <td style="color:#fbbf24; font-weight:bold;">${addedSizesList[size]} Pcs</td>
+                        <td><button class="del-size" onclick="removeSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
 
         function publishDress() {
             let name = document.getElementById('newName').value.trim();
@@ -54,19 +162,21 @@
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
             let img = document.getElementById('newImg').value.trim() || "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300";
             
-            let sizes = {
-                S: parseInt(document.getElementById('sizeS').value) || 0,
-                M: parseInt(document.getElementById('sizeM').value) || 0,
-                L: parseInt(document.getElementById('sizeL').value) || 0,
-                XL: parseInt(document.getElementById('sizeXL').value) || 0
-            };
+            let sizeKeys = Object.keys(addedSizesList);
 
-            let totalStock = sizes.S + sizes.M + sizes.L + sizes.XL;
-
-            if(!name || price <= 0) {
-                tg.showAlert("⚠️ Please enter a valid dress name and price!");
+            if (!name || price <= 0) {
+                tg.showAlert("⚠️ Please enter dress name and price!");
                 return;
             }
+
+            if (sizeKeys.length === 0) {
+                tg.showAlert("⚠️ Please add at least one size and quantity!");
+                return;
+            }
+
+            // Calculate total stock from table sizes
+            let totalStock = 0;
+            sizeKeys.forEach(s => totalStock += addedSizesList[s]);
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
@@ -74,7 +184,7 @@
                 category: cat,
                 price: price,
                 image: img,
-                sizes: sizes,
+                sizes: addedSizesList, // Saved as object e.g. { M: 10, L: 15 }
                 totalStock: totalStock
             };
 
@@ -82,7 +192,7 @@
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
-            tg.showAlert(`✅ Dress "${name}" added successfully and tracked in inventory!`);
+            tg.showAlert(`✅ Dress "${name}" published with size inventory successfully!`);
             window.location.href = "dresslist.html";
         }
     </script>
