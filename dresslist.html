@@ -59,6 +59,14 @@
 
         <div class="admin-card">
             <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
+            <div id="bulkToolbar" style="display:flex; align-items:center; justify-content:space-between; background:#0b0f19; border:1px solid var(--card-border); border-radius:10px; padding:8px 10px; margin-bottom:10px; font-size:11px;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color: var(--text-muted); font-weight:600;">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"> Select All
+                </label>
+                <button class="btn-sm" id="bulkDeleteBtn" style="background:#ef4444; opacity:0.4; pointer-events:none;" onclick="deleteSelectedDresses()">
+                    <i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="selectedCount">0</span>)
+                </button>
+            </div>
             <div class="list-box" id="inventoryListContainer">
                 <div class="item-body" style="text-align:center; color: var(--text-muted);">Loading all dresses...</div>
             </div>
@@ -72,7 +80,7 @@
             <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress & Size Stock</h4>
             <input type="hidden" id="editIndex">
             <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
-            <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control" list="editCatOptions"><datalist id="editCatOptions"></datalist></div>
             <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
             
             <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
@@ -106,6 +114,10 @@
             let container = document.getElementById('inventoryListContainer');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
 
+            // Reset bulk-select toolbar on every render (indexes may have shifted)
+            document.getElementById('selectAllCheckbox').checked = false;
+            updateBulkToolbar();
+
             if (dresses.length === 0) {
                 container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);">No dresses found. Add new dresses from 'Add New Dress' panel.</div>`;
                 return;
@@ -121,6 +133,7 @@
 
                 container.innerHTML += `
                     <div class="list-item">
+                        <input type="checkbox" class="dress-select-checkbox" data-index="${index}" onchange="onSelectionChange()" style="width:16px; height:16px; accent-color:#7c3aed; cursor:pointer; flex-shrink:0;">
                         <img src="${dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'}" class="dress-thumb">
                         <div class="dress-info">
                             <div class="item-header">
@@ -135,7 +148,7 @@
                             <div class="action-btns">
                                 <button class="btn-sm btn-view" onclick="viewDress(${index})">View</button>
                                 <button class="btn-sm btn-edit" onclick="openEditModal(${index})">Edit Stock</button>
-                                <button class="btn-sm btn-delete" onclick="deleteDress(${index})">Remove</button>
+                                <button class="btn-sm btn-delete" onclick="deleteDress(${index})" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </div>
                     </div>
@@ -176,6 +189,11 @@
             document.getElementById('editCat').value = d.category || '';
             document.getElementById('editPrice').value = d.price;
 
+            // Suggest existing categories so a retyped name doesn't create a
+            // near-duplicate category (e.g. "Gowns" vs "gown").
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            document.getElementById('editCatOptions').innerHTML = categories.map(c => `<option value="${c}">`).join('');
+
             let sizeContainer = document.getElementById('editSizesContainer');
             sizeContainer.innerHTML = '';
             
@@ -214,6 +232,52 @@
             tg.showAlert("✅ Dress and size stocks updated successfully!");
             closeModal('editModal');
             loadInventory();
+        }
+
+        function toggleSelectAll(checkbox) {
+            document.querySelectorAll('.dress-select-checkbox').forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateBulkToolbar();
+        }
+
+        function onSelectionChange() {
+            let allBoxes = document.querySelectorAll('.dress-select-checkbox');
+            let checkedBoxes = document.querySelectorAll('.dress-select-checkbox:checked');
+            document.getElementById('selectAllCheckbox').checked = allBoxes.length > 0 && checkedBoxes.length === allBoxes.length;
+            updateBulkToolbar();
+        }
+
+        function updateBulkToolbar() {
+            let checkedBoxes = document.querySelectorAll('.dress-select-checkbox:checked');
+            let count = checkedBoxes.length;
+            document.getElementById('selectedCount').innerText = count;
+            let btn = document.getElementById('bulkDeleteBtn');
+            if (count > 0) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            } else {
+                btn.style.opacity = '0.4';
+                btn.style.pointerEvents = 'none';
+            }
+        }
+
+        function deleteSelectedDresses() {
+            let checkedBoxes = document.querySelectorAll('.dress-select-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            let indexesToDelete = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+            if (confirm(`Remove ${indexesToDelete.length} selected dress(es) from inventory?`)) {
+                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+                // Remove from highest index to lowest so earlier splices don't shift later indexes
+                indexesToDelete.sort((a, b) => b - a).forEach(idx => {
+                    dresses.splice(idx, 1);
+                });
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                tg.showAlert(`🗑️ ${indexesToDelete.length} dress(es) removed successfully!`);
+                loadInventory();
+            }
         }
 
         function deleteDress(index) {
