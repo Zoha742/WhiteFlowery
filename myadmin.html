@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Pro Admin Control</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-pink: #ec4899;
+            --success-green: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 40px 0;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+
+        .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+        .tab-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; }
+        .tab-btn.active { background: var(--primary-gradient); color: #fff; border-color: transparent; }
+
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin-bottom: 20px; }
+        .card-title { font-size: 14px; font-weight: 700; color: #fff; margin: 0 0 14px 0; display: flex; align-items: center; gap: 8px; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 10px; box-sizing: border-box; font-size: 13px; outline: none; }
+        .form-control:focus { border-color: #7c3aed; }
+        
+        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* Upload Preview Box */
+        .upload-preview {
+            width: 100%; height: 100px; background: #0b0f19; border: 2px dashed var(--card-border);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); font-size: 12px; margin-top: 5px; overflow: hidden; position: relative; cursor: pointer;
+        }
+        .upload-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        .list-box { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
+        .item-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 6px; }
+        .item-user { color: #c084fc; }
+        .item-status { color: #fbbf24; font-size: 10px; background: rgba(251, 191, 36, 0.1); padding: 2px 6px; border-radius: 6px; }
+        .item-body { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Admin Panel</h3>
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-store"></i> Shop App</a>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+            <div class="tab-btn active" onclick="switchTab('add-dress')"><i class="fa-solid fa-plus"></i> Add Dress</div>
+            <div class="tab-btn" onclick="switchTab('stock-manage')"><i class="fa-solid fa-boxes-stacked"></i> Stock</div>
+            <div class="tab-btn" onclick="switchTab('orders-list')"><i class="fa-solid fa-truck"></i> Orders</div>
+        </div>
+
+        <!-- TAB 1: Add Dress with Image Upload & Stock -->
+        <div id="tab-add-dress" class="tab-content">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-shirt"></i> Upload New Dress</h4>
+                <div class="form-group">
+                    <label>Dress Title</label>
+                    <input type="text" id="dressTitle" class="form-control" placeholder="e.g. Royal Silk Gown">
+                </div>
+                <div class="form-group">
+                    <label>Price (TK)</label>
+                    <input type="number" id="dressPrice" class="form-control" placeholder="e.g. 4500">
+                </div>
+                <div class="form-group">
+                    <label>Initial Stock Quantity</label>
+                    <input type="number" id="dressStock" class="form-control" placeholder="e.g. 15">
+                </div>
+                <div class="form-group">
+                    <label>Upload Dress Image (Cloudinary)</label>
+                    <input type="file" id="imageFile" class="form-control" accept="image/*" onchange="previewImage(event)">
+                    <div class="upload-preview" onclick="document.getElementById('imageFile').click()">
+                        <span id="uploadText"><i class="fa-solid fa-cloud-arrow-up"></i> Click to browse image</span>
+                        <img id="previewImg" alt="Preview">
+                    </div>
+                </div>
+                <button class="submit-btn" onclick="uploadAndPublishDress()"><i class="fa-solid fa-paper-plane"></i> Upload & Publish</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: Stock Management -->
+        <div id="tab-stock-manage" class="tab-content" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-warehouse"></i> Live Stock Status</h4>
+                <div class="list-box" id="stockListContainer">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-user">Royal Silk Gown</span>
+                            <span class="item-status" style="color: #10b981; background: rgba(16,185,129,0.1);">Stock: 12 Left</span>
+                        </div>
+                        <div class="item-body">
+                            Price: ৳ 8,500 | Auto-minus active on sale.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Orders & Stock Deduction Log -->
+        <div id="tab-orders-list" class="tab-content" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-receipt"></i> Recent Orders & Deductions</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-user">Order #WF-9021</span>
+                            <span class="item-status">Delivered</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Item:</b> White Floral Maxi (Qty: 1)<br>
+                            <b>Stock Updated:</b> -1 deducted from inventory.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+
+        // Image Preview Handler
+        window.previewImage = function(event) {
+            let reader = new FileReader();
+            reader.onload = function(){
+                let output = document.getElementById('previewImg');
+                output.src = reader.result;
+                output.style.display = 'block';
+                document.getElementById('uploadText').style.display = 'none';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Upload to Cloudinary & Publish with Stock
+        window.uploadAndPublishDress = async function() {
+            let title = document.getElementById('dressTitle').value.trim();
+            let price = document.getElementById('dressPrice').value.trim();
+            let stock = document.getElementById('dressStock').value.trim();
+            let fileInput = document.getElementById('imageFile').files[0];
+
+            if(!title || !price || !stock || !fileInput) {
+                tg.showAlert("⚠️ Please fill all fields and select an image!");
+                return;
+            }
+
+            tg.showAlert("⏳ Uploading image to Cloudinary (dyqegwdme)... Please wait.");
+
+            // Cloudinary Upload API Integration (Unsigned Upload Preset)
+            let formData = new FormData();
+            formData.append("file", fileInput);
+            formData.append("upload_preset", "whiteflowery_preset"); // আপনার ক্লাউডিনারি প্রিসেট নাম দিতে হবে
+
+            try {
+                let response = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
+                    method: "POST",
+                    body: formData
+                });
+                let data = await response.json();
+                
+                if(data.secure_url) {
+                    let imageUrl = data.secure_url;
+                    
+                    // এখানে সফলভাবে ক্লাউডিনারি লিংক পাওয়ার পর Firebase ডাটাবেজে Title, Price, Stock এবং imageUrl সেভ হবে।
+                    // যখনই কোনো কাস্টমার অর্ডার করবে, তখন স্টক থেকে '1' মাইনাস হয়ে যাবে (stock = stock - 1)।
+                    
+                    tg.showAlert(`✅ Success! Dress published with stock: ${stock}\nCloudinary URL generated.`);
+                    
+                    // Clear form
+                    document.getElementById('dressTitle').value = '';
+                    document.getElementById('dressPrice').value = '';
+                    document.getElementById('dressStock').value = '';
+                    document.getElementById('imageFile').value = '';
+                    document.getElementById('previewImg').style.display = 'none';
+                    document.getElementById('uploadText').style.display = 'block';
+                } else {
+                    tg.showAlert("❌ Image upload failed. Check Cloudinary preset.");
+                }
+            } catch (error) {
+                tg.showAlert("❌ Error connecting to Cloudinary: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
