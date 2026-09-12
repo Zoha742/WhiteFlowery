@@ -211,16 +211,31 @@
             let formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", "ml_default");
-            formData.append("folder", "shop/Product add");
+            formData.append("folder", "shop/Product_add");
 
             try {
                 let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
                 let data = await res.json();
-                return data.secure_url || "";
+
+                // Cloudinary can respond with HTTP 200/400 and an error payload
+                // (bad/unsigned preset, wrong cloud name, etc.) without fetch()
+                // ever throwing. Previously that meant data.secure_url was
+                // undefined, we saved image: "" for the product, and the
+                // <img onerror> fallback silently swapped in the same old
+                // placeholder photo for every single product. Treat a missing
+                // secure_url as a failure so we fall through to the base64
+                // fallback below instead of saving an empty/broken URL.
+                if (!res.ok || !data.secure_url) {
+                    console.error("Cloudinary upload rejected:", data.error ? data.error.message : data);
+                    throw new Error(data.error ? data.error.message : "Cloudinary upload failed");
+                }
+                return data.secure_url;
             } catch (err) {
+                console.error("Cloudinary upload error, falling back to local image:", err);
                 return new Promise((resolve) => {
                     let reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = () => resolve("");
                     reader.readAsDataURL(file);
                 });
             }
@@ -246,7 +261,13 @@
 
             let images = [];
             let url1 = await uploadToCloudinary(file1);
-            if(url1) images.push(url1);
+            if(url1) {
+                images.push(url1);
+            } else {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert("❌ Photo 1 could not be uploaded or read. Please try a different image/file.");
+                return;
+            }
 
             if(file2) {
                 let url2 = await uploadToCloudinary(file2);
