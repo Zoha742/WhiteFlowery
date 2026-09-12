@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Notifications</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #080b12;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-pink: #ec4899;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 90px 0;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+
+        /* Notification List */
+        .notif-list { display: flex; flex-direction: column; gap: 12px; }
+        .notif-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 14px; position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .notif-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .notif-title { font-size: 14px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 6px; }
+        .notif-title i { color: #ec4899; }
+        .notif-time { font-size: 10px; color: var(--text-muted); }
+        .notif-body { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px; }
+        
+        /* Optional Notification Image */
+        .notif-img-box {
+            width: 100%; height: 130px; background: #0b0f19; border-radius: 10px;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .notif-img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: var(--card-bg);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+        }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-bell"></i> Notifications</h3>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
+        </div>
+
+        <!-- Notifications Container -->
+        <div class="notif-list">
+            
+            <!-- Notification Item 1 -->
+            <div class="notif-card">
+                <div class="notif-top">
+                    <div class="notif-title"><i class="fa-solid fa-bullhorn"></i> Special Spring Offer!</div>
+                    <div class="notif-time">10 mins ago</div>
+                </div>
+                <div class="notif-body">
+                    Get up to 30% off on all fresh white floral arrangements and luxury dresses. Grab your favorite outfit now!
+                </div>
+                <div class="notif-img-box">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress1.jpg" alt="Offer Image">
+                </div>
+            </div>
+
+            <!-- Notification Item 2 -->
+            <div class="notif-card">
+                <div class="notif-top">
+                    <div class="notif-title"><i class="fa-solid fa-box-check"></i> Order Accepted</div>
+                    <div class="notif-time">2 hours ago</div>
+                </div>
+                <div class="notif-body">
+                    Your order #WF-9021 has been accepted by the admin and is currently being packed for express delivery.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+    </script>
+</body>
+</html>
