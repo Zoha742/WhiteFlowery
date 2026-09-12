@@ -25,35 +25,27 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 95px 0;
             display: flex; justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; }
 
         .search-box { position: relative; margin-bottom: 16px; }
-        .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; backdrop-filter: blur(10px); }
-        .search-input:focus { border-color: #7c3aed; }
+        .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
         .categories-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; scrollbar-width: none; }
         .categories-scroll::-webkit-scrollbar { display: none; }
-        .cat-chip { background: var(--card-bg); border: 1px solid var(--card-border); padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); transition: 0.2s; backdrop-filter: blur(10px); }
+        .cat-chip { background: var(--card-bg); border: 1px solid var(--card-border); padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); }
         .cat-chip.active, .cat-chip:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
-        /* Products Grid */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; backdrop-filter: blur(10px); }
+        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
-        .wishlist-btn { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 2; transition: 0.2s; backdrop-filter: blur(5px); }
-        .wishlist-btn.active { color: #ec4899; }
-
-        /* Zoomable Image Box */
-        .product-img-box { width: 100%; height: 140px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: zoom-in; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .product-img-box:hover img { transform: scale(1.25); }
+        .product-img-box { width: 100%; height: 130px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
         .product-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
@@ -61,46 +53,43 @@
         .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 10px; }
         .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 6px; font-weight: bold; }
         
-        .size-box { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+        .size-box { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
         .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
+        .card-action-row { display: flex; gap: 4px; margin-bottom: 6px; }
+        .btn-mini { background: #1e293b; border: 1px solid var(--card-border); color: #c084fc; font-size: 9px; padding: 4px 6px; border-radius: 6px; cursor: pointer; flex: 1; text-align: center; font-weight: bold; }
+        
         .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
-        .add-to-cart-btn:active { transform: scale(0.96); }
 
-        /* Fullscreen Image Zoom Modal */
-        #zoomModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; }
-        #zoomModal img { max-width: 90%; max-height: 80%; border-radius: 12px; border: 2px solid var(--card-border); }
-        .close-zoom { margin-top: 15px; background: #ec4899; color: #fff; border: none; padding: 8px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        /* Modals */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
-            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999; backdrop-filter: blur(15px);
         }
         .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item.active { color: #c084fc; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-store"></i> WhiteFlowery Pro Shop</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Home</a>
         </div>
 
-        <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search dresses..." onkeyup="filterProducts()">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search dresses..." onkeyup="renderProducts()">
         </div>
 
-        <!-- Categories Filter -->
         <div class="categories-scroll" id="categoriesContainer">
             <div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>
             <div class="cat-chip" onclick="filterCategory('Gowns', this)">Gowns</div>
@@ -109,16 +98,27 @@
             <div class="cat-chip" onclick="filterCategory('Bridal', this)">Bridal</div>
         </div>
 
-        <!-- Dynamic Products Grid -->
         <div class="products-grid" id="shopProductsGrid">
-            <!-- JavaScript dynamically loads all dresses here -->
+            <!-- Dynamically populated -->
         </div>
     </div>
 
-    <!-- Image Zoom Fullscreen Modal -->
-    <div id="zoomModal" onclick="closeZoom()">
-        <img id="zoomedImg" src="" alt="Zoomed Dress">
-        <button class="close-zoom">Close</button>
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: left;">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('detailsModal')">&times;</span>
+            <h4 id="modalTitle" style="color:#c084fc; margin-top:0;">Product Details</h4>
+            <p id="modalDescription" style="font-size:12px; color:var(--text-muted); line-height:1.6;"></p>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('videoModal')">&times;</span>
+            <h4 style="color:#fff; margin-top:0;">Product Video</h4>
+            <video id="modalVideoPlayer" src="" controls style="width:100%; max-height:280px; border-radius:8px; border:1px solid var(--card-border);"></video>
+        </div>
     </div>
 
     <!-- Bottom Navigation Bar -->
@@ -132,7 +132,6 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-
         let currentCategory = 'All';
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -140,29 +139,22 @@
         });
 
         function loadShopProducts() {
-            let grid = document.getElementById('shopProductsGrid');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-
-            // If empty, provide a default set of products matching Cloudinary assets
             if (dresses.length === 0) {
                 dresses = [
-                    { id: 'WF-1', name: 'Royal Silk Gown', category: 'Gowns', price: 8500, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp', sizes: { S: 5, M: 5 } },
-                    { id: 'WF-2', name: 'White Floral Maxi', category: 'Casual Sets', price: 3500, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/4_jwi1bs.webp', sizes: { M: 5, L: 5 } },
-                    { id: 'WF-3', name: 'Designer Party Frock', category: 'Party Wear', price: 6200, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/7_zz8gga.webp', sizes: { L: 5, XL: 5 } },
-                    { id: 'WF-4', name: 'Bridal White Lehenga', category: 'Bridal', price: 10000, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/19_fazthb.webp', sizes: { S: 2, M: 3, L: 5 } }
+                    { id: 'WF-1', name: 'Royal Silk Gown', category: 'Gowns', price: 8500, details: 'Pure silk gown with royal embroidery work.', image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp', video: '', sizes: { S: 3, M: 5, L: 2 } }
                 ];
                 localStorage.setItem('shopDresses', JSON.stringify(dresses));
             }
-
-            renderProducts(dresses);
+            renderProducts();
         }
 
-        function renderProducts(dresses) {
+        function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let searchVal = document.getElementById('searchInput').value.toLowerCase();
             
             grid.innerHTML = '';
-
             let filtered = dresses.filter(d => {
                 let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
                 let matchesSearch = d.name.toLowerCase().includes(searchVal);
@@ -170,36 +162,41 @@
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 30px; font-size: 12px;">No dresses found in this category.</div>`;
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 30px; font-size: 12px;">No dresses found.</div>`;
                 return;
             }
 
-            filtered.forEach((dress) => {
+            filtered.forEach((dress, index) => {
                 let sizesObj = dress.sizes || {};
-                let totalStock = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
+                let sizeKeys = Object.keys(sizesObj);
+                let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
+                let initialStock = firstSize ? sizesObj[firstSize] : 0;
                 
                 let sizePillsHtml = '';
-                let firstSelected = true;
-                for (let [sizeKey, qty] of Object.entries(sizesObj)) {
-                    if (qty > 0) {
-                        let cls = firstSelected ? 'size-pill selected' : 'size-pill';
-                        sizePillsHtml += `<span class="${cls}" onclick="selectSize(this)">${sizeKey}</span>`;
-                        firstSelected = false;
-                    }
-                }
+                sizeKeys.forEach((sizeKey, sIdx) => {
+                    let cls = sIdx === 0 ? 'size-pill selected' : 'size-pill';
+                    sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${dress.name}', '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
+                });
+
+                let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
                 grid.innerHTML += `
-                    <div class="product-card">
-                        <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                        <div class="product-img-box" onclick="openZoom(this)">
-                            <img src="${dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'}" alt="${dress.name}">
+                    <div class="product-card" id="card-${index}">
+                        <div class="product-img-box">
+                            <img src="${dress.image}" alt="${dress.name}">
                         </div>
                         <div>
                             <h4 class="product-title">${dress.name}</h4>
                             <p class="product-price">৳ ${Number(dress.price).toLocaleString()}</p>
-                            <div class="meta-info"><span class="stock-badge">Stock: ${totalStock} Pcs</span></div>
+                            <div class="meta-info">
+                                <span class="stock-badge" id="stock-text-${index}">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
+                            </div>
                             <div class="size-box">
                                 ${sizePillsHtml || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>'}
+                            </div>
+                            <div class="card-action-row">
+                                <button class="btn-mini" onclick="openDetailsModal('${dress.name}', \`${dress.details || 'No details'}\`)"><i class="fa-solid fa-circle-info"></i> Details</button>
+                                ${videoBtn}
                             </div>
                         </div>
                         <button class="add-to-cart-btn" onclick="addToCart('${dress.name}', ${dress.price})">Add to Cart</button>
@@ -208,50 +205,44 @@
             });
         }
 
+        function selectSize(pill, dressName, sizeKey, qty, cardIndex) {
+            let parent = pill.parentElement;
+            parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
+            pill.classList.add('selected');
+            
+            // Update specific stock dynamically based on selected size
+            document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${sizeKey}): ${qty} Pcs`;
+        }
+
+        function openDetailsModal(title, desc) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDescription').innerText = desc;
+            document.getElementById('detailsModal').style.display = 'flex';
+        }
+
+        function openVideoModal(videoUrl) {
+            let player = document.getElementById('modalVideoPlayer');
+            player.src = videoUrl;
+            document.getElementById('videoModal').style.display = 'flex';
+            player.play();
+        }
+
+        function closeModal(modalId) {
+            if(modalId === 'videoModal') {
+                document.getElementById('modalVideoPlayer').pause();
+            }
+            document.getElementById(modalId).style.display = 'none';
+        }
+
         function filterCategory(cat, chip) {
             currentCategory = cat;
             document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
-            
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            renderProducts(dresses);
-        }
-
-        function filterProducts() {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            renderProducts(dresses);
-        }
-
-        function selectSize(pill) {
-            let parent = pill.parentElement;
-            parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
-            pill.classList.add('selected');
+            renderProducts();
         }
 
         function addToCart(itemName, price) {
             tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
-        }
-
-        function toggleWishlist(btn) {
-            btn.classList.toggle('active');
-            let isFav = btn.classList.contains('active');
-            if(isFav) {
-                tg.showAlert("❤️ Added to Wishlist!");
-            } else {
-                tg.showAlert("💔 Removed from Wishlist!");
-            }
-        }
-
-        function openZoom(box) {
-            let img = box.querySelector('img');
-            let modal = document.getElementById('zoomModal');
-            let zoomedImg = document.getElementById('zoomedImg');
-            zoomedImg.src = img.src;
-            modal.style.display = 'flex';
-        }
-
-        function closeZoom() {
-            document.getElementById('zoomModal').style.display = 'none';
         }
     </script>
 </body>
