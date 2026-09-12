@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Dress List & Customize</title>
+    <title>WhiteFlowery - Track All Dress List</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg-color: #080b12; --card-bg: #131c2e; --card-border: #2a1b4e; --text-main: #f8fafc; --text-muted: #94a3b8; --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
+        :root {
+            --bg-color: #080b12;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 60px; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
@@ -26,7 +33,7 @@
         .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
         .item-body { font-size: 10px; color: var(--text-muted); line-height: 1.4; margin-bottom: 6px; }
 
-        .action-btns { display: flex; gap: 5px; }
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
         .btn-sm { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
         .btn-edit { background: #7c3aed; }
         .btn-delete { background: #ef4444; }
@@ -46,15 +53,14 @@
 
     <div class="container">
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-shirt"></i> Dress Inventory</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-shirt"></i> All Tracked Dresses</h3>
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-list"></i> Tracked Shop Dresses</h4>
+            <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
             <div class="list-box" id="inventoryListContainer">
-                <!-- Dynamically loaded dresses from localStorage -->
-                <div class="item-body" style="text-align:center;">Loading dresses...</div>
+                <div class="item-body" style="text-align:center; color: var(--text-muted);">Loading all dresses...</div>
             </div>
         </div>
     </div>
@@ -70,11 +76,8 @@
             <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
             
             <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
-            <div class="size-grid">
-                <div><label style="font-size:9px; color:#94a3b8;">S</label><input type="number" id="editS" class="form-control"></div>
-                <div><label style="font-size:9px; color:#94a3b8;">M</label><input type="number" id="editM" class="form-control"></div>
-                <div><label style="font-size:9px; color:#94a3b8;">L</label><input type="number" id="editL" class="form-control"></div>
-                <div><label style="font-size:9px; color:#94a3b8;">XL</label><input type="number" id="editXL" class="form-control"></div>
+            <div class="size-grid" id="editSizesContainer">
+                <!-- Size fields will be loaded dynamically -->
             </div>
 
             <button class="submit-btn" onclick="saveDressChanges()">Save Changes</button>
@@ -103,40 +106,35 @@
             let container = document.getElementById('inventoryListContainer');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
 
-            // Default sample item if empty
             if (dresses.length === 0) {
-                dresses = [{
-                    id: 'WF-9921',
-                    name: 'Royal Silk Gown',
-                    category: 'Gowns',
-                    price: 8500,
-                    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300',
-                    sizes: { S: 2, M: 3, L: 3, XL: 2 },
-                    totalStock: 10
-                }];
-                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);">No dresses found. Add new dresses from 'Add New Dress' panel.</div>`;
+                return;
             }
 
             container.innerHTML = '';
             dresses.forEach((dress, index) => {
-                let totalCurrentStock = (dress.sizes.S || 0) + (dress.sizes.M || 0) + (dress.sizes.L || 0) + (dress.sizes.XL || 0);
+                // Calculate total stock from size quantities
+                let sizesObj = dress.sizes || { S: 0, M: 0, L: 0, XL: 0 };
+                let totalCurrentStock = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
                 
+                let sizeStr = Object.entries(sizesObj).map(([k, v]) => `${k}:${v}`).join(' | ');
+
                 container.innerHTML += `
                     <div class="list-item">
-                        <img src="${dress.image}" class="dress-thumb">
+                        <img src="${dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'}" class="dress-thumb">
                         <div class="dress-info">
                             <div class="item-header">
                                 <span class="item-title">${dress.name}</span>
-                                <span class="item-badge">৳ ${dress.price.toLocaleString()}</span>
+                                <span class="item-badge">৳ ${Number(dress.price).toLocaleString()}</span>
                             </div>
                             <div class="item-body">
-                                <b>Category:</b> ${dress.category}<br>
-                                <b>Size Stock:</b> S:${dress.sizes.S} | M:${dress.sizes.M} | L:${dress.sizes.L} | XL:${dress.sizes.XL} <br>
+                                <b>Category:</b> ${dress.category || 'General'}<br>
+                                <b>Sizes:</b> ${sizeStr || 'N/A'}<br>
                                 <b>Total Stock:</b> <span style="color:#fbbf24; font-weight:bold;">${totalCurrentStock} Pcs</span>
                             </div>
                             <div class="action-btns">
                                 <button class="btn-sm btn-view" onclick="viewDress(${index})">View</button>
-                                <button class="btn-sm btn-edit" onclick="openEditModal(${index})">Edit & Stock</button>
+                                <button class="btn-sm btn-edit" onclick="openEditModal(${index})">Edit Stock</button>
                                 <button class="btn-sm btn-delete" onclick="deleteDress(${index})">Remove</button>
                             </div>
                         </div>
@@ -148,19 +146,21 @@
         function viewDress(index) {
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let d = dresses[index];
-            let total = (d.sizes.S || 0) + (d.sizes.M || 0) + (d.sizes.L || 0) + (d.sizes.XL || 0);
+            let sizesObj = d.sizes || {};
+            let total = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
+
+            let sizeBreakdownHtml = Object.keys(sizesObj).length > 0 
+                ? Object.entries(sizesObj).map(([k, v]) => `&nbsp;&bull; ${k} Size: ${v} Pcs`).join('<br>')
+                : 'No size info';
 
             document.getElementById('viewTitle').innerText = d.name;
             document.getElementById('viewImg').src = d.image;
             document.getElementById('viewDetails').innerHTML = `
-                <b>Product ID:</b> ${d.id}<br>
-                <b>Category:</b> ${d.category}<br>
-                <b>Price:</b> ৳ ${d.price.toLocaleString()}<br>
+                <b>Product ID:</b> ${d.id || 'N/A'}<br>
+                <b>Category:</b> ${d.category || 'General'}<br>
+                <b>Price:</b> ৳ ${Number(d.price).toLocaleString()}<br>
                 <b>Size Breakdown:</b><br>
-                &nbsp;&bull; S Size: ${d.sizes.S} Pcs<br>
-                &nbsp;&bull; M Size: ${d.sizes.M} Pcs<br>
-                &nbsp;&bull; L Size: ${d.sizes.L} Pcs<br>
-                &nbsp;&bull; XL Size: ${d.sizes.XL} Pcs<br>
+                ${sizeBreakdownHtml}<br>
                 <b>Overall Total Stock:</b> ${total} Pcs
             `;
             document.getElementById('viewModal').style.display = 'flex';
@@ -169,15 +169,24 @@
         function openEditModal(index) {
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let d = dresses[index];
+            let sizesObj = d.sizes || { S: 0, M: 0, L: 0, XL: 0 };
 
             document.getElementById('editIndex').value = index;
             document.getElementById('editName').value = d.name;
-            document.getElementById('editCat').value = d.category;
+            document.getElementById('editCat').value = d.category || '';
             document.getElementById('editPrice').value = d.price;
-            document.getElementById('editS').value = d.sizes.S || 0;
-            document.getElementById('editM').value = d.sizes.M || 0;
-            document.getElementById('editL').value = d.sizes.L || 0;
-            document.getElementById('editXL').value = d.sizes.XL || 0;
+
+            let sizeContainer = document.getElementById('editSizesContainer');
+            sizeContainer.innerHTML = '';
+            
+            Object.keys(sizesObj).forEach(sizeKey => {
+                sizeContainer.innerHTML += `
+                    <div>
+                        <label style="font-size:9px; color:#94a3b8;">${sizeKey}</label>
+                        <input type="number" id="editSize_${sizeKey}" class="form-control edit-size-input" value="${sizesObj[sizeKey]}" data-size="${sizeKey}">
+                    </div>
+                `;
+            });
 
             document.getElementById('editModal').style.display = 'flex';
         }
@@ -193,12 +202,13 @@
             dresses[index].name = document.getElementById('editName').value.trim();
             dresses[index].category = document.getElementById('editCat').value.trim();
             dresses[index].price = parseFloat(document.getElementById('editPrice').value) || 0;
-            dresses[index].sizes = {
-                S: parseInt(document.getElementById('editS').value) || 0,
-                M: parseInt(document.getElementById('editM').value) || 0,
-                L: parseInt(document.getElementById('editL').value) || 0,
-                XL: parseInt(document.getElementById('editXL').value) || 0
-            };
+
+            let updatedSizes = {};
+            document.querySelectorAll('.edit-size-input').forEach(input => {
+                let sizeKey = input.getAttribute('data-size');
+                updatedSizes[sizeKey] = parseInt(input.value) || 0;
+            });
+            dresses[index].sizes = updatedSizes;
 
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
             tg.showAlert("✅ Dress and size stocks updated successfully!");
@@ -207,7 +217,7 @@
         }
 
         function deleteDress(index) {
-            if(confirm("Are you sure you want to remove this dress from the shop inventory?")) {
+            if(confirm("Are you sure you want to remove this dress from inventory?")) {
                 let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
                 dresses.splice(index, 1);
                 localStorage.setItem('shopDresses', JSON.stringify(dresses));
