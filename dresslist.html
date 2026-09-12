@@ -7,16 +7,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-        }
+        :root { --bg-color: #080b12; --card-bg: #131c2e; --card-border: #2a1b4e; --text-main: #f8fafc; --text-muted: #94a3b8; --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 60px; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
@@ -25,21 +18,28 @@
         .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
         
         .list-box { display: flex; flex-direction: column; gap: 10px; }
-        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
-        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+        .dress-thumb { width: 55px; height: 65px; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
+        .dress-info { flex: 1; }
+        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 2px; }
         .item-title { color: #c084fc; }
         .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
-        .item-body { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .item-body { font-size: 10px; color: var(--text-muted); line-height: 1.4; margin-bottom: 6px; }
 
-        .btn-edit { background: #7c3aed; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; }
-        
+        .action-btns { display: flex; gap: 5px; }
+        .btn-sm { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
+        .btn-edit { background: #7c3aed; }
+        .btn-delete { background: #ef4444; }
+        .btn-view { background: #3b82f6; }
+
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -51,30 +51,43 @@
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-list"></i> All Dresses</h4>
-            <div class="list-box">
-                <div class="list-item">
-                    <div class="item-header">
-                        <span class="item-title">Royal Silk Gown</span>
-                        <span class="item-badge">৳ 8,500 (Stock: 10)</span>
-                    </div>
-                    <div class="item-body">Category: Gowns</div>
-                    <button class="btn-edit" onclick="openEditModal('Royal Silk Gown', 8500, 10, 'Gowns')"><i class="fa-solid fa-pen-to-square"></i> Full Customize</button>
-                </div>
+            <h4 class="card-title"><i class="fa-solid fa-list"></i> Tracked Shop Dresses</h4>
+            <div class="list-box" id="inventoryListContainer">
+                <!-- Dynamically loaded dresses from localStorage -->
+                <div class="item-body" style="text-align:center;">Loading dresses...</div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Modal -->
+    <!-- Edit & Size Stock Customize Modal -->
     <div id="editModal" class="modal-overlay">
         <div class="modal-content">
-            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress Details</h4>
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('editModal')">&times;</span>
+            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress & Size Stock</h4>
+            <input type="hidden" id="editIndex">
             <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
-            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
-            <div class="form-group"><label>Stock (Pcs)</label><input type="number" id="editStock" class="form-control"></div>
             <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control"></div>
-            <button class="submit-btn" onclick="saveEdit()">Save Changes</button>
-            <button class="submit-btn" style="background:#ef4444; margin-top:6px;" onclick="closeModal()">Cancel</button>
+            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
+            
+            <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
+            <div class="size-grid">
+                <div><label style="font-size:9px; color:#94a3b8;">S</label><input type="number" id="editS" class="form-control"></div>
+                <div><label style="font-size:9px; color:#94a3b8;">M</label><input type="number" id="editM" class="form-control"></div>
+                <div><label style="font-size:9px; color:#94a3b8;">L</label><input type="number" id="editL" class="form-control"></div>
+                <div><label style="font-size:9px; color:#94a3b8;">XL</label><input type="number" id="editXL" class="form-control"></div>
+            </div>
+
+            <button class="submit-btn" onclick="saveDressChanges()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- View Dress Modal -->
+    <div id="viewModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('viewModal')">&times;</span>
+            <h4 style="color:#fff; margin-bottom:10px;" id="viewTitle">Dress Details</h4>
+            <img id="viewImg" src="" alt="Dress" style="width:100%; max-height:250px; object-fit:contain; border-radius:8px; margin-bottom:10px; border:1px solid var(--card-border);">
+            <div id="viewDetails" style="font-size:12px; color:var(--text-muted); text-align:left; line-height:1.6;"></div>
         </div>
     </div>
 
@@ -82,21 +95,125 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function openEditModal(name, price, stock, cat) {
-            document.getElementById('editName').value = name;
-            document.getElementById('editPrice').value = price;
-            document.getElementById('editStock').value = stock;
-            document.getElementById('editCat').value = cat;
+        window.addEventListener('DOMContentLoaded', () => {
+            loadInventory();
+        });
+
+        function loadInventory() {
+            let container = document.getElementById('inventoryListContainer');
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+
+            // Default sample item if empty
+            if (dresses.length === 0) {
+                dresses = [{
+                    id: 'WF-9921',
+                    name: 'Royal Silk Gown',
+                    category: 'Gowns',
+                    price: 8500,
+                    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300',
+                    sizes: { S: 2, M: 3, L: 3, XL: 2 },
+                    totalStock: 10
+                }];
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            }
+
+            container.innerHTML = '';
+            dresses.forEach((dress, index) => {
+                let totalCurrentStock = (dress.sizes.S || 0) + (dress.sizes.M || 0) + (dress.sizes.L || 0) + (dress.sizes.XL || 0);
+                
+                container.innerHTML += `
+                    <div class="list-item">
+                        <img src="${dress.image}" class="dress-thumb">
+                        <div class="dress-info">
+                            <div class="item-header">
+                                <span class="item-title">${dress.name}</span>
+                                <span class="item-badge">৳ ${dress.price.toLocaleString()}</span>
+                            </div>
+                            <div class="item-body">
+                                <b>Category:</b> ${dress.category}<br>
+                                <b>Size Stock:</b> S:${dress.sizes.S} | M:${dress.sizes.M} | L:${dress.sizes.L} | XL:${dress.sizes.XL} <br>
+                                <b>Total Stock:</b> <span style="color:#fbbf24; font-weight:bold;">${totalCurrentStock} Pcs</span>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-sm btn-view" onclick="viewDress(${index})">View</button>
+                                <button class="btn-sm btn-edit" onclick="openEditModal(${index})">Edit & Stock</button>
+                                <button class="btn-sm btn-delete" onclick="deleteDress(${index})">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function viewDress(index) {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let d = dresses[index];
+            let total = (d.sizes.S || 0) + (d.sizes.M || 0) + (d.sizes.L || 0) + (d.sizes.XL || 0);
+
+            document.getElementById('viewTitle').innerText = d.name;
+            document.getElementById('viewImg').src = d.image;
+            document.getElementById('viewDetails').innerHTML = `
+                <b>Product ID:</b> ${d.id}<br>
+                <b>Category:</b> ${d.category}<br>
+                <b>Price:</b> ৳ ${d.price.toLocaleString()}<br>
+                <b>Size Breakdown:</b><br>
+                &nbsp;&bull; S Size: ${d.sizes.S} Pcs<br>
+                &nbsp;&bull; M Size: ${d.sizes.M} Pcs<br>
+                &nbsp;&bull; L Size: ${d.sizes.L} Pcs<br>
+                &nbsp;&bull; XL Size: ${d.sizes.XL} Pcs<br>
+                <b>Overall Total Stock:</b> ${total} Pcs
+            `;
+            document.getElementById('viewModal').style.display = 'flex';
+        }
+
+        function openEditModal(index) {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let d = dresses[index];
+
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editName').value = d.name;
+            document.getElementById('editCat').value = d.category;
+            document.getElementById('editPrice').value = d.price;
+            document.getElementById('editS').value = d.sizes.S || 0;
+            document.getElementById('editM').value = d.sizes.M || 0;
+            document.getElementById('editL').value = d.sizes.L || 0;
+            document.getElementById('editXL').value = d.sizes.XL || 0;
+
             document.getElementById('editModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
-        function saveEdit() {
-            tg.showAlert("✅ Dress updated successfully!");
-            closeModal();
+        function saveDressChanges() {
+            let index = document.getElementById('editIndex').value;
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+
+            dresses[index].name = document.getElementById('editName').value.trim();
+            dresses[index].category = document.getElementById('editCat').value.trim();
+            dresses[index].price = parseFloat(document.getElementById('editPrice').value) || 0;
+            dresses[index].sizes = {
+                S: parseInt(document.getElementById('editS').value) || 0,
+                M: parseInt(document.getElementById('editM').value) || 0,
+                L: parseInt(document.getElementById('editL').value) || 0,
+                XL: parseInt(document.getElementById('editXL').value) || 0
+            };
+
+            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            tg.showAlert("✅ Dress and size stocks updated successfully!");
+            closeModal('editModal');
+            loadInventory();
+        }
+
+        function deleteDress(index) {
+            if(confirm("Are you sure you want to remove this dress from the shop inventory?")) {
+                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+                dresses.splice(index, 1);
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                tg.showAlert("🗑️ Dress removed successfully!");
+                loadInventory();
+            }
         }
     </script>
 </body>
