@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Pro Shop</title>
+    <title>WhiteFlowery - Pro Shop with Zoom</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -47,12 +47,38 @@
 
         /* Products Grid */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-img-box { width: 100%; height: 120px; background: #0b0f19; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px; color: #ec4899; }
+        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        
+        /* Wishlist Icon Button */
+        .wishlist-btn {
+            position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.4); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 2; transition: 0.2s;
+        }
+        .wishlist-btn.active { color: #ec4899; }
+
+        /* Zoomable Image Box */
+        .product-img-box { 
+            width: 100%; height: 130px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; cursor: zoom-in;
+        }
+        .product-img-box img {
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;
+        }
+        .product-img-box:hover img {
+            transform: scale(1.3); /* Hover Zoom Effect */
+        }
+
         .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price { margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
-        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
-        .add-to-cart-btn:active { transform: scale(0.96); }
+        
+        .card-actions { display: flex; gap: 6px; }
+        .action-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; flex: 1; text-align: center; }
+        .action-btn:active { transform: scale(0.96); }
+
+        /* Modal for Full Image Zoom */
+        #zoomModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column;
+        }
+        #zoomModal img { max-width: 90%; max-height: 80%; border-radius: 12px; border: 2px solid var(--card-border); }
+        .close-zoom { margin-top: 15px; background: #ec4899; color: #fff; border: none; padding: 8px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -77,7 +103,7 @@
         <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search dresses, gowns, sets...">
+            <input type="text" class="search-input" placeholder="Search dresses...">
         </div>
 
         <!-- Categories Filter -->
@@ -89,158 +115,239 @@
             <div class="cat-chip">Bridal</div>
         </div>
 
-        <!-- Products Grid (15 Dresses) -->
+        <!-- Products Grid (Cloudinary Image Links & Zoom integrated) -->
         <div class="products-grid">
             <!-- Dress 1 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress1.jpg" alt="Royal Silk Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+1'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Royal Silk Gown</h4>
                     <p class="product-price">৳ 8,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 2 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress2.jpg" alt="White Floral Maxi" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+2'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">White Floral Maxi</h4>
                     <p class="product-price">৳ 3,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('White Floral Maxi', 3500)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('White Floral Maxi', 3500)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 3 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress3.jpg" alt="Designer Party Frock" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+3'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Designer Party Frock</h4>
                     <p class="product-price">৳ 6,200</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Designer Party Frock', 6200)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Designer Party Frock', 6200)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 4 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress4.jpg" alt="Chiffon Ethnic Set" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+4'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">Chiffon Ethnic Set</h4>
                     <p class="product-price">৳ 4,800</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 5 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress5.jpg" alt="Velvet Winter Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+5'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Velvet Winter Gown</h4>
                     <p class="product-price">৳ 9,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 6 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress6.jpg" alt="Casual Linen Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+6'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">Casual Linen Dress</h4>
                     <p class="product-price">৳ 2,200</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 7 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress7.jpg" alt="Embroidered Anarkali" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+7'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Embroidered Anarkali</h4>
                     <p class="product-price">৳ 7,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 8 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress8.jpg" alt="Organza Party Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+8'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">Organza Party Dress</h4>
                     <p class="product-price">৳ 5,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Organza Party Dress', 5500)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Organza Party Dress', 5500)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 9 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress9.jpg" alt="Georgette Long Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+9'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Georgette Long Dress</h4>
                     <p class="product-price">৳ 4,200</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 10 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress10.jpg" alt="Classic Cotton Kurti" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+10'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">Classic Cotton Kurti</h4>
                     <p class="product-price">৳ 2,000</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 11 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress11.jpg" alt="Bridal White Lehenga" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+11'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Bridal White Lehenga</h4>
                     <p class="product-price">৳ 10,000</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 12 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress12.jpg" alt="Satin Evening Gown" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+12'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">Satin Evening Gown</h4>
                     <p class="product-price">৳ 6,800</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 13 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress13.jpg" alt="Boho Summer Dress" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+13'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Boho Summer Dress</h4>
                     <p class="product-price">৳ 2,800</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 14 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress14.jpg" alt="Net Layered Frock" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+14'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
                     <h4 class="product-title">Net Layered Frock</h4>
                     <p class="product-price">৳ 5,100</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Net Layered Frock', 5100)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Net Layered Frock', 5100)">Add Cart</button>
+                </div>
             </div>
 
             <!-- Dress 15 -->
             <div class="product-card">
+                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                <div class="product-img-box" onclick="openZoom(this)">
+                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress15.jpg" alt="Luxury Printed Kaftan" onerror="this.src='https://via.placeholder.com/150/131c2e/ec4899?text=Dress+15'">
+                </div>
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
                     <h4 class="product-title">Luxury Printed Kaftan</h4>
                     <p class="product-price">৳ 3,900</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add to Cart</button>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add Cart</button>
+                </div>
             </div>
         </div>
+    </div>
+
+    <!-- Image Zoom Fullscreen Modal -->
+    <div id="zoomModal" onclick="closeZoom()">
+        <img id="zoomedImg" src="" alt="Zoomed Dress">
+        <button class="close-zoom">Close</button>
     </div>
 
     <!-- Bottom Navigation Bar -->
@@ -257,6 +364,28 @@
 
         function addToCart(itemName, price) {
             tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
+        }
+
+        function toggleWishlist(btn) {
+            btn.classList.toggle('active');
+            let isFav = btn.classList.contains('active');
+            if(isFav) {
+                tg.showAlert("❤️ Added to Wishlist!");
+            } else {
+                tg.showAlert("💔 Removed from Wishlist!");
+            }
+        }
+
+        function openZoom(box) {
+            let img = box.querySelector('img');
+            let modal = document.getElementById('zoomModal');
+            let zoomedImg = document.getElementById('zoomedImg');
+            zoomedImg.src = img.src;
+            modal.style.display = 'flex';
+        }
+
+        function closeZoom() {
+            document.getElementById('zoomModal').style.display = 'none';
         }
     </script>
 </body>
