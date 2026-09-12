@@ -58,10 +58,10 @@
         .product-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
 
-        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 10px; }
+        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 10px; }
         .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 6px; font-weight: bold; }
         
-        .size-box { display: flex; gap: 4px; margin-bottom: 10px; }
+        .size-box { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
         .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
@@ -97,478 +97,21 @@
         <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search dresses...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search dresses..." onkeyup="filterProducts()">
         </div>
 
         <!-- Categories Filter -->
-        <div class="categories-scroll">
-            <div class="cat-chip active">All Dresses</div>
-            <div class="cat-chip">Gowns</div>
-            <div class="cat-chip">Party Wear</div>
-            <div class="cat-chip">Casual Sets</div>
-            <div class="cat-chip">Bridal</div>
+        <div class="categories-scroll" id="categoriesContainer">
+            <div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>
+            <div class="cat-chip" onclick="filterCategory('Gowns', this)">Gowns</div>
+            <div class="cat-chip" onclick="filterCategory('Party Wear', this)">Party Wear</div>
+            <div class="cat-chip" onclick="filterCategory('Casual Sets', this)">Casual Sets</div>
+            <div class="cat-chip" onclick="filterCategory('Bridal', this)">Bridal</div>
         </div>
 
-        <!-- Products Grid (24 Dresses with Cloudinary Links) -->
-        <div class="products-grid">
-            
-            <!-- Dress 1 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp" alt="Royal Silk Gown">
-                </div>
-                <div>
-                    <h4 class="product-title">Royal Silk Gown</h4>
-                    <p class="product-price">৳ 8,500</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 2 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/4_jwi1bs.webp" alt="White Floral Maxi">
-                </div>
-                <div>
-                    <h4 class="product-title">White Floral Maxi</h4>
-                    <p class="product-price">৳ 3,500</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">S</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('White Floral Maxi', 3500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 3 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/7_zz8gga.webp" alt="Designer Party Frock">
-                </div>
-                <div>
-                    <h4 class="product-title">Designer Party Frock</h4>
-                    <p class="product-price">৳ 6,200</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Designer Party Frock', 6200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 4 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/1_ufizyp.webp" alt="Chiffon Ethnic Set">
-                </div>
-                <div>
-                    <h4 class="product-title">Chiffon Ethnic Set</h4>
-                    <p class="product-price">৳ 4,800</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 5 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180132/3_tm4w9f.webp" alt="Velvet Winter Gown">
-                </div>
-                <div>
-                    <h4 class="product-title">Velvet Winter Gown</h4>
-                    <p class="product-price">৳ 9,500</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 6 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180132/5_lphyur.webp" alt="Casual Linen Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Casual Linen Dress</h4>
-                    <p class="product-price">৳ 2,200</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 7 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180132/6_a7nrjj.webp" alt="Embroidered Anarkali">
-                </div>
-                <div>
-                    <h4 class="product-title">Embroidered Anarkali</h4>
-                    <p class="product-price">৳ 7,500</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 8 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180132/9_pyynus.webp" alt="Organza Party Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Organza Party Dress</h4>
-                    <p class="product-price">৳ 5,500</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Organza Party Dress', 5500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 9 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180131/8_rnhjh5.webp" alt="Georgette Long Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Georgette Long Dress</h4>
-                    <p class="product-price">৳ 4,200</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 10 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180131/10_l7enmg.webp" alt="Classic Cotton Kurti">
-                </div>
-                <div>
-                    <h4 class="product-title">Classic Cotton Kurti</h4>
-                    <p class="product-price">৳ 2,000</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 11 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/19_fazthb.webp" alt="Bridal White Lehenga">
-                </div>
-                <div>
-                    <h4 class="product-title">Bridal White Lehenga</h4>
-                    <p class="product-price">৳ 10,000</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 12 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180131/16_ff8bo3.webp" alt="Satin Evening Gown">
-                </div>
-                <div>
-                    <h4 class="product-title">Satin Evening Gown</h4>
-                    <p class="product-price">৳ 6,800</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 13 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/11_nmuqvi.webp" alt="Boho Summer Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Boho Summer Dress</h4>
-                    <p class="product-price">৳ 2,800</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">S</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 14 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180131/17_nevt22.webp" alt="Net Layered Frock">
-                </div>
-                <div>
-                    <h4 class="product-title">Net Layered Frock</h4>
-                    <p class="product-price">৳ 5,100</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Net Layered Frock', 5100)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 15 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/21_g8xdy3.webp" alt="Luxury Printed Kaftan">
-                </div>
-                <div>
-                    <h4 class="product-title">Luxury Printed Kaftan</h4>
-                    <p class="product-price">৳ 3,900</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">S</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 16 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/18_vtbuam.webp" alt="Chic White Blazer Set">
-                </div>
-                <div>
-                    <h4 class="product-title">Chic White Blazer Set</h4>
-                    <p class="product-price">৳ 5,800</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Chic White Blazer Set', 5800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 17 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/12_lxoxkk.webp" alt="Ruffled Elegant Gown">
-                </div>
-                <div>
-                    <h4 class="product-title">Ruffled Elegant Gown</h4>
-                    <p class="product-price">৳ 7,200</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Ruffled Elegant Gown', 7200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 18 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180129/14_vv3edn.webp" alt="Pearls Decorated Frock">
-                </div>
-                <div>
-                    <h4 class="product-title">Pearls Decorated Frock</h4>
-                    <p class="product-price">৳ 6,500</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Pearls Decorated Frock', 6500)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 19 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/13_j1iqqj.webp" alt="Minimalist White Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Minimalist White Dress</h4>
-                    <p class="product-price">৳ 3,200</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Minimalist White Dress', 3200)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 20 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180129/20_nl0iqq.webp" alt="Royal Lace Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Royal Lace Dress</h4>
-                    <p class="product-price">৳ 8,100</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Royal Lace Dress', 8100)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 21 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180129/22_ostfn4.webp" alt="Embossed Velvet Outfit">
-                </div>
-                <div>
-                    <h4 class="product-title">Embossed Velvet Outfit</h4>
-                    <p class="product-price">৳ 9,100</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Embossed Velvet Outfit', 9100)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 22 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180129/24_pbzdij.webp" alt="Signature Designer Set">
-                </div>
-                <div>
-                    <h4 class="product-title">Signature Designer Set</h4>
-                    <p class="product-price">৳ 7,800</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Signature Designer Set', 7800)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 23 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180129/23_exv5bf.webp" alt="Classic White Gown">
-                </div>
-                <div>
-                    <h4 class="product-title">Classic White Gown</h4>
-                    <p class="product-price">৳ 6,900</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
-                        <span class="size-pill" onclick="selectSize(this)">XL</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Classic White Gown', 6900)">Add to Cart</button>
-            </div>
-
-            <!-- Dress 24 -->
-            <div class="product-card">
-                <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
-                <div class="product-img-box" onclick="openZoom(this)">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180129/15_vgqlvi.webp" alt="Exquisite Bridal Dress">
-                </div>
-                <div>
-                    <h4 class="product-title">Exquisite Bridal Dress</h4>
-                    <p class="product-price">৳ 9,800</p>
-                    <div class="meta-info"><span class="stock-badge">Stock: 10 Pcs</span></div>
-                    <div class="size-box">
-                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
-                        <span class="size-pill" onclick="selectSize(this)">M</span>
-                        <span class="size-pill" onclick="selectSize(this)">L</span>
-                    </div>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Exquisite Bridal Dress', 9800)">Add to Cart</button>
-            </div>
-
+        <!-- Dynamic Products Grid -->
+        <div class="products-grid" id="shopProductsGrid">
+            <!-- JavaScript dynamically loads all dresses here -->
         </div>
     </div>
 
@@ -589,6 +132,95 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        let currentCategory = 'All';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadShopProducts();
+        });
+
+        function loadShopProducts() {
+            let grid = document.getElementById('shopProductsGrid');
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+
+            // If empty, provide a default set of products matching Cloudinary assets
+            if (dresses.length === 0) {
+                dresses = [
+                    { id: 'WF-1', name: 'Royal Silk Gown', category: 'Gowns', price: 8500, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp', sizes: { S: 5, M: 5 } },
+                    { id: 'WF-2', name: 'White Floral Maxi', category: 'Casual Sets', price: 3500, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/4_jwi1bs.webp', sizes: { M: 5, L: 5 } },
+                    { id: 'WF-3', name: 'Designer Party Frock', category: 'Party Wear', price: 6200, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/7_zz8gga.webp', sizes: { L: 5, XL: 5 } },
+                    { id: 'WF-4', name: 'Bridal White Lehenga', category: 'Bridal', price: 10000, image: 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180130/19_fazthb.webp', sizes: { S: 2, M: 3, L: 5 } }
+                ];
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            }
+
+            renderProducts(dresses);
+        }
+
+        function renderProducts(dresses) {
+            let grid = document.getElementById('shopProductsGrid');
+            let searchVal = document.getElementById('searchInput').value.toLowerCase();
+            
+            grid.innerHTML = '';
+
+            let filtered = dresses.filter(d => {
+                let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
+                let matchesSearch = d.name.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 30px; font-size: 12px;">No dresses found in this category.</div>`;
+                return;
+            }
+
+            filtered.forEach((dress) => {
+                let sizesObj = dress.sizes || {};
+                let totalStock = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
+                
+                let sizePillsHtml = '';
+                let firstSelected = true;
+                for (let [sizeKey, qty] of Object.entries(sizesObj)) {
+                    if (qty > 0) {
+                        let cls = firstSelected ? 'size-pill selected' : 'size-pill';
+                        sizePillsHtml += `<span class="${cls}" onclick="selectSize(this)">${sizeKey}</span>`;
+                        firstSelected = false;
+                    }
+                }
+
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
+                        <div class="product-img-box" onclick="openZoom(this)">
+                            <img src="${dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'}" alt="${dress.name}">
+                        </div>
+                        <div>
+                            <h4 class="product-title">${dress.name}</h4>
+                            <p class="product-price">৳ ${Number(dress.price).toLocaleString()}</p>
+                            <div class="meta-info"><span class="stock-badge">Stock: ${totalStock} Pcs</span></div>
+                            <div class="size-box">
+                                ${sizePillsHtml || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>'}
+                            </div>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart('${dress.name}', ${dress.price})">Add to Cart</button>
+                    </div>
+                `;
+            });
+        }
+
+        function filterCategory(cat, chip) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            renderProducts(dresses);
+        }
+
+        function filterProducts() {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            renderProducts(dresses);
+        }
 
         function selectSize(pill) {
             let parent = pill.parentElement;
@@ -618,7 +250,7 @@
             modal.style.display = 'flex';
         }
 
-        closeZoom = function() {
+        function closeZoom() {
             document.getElementById('zoomModal').style.display = 'none';
         }
     </script>
