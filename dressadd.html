@@ -23,6 +23,8 @@
 
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
         .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        .section-divider { border-top: 1px dashed var(--card-border); margin: 16px 0; padding-top: 4px; }
+        .sub-label { font-size: 11px; font-weight: 700; color: #c084fc; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
@@ -37,12 +39,16 @@
         .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
-        .color-chip-box { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-        .color-chip { display: flex; align-items: center; gap: 6px; background: #0b0f19; border: 1px solid var(--card-border); border-radius: 20px; padding: 4px 6px 4px 10px; font-size: 11px; }
-        .color-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0; }
-        .del-color { background: #ef4444; color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 9px; cursor: pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+        .variant-card { display: flex; gap: 10px; align-items: center; background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+        .variant-thumb { width: 44px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); flex-shrink: 0; }
+        .variant-swatch { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.4); margin-right: 5px; vertical-align: middle; }
+        .variant-info { flex: 1; font-size: 10px; color: var(--text-muted); }
+        .variant-color-name { color: #fff; font-weight: 700; font-size: 12px; }
+
+        .variant-builder-box { background: rgba(124,58,237,0.06); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; margin-bottom: 14px; }
 
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
+        .add-variant-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
     </style>
 </head>
@@ -55,8 +61,8 @@
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Multi-Image & Dynamic Setup</h4>
-            
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product Info</h4>
+
             <div class="form-group">
                 <label>Dress Name</label>
                 <input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock">
@@ -96,70 +102,75 @@
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
             </div>
 
-            <!-- Size Setup -->
-            <div class="size-row-input">
-                <div style="flex: 1;">
-                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
-                    <select id="sizeDropdown" class="form-control">
-                        <option value="S">S Size</option>
-                        <option value="M">M Size</option>
-                        <option value="L">L Size</option>
-                        <option value="XL">XL Size</option>
-                        <option value="XXL">XXL Size</option>
-                        <option value="Free Size">Free Size</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
-                    <input type="number" id="sizeQty" class="form-control" placeholder="10" value="1">
-                </div>
-                <button type="button" class="add-size-btn" onclick="addSizeToTable()"><i class="fa-solid fa-plus"></i> Add</button>
-            </div>
-
-            <table class="size-table">
-                <thead>
-                    <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
-                </thead>
-                <tbody id="sizeTableBody">
-                    <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
-                </tbody>
-            </table>
-
-            <!-- Color Setup (optional, for multi-color dresses) -->
-            <div class="size-row-input">
-                <div style="flex: 1;">
-                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Add Color (optional)</label>
-                    <input type="text" id="colorInput" class="form-control" placeholder="e.g. Red, Navy Blue, Maroon">
-                </div>
-                <button type="button" class="add-size-btn" onclick="addColorToList()"><i class="fa-solid fa-plus"></i> Add</button>
-            </div>
-
-            <div class="color-chip-box" id="colorChipBox">
-                <span style="color: var(--text-muted); font-size: 10px;">No colors added yet (optional).</span>
-            </div>
-
-            <!-- 3 Image Uploads (Min 1, Max 3) -->
             <div class="form-group">
-                <label>Product Photo 1 (Required - Cloudinary)</label>
-                <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
-            </div>
-            <div class="form-group">
-                <label>Product Photo 2 (Optional)</label>
-                <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
-            </div>
-            <div class="form-group">
-                <label>Product Photo 3 (Optional)</label>
-                <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
-            </div>
-
-            <!-- Video Upload -->
-            <div class="form-group">
-                <label>Product Video (Optional)</label>
+                <label>Product Video (Optional, applies to whole product)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #94a3b8;">
             </div>
-
-            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
         </div>
+
+        <div class="admin-card">
+            <h4 class="card-title"><i class="fa-solid fa-palette"></i> Add a Color Variant</h4>
+            <p style="font-size:10px; color:var(--text-muted); margin-top:-6px;">Proti color-er jonno alada photo + alada size/qty diye "Add This Color Variant" e click koro. Ekaadhik color add korte parবে.</p>
+
+            <div class="variant-builder-box">
+                <div class="form-group">
+                    <label>Color Name</label>
+                    <input type="text" id="variantColorInput" class="form-control" placeholder="e.g. Red, Navy Blue, Maroon">
+                </div>
+
+                <div class="sub-label"><i class="fa-solid fa-ruler"></i> This Color's Size & Stock</div>
+                <div class="size-row-input">
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
+                        <select id="variantSizeDropdown" class="form-control">
+                            <option value="S">S Size</option>
+                            <option value="M">M Size</option>
+                            <option value="L">L Size</option>
+                            <option value="XL">XL Size</option>
+                            <option value="XXL">XXL Size</option>
+                            <option value="Free Size">Free Size</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
+                        <input type="number" id="variantSizeQty" class="form-control" placeholder="10" value="1">
+                    </div>
+                    <button type="button" class="add-size-btn" onclick="addSizeToVariantTable()"><i class="fa-solid fa-plus"></i> Add</button>
+                </div>
+
+                <table class="size-table">
+                    <thead>
+                        <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="variantSizeTableBody">
+                        <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="sub-label"><i class="fa-solid fa-image"></i> This Color's Photos</div>
+                <div class="form-group">
+                    <label>Photo 1 (Required)</label>
+                    <input type="file" id="variantImgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
+                </div>
+                <div class="form-group">
+                    <label>Photo 2 (Optional)</label>
+                    <input type="file" id="variantImgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
+                </div>
+                <div class="form-group">
+                    <label>Photo 3 (Optional)</label>
+                    <input type="file" id="variantImgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
+                </div>
+
+                <button type="button" class="add-variant-btn" onclick="addColorVariant()"><i class="fa-solid fa-circle-plus"></i> Add This Color Variant</button>
+            </div>
+
+            <div class="sub-label"><i class="fa-solid fa-layer-group"></i> Added Color Variants</div>
+            <div id="variantsListBox">
+                <span style="color: var(--text-muted); font-size: 10px;">No color variants added yet.</span>
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
     </div>
 
     <div id="uploadOverlay" class="uploading-overlay">
@@ -171,8 +182,10 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let addedSizesList = {};
-        let addedColorsList = [];
+        // Sizes for the color variant currently being built (resets after each "Add This Color Variant")
+        let variantSizesList = {};
+        // Finalized color variants for the dress being created: [{ color, images, sizes }]
+        let addedVariantsList = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             loadCategoriesDropdown();
@@ -182,53 +195,13 @@
             let catSelect = document.getElementById('newCat');
             let renameSelect = document.getElementById('renameCatSelect');
             let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
-            
+
             catSelect.innerHTML = '';
             renameSelect.innerHTML = '';
             categories.forEach(cat => {
                 catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
                 renameSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
-        }
-
-        function renameCategory() {
-            let oldName = document.getElementById('renameCatSelect').value;
-            let newNameInput = document.getElementById('renameCatInput');
-            let newName = newNameInput.value.trim();
-
-            if (!oldName) { tg.showAlert("⚠️ No category selected!"); return; }
-            if (!newName) { tg.showAlert("⚠️ Enter the new category name!"); return; }
-
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
-
-            if (newName !== oldName && categories.includes(newName)) {
-                tg.showAlert(`⚠️ Category "${newName}" already exists! Choose a different name.`);
-                return;
-            }
-
-            // Rename in the category list
-            categories = categories.map(c => c === oldName ? newName : c);
-            localStorage.setItem('shopCategories', JSON.stringify(categories));
-
-            // Update every existing dress that belonged to the old category name,
-            // so already-published products don't get orphaned/hidden.
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let updatedCount = 0;
-            dresses = dresses.map(d => {
-                if (d.category === oldName) {
-                    updatedCount++;
-                    return { ...d, category: newName };
-                }
-                return d;
-            });
-            localStorage.setItem('shopDresses', JSON.stringify(dresses));
-
-            loadCategoriesDropdown();
-            document.getElementById('newCat').value = newName;
-            document.getElementById('renameCatSelect').value = newName;
-            newNameInput.value = '';
-
-            tg.showAlert(`✅ Category renamed to "${newName}"! (${updatedCount} product(s) updated)`);
         }
 
         function addNewCategory() {
@@ -249,22 +222,60 @@
             }
         }
 
-        function addSizeToTable() {
-            let size = document.getElementById('sizeDropdown').value;
-            let qty = parseInt(document.getElementById('sizeQty').value) || 0;
+        function renameCategory() {
+            let oldName = document.getElementById('renameCatSelect').value;
+            let newNameInput = document.getElementById('renameCatInput');
+            let newName = newNameInput.value.trim();
+
+            if (!oldName) { tg.showAlert("⚠️ No category selected!"); return; }
+            if (!newName) { tg.showAlert("⚠️ Enter the new category name!"); return; }
+
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+
+            if (newName !== oldName && categories.includes(newName)) {
+                tg.showAlert(`⚠️ Category "${newName}" already exists! Choose a different name.`);
+                return;
+            }
+
+            categories = categories.map(c => c === oldName ? newName : c);
+            localStorage.setItem('shopCategories', JSON.stringify(categories));
+
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let updatedCount = 0;
+            dresses = dresses.map(d => {
+                if (d.category === oldName) {
+                    updatedCount++;
+                    return { ...d, category: newName };
+                }
+                return d;
+            });
+            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+
+            loadCategoriesDropdown();
+            document.getElementById('newCat').value = newName;
+            document.getElementById('renameCatSelect').value = newName;
+            newNameInput.value = '';
+
+            tg.showAlert(`✅ Category renamed to "${newName}"! (${updatedCount} product(s) updated)`);
+        }
+
+        // ---------- Variant size table (per color, before it's added) ----------
+        function addSizeToVariantTable() {
+            let size = document.getElementById('variantSizeDropdown').value;
+            let qty = parseInt(document.getElementById('variantSizeQty').value) || 0;
             if (qty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
-            addedSizesList[size] = qty;
-            renderSizeTable();
+            variantSizesList[size] = qty;
+            renderVariantSizeTable();
         }
 
-        function removeSize(sizeKey) {
-            delete addedSizesList[sizeKey];
-            renderSizeTable();
+        function removeVariantSize(sizeKey) {
+            delete variantSizesList[sizeKey];
+            renderVariantSizeTable();
         }
 
-        function renderSizeTable() {
-            let tbody = document.getElementById('sizeTableBody');
-            let keys = Object.keys(addedSizesList);
+        function renderVariantSizeTable() {
+            let tbody = document.getElementById('variantSizeTableBody');
+            let keys = Object.keys(variantSizesList);
             if (keys.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>`;
                 return;
@@ -274,59 +285,20 @@
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${size}</b></td>
-                        <td style="color:#fbbf24; font-weight:bold;">${addedSizesList[size]} Pcs</td>
-                        <td><button class="del-size" onclick="removeSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
+                        <td style="color:#fbbf24; font-weight:bold;">${variantSizesList[size]} Pcs</td>
+                        <td><button class="del-size" onclick="removeVariantSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
             });
         }
 
-        function addColorToList() {
-            let input = document.getElementById('colorInput');
-            let color = input.value.trim();
-            if (!color) { tg.showAlert("⚠️ Enter a color name!"); return; }
-            if (addedColorsList.some(c => c.toLowerCase() === color.toLowerCase())) {
-                tg.showAlert("⚠️ This color is already added!");
-                return;
-            }
-            addedColorsList.push(color);
-            input.value = '';
-            renderColorChips();
-        }
-
-        function removeColor(color) {
-            addedColorsList = addedColorsList.filter(c => c !== color);
-            renderColorChips();
-        }
-
-        function renderColorChips() {
-            let box = document.getElementById('colorChipBox');
-            if (addedColorsList.length === 0) {
-                box.innerHTML = `<span style="color: var(--text-muted); font-size: 10px;">No colors added yet (optional).</span>`;
-                return;
-            }
-            box.innerHTML = addedColorsList.map(color => `
-                <span class="color-chip">
-                    <span class="color-swatch" style="background:${color};"></span>
-                    ${color}
-                    <button class="del-color" onclick="removeColor('${color.replace(/'/g, "\\'")}')"><i class="fa-solid fa-xmark"></i></button>
-                </span>
-            `).join('');
-        }
-
+        // ---------- Cloudinary upload (unique public_id so a new photo never reuses an old asset's URL) ----------
         async function uploadToCloudinary(file) {
             let formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", "ml_default");
             formData.append("folder", "shop/Product_add");
 
-            // IMPORTANT: give every upload a guaranteed-unique public_id.
-            // Without this, if Cloudinary's preset (or the browser's file
-            // picker reusing the same filename, e.g. IMG_1234.jpg) ends up
-            // generating the same public_id twice, Cloudinary can hand back
-            // the URL of the OLD asset instead of storing the new photo —
-            // so the upload "succeeds" but the image never actually
-            // changes, and the same old picture keeps showing up.
             let uniqueId = "dress_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
             formData.append("public_id", uniqueId);
 
@@ -350,52 +322,107 @@
             }
         }
 
-        async function publishDress() {
-            let name = document.getElementById('newName').value.trim();
-            let cat = document.getElementById('newCat').value;
-            let price = parseFloat(document.getElementById('newPrice').value) || 0;
-            let details = document.getElementById('newDetails').value.trim();
-            
-            let file1 = document.getElementById('imgFile1').files[0];
-            let file2 = document.getElementById('imgFile2').files[0];
-            let file3 = document.getElementById('imgFile3').files[0];
-            let videoInput = document.getElementById('productVideoFile');
-            let sizeKeys = Object.keys(addedSizesList);
+        // ---------- Add a finished color variant (uploads its photos now) ----------
+        async function addColorVariant() {
+            let colorName = document.getElementById('variantColorInput').value.trim();
+            let file1 = document.getElementById('variantImgFile1').files[0];
+            let file2 = document.getElementById('variantImgFile2').files[0];
+            let file3 = document.getElementById('variantImgFile3').files[0];
+            let sizeKeys = Object.keys(variantSizesList);
 
-            if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Please add at least one size & quantity!"); return; }
-            if (!file1) { tg.showAlert("⚠️ Product Photo 1 is required!"); return; }
+            if (!colorName) { tg.showAlert("⚠️ Enter a color name for this variant!"); return; }
+            if (addedVariantsList.some(v => v.color.toLowerCase() === colorName.toLowerCase())) {
+                tg.showAlert("⚠️ This color is already added for this dress!");
+                return;
+            }
+            if (!file1) { tg.showAlert("⚠️ At least 1 photo is required for this color!"); return; }
+            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Add at least one size & quantity for this color!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
 
             let images = [];
             let url1 = await uploadToCloudinary(file1);
-            if(url1) {
+            if (url1) {
                 images.push(url1);
             } else {
                 document.getElementById('uploadOverlay').style.display = 'none';
-                tg.showAlert("❌ Photo 1 could not be uploaded or read. Please try a different image/file.");
+                tg.showAlert("❌ Photo could not be uploaded or read. Please try a different image.");
                 return;
             }
+            if (file2) { let u2 = await uploadToCloudinary(file2); if (u2) images.push(u2); }
+            if (file3) { let u3 = await uploadToCloudinary(file3); if (u3) images.push(u3); }
 
-            if(file2) {
-                let url2 = await uploadToCloudinary(file2);
-                if(url2) images.push(url2);
+            document.getElementById('uploadOverlay').style.display = 'none';
+
+            addedVariantsList.push({
+                color: colorName,
+                images: images,
+                sizes: { ...variantSizesList }
+            });
+
+            // Reset the variant-builder fields so the next color starts fresh
+            document.getElementById('variantColorInput').value = '';
+            document.getElementById('variantImgFile1').value = '';
+            document.getElementById('variantImgFile2').value = '';
+            document.getElementById('variantImgFile3').value = '';
+            variantSizesList = {};
+            renderVariantSizeTable();
+            renderAddedVariantsList();
+
+            tg.showAlert(`✅ "${colorName}" color variant added! Add another color or publish the dress.`);
+        }
+
+        function removeAddedVariant(idx) {
+            addedVariantsList.splice(idx, 1);
+            renderAddedVariantsList();
+        }
+
+        function renderAddedVariantsList() {
+            let box = document.getElementById('variantsListBox');
+            if (addedVariantsList.length === 0) {
+                box.innerHTML = `<span style="color: var(--text-muted); font-size: 10px;">No color variants added yet.</span>`;
+                return;
             }
-            if(file3) {
-                let url3 = await uploadToCloudinary(file3);
-                if(url3) images.push(url3);
-            }
+            box.innerHTML = addedVariantsList.map((v, idx) => {
+                let sizeStr = Object.entries(v.sizes).map(([k, val]) => `${k}: ${val} Pcs`).join(' &nbsp;|&nbsp; ');
+                return `
+                    <div class="variant-card">
+                        <img src="${v.images[0]}" class="variant-thumb">
+                        <div class="variant-info">
+                            <span class="variant-swatch" style="background:${v.color};"></span>
+                            <span class="variant-color-name">${v.color}</span><br>
+                            ${sizeStr}
+                        </div>
+                        <button class="del-size" onclick="removeAddedVariant(${idx})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ---------- Final publish ----------
+        async function publishDress() {
+            let name = document.getElementById('newName').value.trim();
+            let cat = document.getElementById('newCat').value;
+            let price = parseFloat(document.getElementById('newPrice').value) || 0;
+            let details = document.getElementById('newDetails').value.trim();
+            let videoInput = document.getElementById('productVideoFile');
+
+            if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
+            if (addedVariantsList.length === 0) { tg.showAlert("⚠️ Add at least one color variant (with photo & size) before publishing!"); return; }
+
+            document.getElementById('uploadOverlay').style.display = 'flex';
 
             let videoUrl = "";
-            if(videoInput.files.length > 0) {
+            if (videoInput.files.length > 0) {
                 videoUrl = await uploadToCloudinary(videoInput.files[0]);
             }
 
             document.getElementById('uploadOverlay').style.display = 'none';
 
             let totalStock = 0;
-            sizeKeys.forEach(s => totalStock += addedSizesList[s]);
+            addedVariantsList.forEach(v => {
+                Object.values(v.sizes).forEach(q => totalStock += Number(q));
+            });
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
@@ -403,11 +430,13 @@
                 category: cat,
                 price: price,
                 details: details || "No details provided.",
-                images: images, // Array of 1 to 3 images
-                image: images[0], // Main thumbnail fallback
                 video: videoUrl,
-                sizes: addedSizesList,
-                colors: addedColorsList, // Array of color names (optional)
+                variants: addedVariantsList, // [{ color, images, sizes }]
+                // Backward-compatible fallback fields (first variant), used by any older page
+                image: addedVariantsList[0].images[0],
+                images: addedVariantsList[0].images,
+                sizes: addedVariantsList[0].sizes,
+                colors: addedVariantsList.map(v => v.color),
                 totalStock: totalStock
             };
 
@@ -415,20 +444,15 @@
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
-            tg.showAlert(`✅ Dress "${name}" published successfully! Add more if you want.`);
-            
-            // Reset form for next entry
+            tg.showAlert(`✅ Dress "${name}" published with ${addedVariantsList.length} color variant(s)! Add more if you want.`);
+
+            // Reset the whole form for the next dress
             document.getElementById('newName').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
-            document.getElementById('imgFile1').value = '';
-            document.getElementById('imgFile2').value = '';
-            document.getElementById('imgFile3').value = '';
             document.getElementById('productVideoFile').value = '';
-            addedSizesList = {};
-            renderSizeTable();
-            addedColorsList = [];
-            renderColorChips();
+            addedVariantsList = [];
+            renderAddedVariantsList();
         }
     </script>
 </body>
