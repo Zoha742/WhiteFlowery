@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Master Admin</title>
+    <title>WhiteFlowery - Master Admin Hub</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,97 +15,102 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-pink: #ec4899;
         }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 16px;
+            display: flex; justify-content: center;
+        }
         .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
+
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        /* File Call Cards Grid */
-        .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .admin-card-btn {
-            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px;
-            text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; font-size: 12px; font-weight: bold;
-        }
-        .admin-card-btn i { font-size: 22px; color: #c084fc; margin-bottom: 4px; }
-
-        /* Support Tickets Section */
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
-        .card-title { font-size: 14px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
-        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #c084fc; }
-        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+        /* Admin Grid Hub */
+        .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
         
-        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; margin-bottom: 8px; }
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; }
+        .admin-card-btn {
+            background: linear-gradient(135deg, rgba(19, 28, 46, 0.9) 0%, rgba(30, 27, 75, 0.8) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 18px; padding: 20px 16px;
+            text-decoration: none; color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: 12px; transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .admin-card-btn:active { transform: scale(0.96); border-color: #c084fc; }
+        
+        .card-icon {
+            width: 45px; height: 45px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .card-title { margin: 0; font-size: 13px; font-weight: 700; color: #fff; }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
+        /* Notification Card Styles */
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .submit-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin Hub</h3>
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-user"></i> Profile</a>
         </div>
 
-        <!-- 3 আলাদা ফাইল কল করার বাটন কার্ড -->
+        <!-- Admin Navigation Grid -->
         <div class="admin-grid">
+            <!-- 1. Dress List & Customize -->
             <a href="dresslist.html" class="admin-card-btn">
-                <i class="fa-solid fa-shirt"></i> Dress List & Edit
-            </a>
-            <a href="ordermanage.html" class="admin-card-btn">
-                <i class="fa-solid fa-box-archive"></i> Order Management
-            </a>
-            <a href="dressadd.html" class="admin-card-btn" style="grid-column: span 2;">
-                <i class="fa-solid fa-plus-circle"></i> Add New Dress
-            </a>
-        </div>
-
-        <!-- User Problems & Support Section -->
-        <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-headset"></i> User Support & Problems Inbox</h4>
-            <div id="adminTicketsContainer">
-                <!-- ডাইনামিক বা লোকালস্টোরেজ থেকে আসা ইউজারের প্রবলেম এখানে দেখাবে -->
-                <div class="list-item">
-                    <div class="item-header">
-                        <span>User: Zoha (#884920)</span>
-                        <span style="color:#fbbf24;">Pending</span>
-                    </div>
-                    <div class="item-body">
-                        <b>Problem:</b> Dress size exchange inquiry regarding my order.<br>
-                        <button class="btn-sm" style="background:#3b82f6; margin-top:6px;" onclick="viewUserPhoto('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')">
-                            <i class="fa-solid fa-image"></i> View Photo / Proof
-                        </button>
-                    </div>
-                    <button class="btn-sm" style="background:#10b981;" onclick="openReplyModal('884920', 'Zoha')">
-                        <i class="fa-solid fa-reply"></i> Text Reply to User
-                    </button>
+                <div class="card-icon" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);">
+                    <i class="fa-solid fa-shirt"></i>
                 </div>
+                <h4 class="card-title">Dress List & Edit</h4>
+            </a>
+
+            <!-- 2. Order Management & History -->
+            <a href="ordermanage.html" class="admin-card-btn">
+                <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);">
+                    <i class="fa-solid fa-box-archive"></i>
+                </div>
+                <h4 class="card-title">Order Management</h4>
+            </a>
+
+            <!-- 3. Add New Dress (Full Width) -->
+            <a href="dressadd.html" class="admin-card-btn" style="grid-column: span 2;">
+                <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                    <i class="fa-solid fa-plus-circle"></i>
+                </div>
+                <h4 class="card-title">Add New Dress</h4>
+            </a>
+        </div>
+
+        <!-- Admin Broadcast Notification Section -->
+        <div class="admin-card">
+            <h4 style="font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-bullhorn" style="color: var(--accent-pink);"></i> Send Broadcast Notification
+            </h4>
+            <div class="form-group">
+                <label>Notification Title</label>
+                <input type="text" id="notifTitle" class="form-control" placeholder="Special Offer / Update!">
             </div>
-        </div>
-    </div>
-
-    <!-- View User Photo Modal -->
-    <div id="photoModal" class="modal-overlay">
-        <div class="modal-content">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('photoModal')">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;">User Attached Photo</h4>
-            <img id="modalUserImg" src="" alt="User Photo" style="width:100%; max-height:300px; object-fit:contain; border-radius:8px;">
-        </div>
-    </div>
-
-    <!-- Text Reply Modal -->
-    <div id="replyModal" class="modal-overlay">
-        <div class="modal-content" style="text-align: left;">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('replyModal')">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;" id="replyModalTitle">Reply to User</h4>
-            <textarea id="adminReplyText" class="form-control" placeholder="Write reply message..." style="height:85px; resize:none;"></textarea>
-            <button class="submit-btn" onclick="sendReplyToUser()">Send Reply</button>
+            <div class="form-group">
+                <label>Message Details</label>
+                <textarea id="notifMsg" class="form-control" placeholder="Write message for users..." style="height:60px; resize:none;"></textarea>
+            </div>
+            <button class="submit-btn" onclick="sendBroadcastNotification()">Send Notification to All Users</button>
         </div>
     </div>
 
@@ -113,68 +118,28 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let activeUserId = "";
+        function sendBroadcastNotification() {
+            let title = document.getElementById('notifTitle').value.trim();
+            let msg = document.getElementById('notifMsg').value.trim();
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+            if(!title || !msg) {
+                tg.showAlert("⚠️ Please enter both title and message!");
+                return;
+            }
 
-        function viewUserPhoto(imgUrl) {
-            document.getElementById('modalUserImg').src = imgUrl;
-            document.getElementById('photoModal').style.display = 'flex';
-        }
-
-        function openReplyModal(userId, userName) {
-            activeUserId = userId;
-            document.getElementById('replyModalTitle').innerText = `Reply to ${userName} (#${userId})`;
-            document.getElementById('replyModal').style.display = 'flex';
-        }
-
-        function sendReplyToUser() {
-            let replyText = document.getElementById('adminReplyText').value.trim();
-            if(!replyText) { tg.showAlert("⚠️ Please write a reply!"); return; }
-
-            // ইউজারের ইনবক্সে বা লোকালস্টোরেজে রিপ্লাই সেভ করা
-            let replies = JSON.parse(localStorage.getItem(`userSupportReplies_${activeUserId}`)) || [];
-            replies.unshift({
-                sender: "Admin",
-                message: replyText,
+            // Save notification to localStorage for users to receive
+            let notifs = JSON.parse(localStorage.getItem('globalUserNotifications')) || [];
+            notifs.unshift({
+                title: title,
+                message: msg,
                 date: new Date().toLocaleString()
             });
-            localStorage.setItem(`userSupportReplies_${activeUserId}`, JSON.stringify(replies));
+            localStorage.setItem('globalUserNotifications', JSON.stringify(notifs));
 
-            tg.showAlert(`✅ Reply sent successfully to User #${activeUserId}!`);
-            document.getElementById('adminReplyText').value = '';
-            closeModal('replyModal');
+            tg.showAlert("🔔 Broadcast notification sent to all users successfully!");
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifMsg').value = '';
         }
-
-        // ইউজারের পাঠানো সাপোর্ট টিকিট লোড করা (যদি থাকে)
-        window.addEventListener('DOMContentLoaded', () => {
-            let tickets = JSON.parse(localStorage.getItem('allSupportTickets')) || [];
-            let container = document.getElementById('adminTicketsContainer');
-
-            if(tickets.length > 0) {
-                container.innerHTML = '';
-                tickets.forEach((t, index) => {
-                    let photoBtn = t.screenshot ? `<button class="btn-sm" style="background:#3b82f6; margin-top:6px;" onclick="viewUserPhoto('${t.screenshot}')"><i class="fa-solid fa-image"></i> View Photo / Proof</button>` : '';
-                    container.innerHTML += `
-                        <div class="list-item">
-                            <div class="item-header">
-                                <span>User: ${t.userName} (#${t.userId})</span>
-                                <span style="color:#fbbf24;">${t.date}</span>
-                            </div>
-                            <div class="item-body">
-                                <b>Problem:</b> ${t.message}<br>
-                                ${photoBtn}
-                            </div>
-                            <button class="btn-sm" style="background:#10b981;" onclick="openReplyModal('${t.userId}', '${t.userName}')">
-                                <i class="fa-solid fa-reply"></i> Text Reply to User
-                            </button>
-                        </div>
-                    `;
-                });
-            }
-        });
     </script>
 </body>
 </html>
