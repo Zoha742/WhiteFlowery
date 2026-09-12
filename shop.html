@@ -22,225 +22,50 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            padding: 0 0 90px 0;
-            display: flex;
-            justify-content: center;
-            overflow-x: hidden;
+            margin: 0; padding: 0 0 90px 0;
+            display: flex; justify-content: center;
         }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            padding: 16px;
-            box-sizing: border-box;
-        }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        /* Top Header */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .brand-title {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #c084fc, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .back-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .search-box { position: relative; margin-bottom: 16px; }
+        .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        /* Search Bar */
-        .search-box {
-            position: relative;
-            margin-bottom: 16px;
-        }
-        .search-input {
-            width: 100%;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 12px 16px 12px 42px;
-            border-radius: 14px;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-            box-sizing: border-box;
-        }
-        .search-input:focus { border-color: #7c3aed; }
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 14px;
-        }
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-img-box { width: 100%; height: 120px; background: #0b0f19; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px; color: #ec4899; }
+        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
 
-        /* Categories Scroll */
-        .categories-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 6px;
-            margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-        .categories-scroll::-webkit-scrollbar { display: none; }
-        
-        .cat-chip {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 8px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: 0.2s;
-        }
-        .cat-chip.active, .cat-chip:hover {
-            background: #7c3aed;
-            color: #fff;
-            border-color: #7c3aed;
-        }
-
-        /* Products Grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .product-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .product-img-box {
-            width: 100%;
-            height: 120px;
-            background: #0b0f19;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            margin-bottom: 10px;
-            color: #ec4899;
-        }
-        .product-title {
-            margin: 0 0 4px 0;
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .product-price {
-            margin: 0 0 10px 0;
-            font-size: 13px;
-            font-weight: bold;
-            color: #fbbf24;
-        }
-        .add-to-cart-btn {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            color: #fff;
-            border: none;
-            padding: 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.2s;
-        }
-        .add-to-cart-btn:active { transform: scale(0.96); }
-
-        /* Bottom Navigation Bar */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            background: var(--card-bg);
-            border-top: 1px solid var(--card-border);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0 14px 0;
-            box-sizing: border-box;
-            z-index: 9999;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: var(--card-bg);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
         }
-        .nav-item {
-            text-align: center;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            flex: 1;
-            transition: color 0.2s, transform 0.2s;
-        }
-        .nav-item.active {
-            color: #c084fc;
-            transform: translateY(-2px);
-        }
-        .nav-item i {
-            font-size: 20px;
-            display: block;
-            margin-bottom: 4px;
-        }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-store"></i> All Floral Catalog</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Home</a>
         </div>
 
-        <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" class="search-input" placeholder="Search products...">
         </div>
 
-        <!-- Categories Filter -->
-        <div class="categories-scroll">
-            <div class="cat-chip active">All Items</div>
-            <div class="cat-chip">Bouquets</div>
-            <div class="cat-chip">Gift Boxes</div>
-            <div class="cat-chip">Plants</div>
-            <div class="cat-chip">Accessories</div>
-        </div>
-
-        <!-- Products Grid -->
         <div class="products-grid">
             <div class="product-card">
                 <div>
@@ -250,7 +75,6 @@
                 </div>
                 <button class="add-to-cart-btn" onclick="addToCart('White Rose Bouquet', 25)">Add to Cart</button>
             </div>
-
             <div class="product-card">
                 <div>
                     <div class="product-img-box"><i class="fa-solid fa-seedling"></i></div>
@@ -259,58 +83,21 @@
                 </div>
                 <button class="add-to-cart-btn" onclick="addToCart('Orchid Elegance', 40)">Add to Cart</button>
             </div>
-
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-gift"></i></div>
-                    <h4 class="product-title">Floral Gift Box</h4>
-                    <p class="product-price">$35.00</p>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Floral Gift Box', 35)">Add to Cart</button>
-            </div>
-
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-spa"></i></div>
-                    <h4 class="product-title">Pure Jasmine Set</h4>
-                    <p class="product-price">$20.00</p>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Pure Jasmine Set', 20)">Add to Cart</button>
-            </div>
-
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-leaf"></i></div>
-                    <h4 class="product-title">Indoor Mini Palm</h4>
-                    <p class="product-price">$30.00</p>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Indoor Mini Palm', 30)">Add to Cart</button>
-            </div>
-
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-seedling"></i></div>
-                    <h4 class="product-title">Luxury Tulip Vase</h4>
-                    <p class="product-price">$45.00</p>
-                </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Luxury Tulip Vase', 45)">Add to Cart</button>
-            </div>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function addToCart(itemName, price) {
+        window.addToCart = function(itemName, price) {
             tg.showAlert(`✅ Added "${itemName}" to cart! ($${price})`);
         }
     </script>
