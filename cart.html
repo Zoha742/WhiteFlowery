@@ -176,7 +176,7 @@
 
         <!-- Change Address Option at the Bottom -->
         <div class="change-address-box">
-            <span><i class="fa-solid fa-location-dot" style="color: #c084fc;"></i> Delivery Address: <b>Not Set</b></span>
+            <span><i class="fa-solid fa-location-dot" style="color: #c084fc;"></i> Delivery Address: <b id="addressStatus">Set</b></span>
             <button class="change-addr-btn" onclick="location.href='address.html'">Change Address</button>
         </div>
 
@@ -195,8 +195,6 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-
-        let userHasAddress = false; // প্রোফাইলে অ্যাড্রেস না থাকলে চেকআউটের সময় প্রম্পট করবে
 
         // Quantity Update & Double Price Logic
         function updateQty(btn, change) {
@@ -255,7 +253,10 @@
         function touchEnd(e) {}
 
         function proceedToCheckout() {
-            if(!userHasAddress) {
+            // Check if address exists in localStorage
+            let savedAddress = localStorage.getItem('userFullAddress') || localStorage.getItem('userAddress');
+
+            if(!savedAddress) {
                 tg.showAlert("⚠️ Delivery address not found! Please set your address first.");
                 window.location.href = "address.html";
                 return;
