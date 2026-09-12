@@ -113,6 +113,22 @@
             <p style="font-size:10px; color:var(--text-muted); margin-top:-6px;">Proti color-er jonno alada photo + alada size/qty diye "Add This Color Variant" e click koro. Ekaadhik color add korte parবে.</p>
 
             <div class="variant-builder-box">
+                <div class="sub-label"><i class="fa-solid fa-image"></i> Upload This Color's Photos</div>
+                <div class="form-group">
+                    <label>Photo 1 (Required)</label>
+                    <input type="file" id="variantImgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
+                </div>
+                <div class="form-group">
+                    <label>Photo 2 (Optional)</label>
+                    <input type="file" id="variantImgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
+                </div>
+                <div class="form-group">
+                    <label>Photo 3 (Optional)</label>
+                    <input type="file" id="variantImgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
+                </div>
+
+                <div class="section-divider"></div>
+
                 <div class="form-group">
                     <label>Color Name</label>
                     <input type="text" id="variantColorInput" class="form-control" placeholder="e.g. Red, Navy Blue, Maroon">
@@ -146,20 +162,6 @@
                         <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
                     </tbody>
                 </table>
-
-                <div class="sub-label"><i class="fa-solid fa-image"></i> This Color's Photos</div>
-                <div class="form-group">
-                    <label>Photo 1 (Required)</label>
-                    <input type="file" id="variantImgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
-                </div>
-                <div class="form-group">
-                    <label>Photo 2 (Optional)</label>
-                    <input type="file" id="variantImgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
-                </div>
-                <div class="form-group">
-                    <label>Photo 3 (Optional)</label>
-                    <input type="file" id="variantImgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
-                </div>
 
                 <button type="button" class="add-variant-btn" onclick="addColorVariant()"><i class="fa-solid fa-circle-plus"></i> Add This Color Variant</button>
             </div>
