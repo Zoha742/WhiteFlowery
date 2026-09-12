@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Pro Cart & Checkout</title>
+    <title>WhiteFlowery - Pro Cart & Duplicate</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --bg-color: #080b12;
-            --card-bg: rgba(19, 28, 46, 0.75);
+            --card-bg: rgba(19, 28, 46, 0.85);
             --card-border: rgba(124, 58, 237, 0.25);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -32,21 +32,32 @@
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
 
-        /* Cart Items List */
-        .cart-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+        /* Cart Items List & Swipe Container */
+        .cart-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+        
+        .cart-item-wrapper {
+            position: relative; overflow: hidden; border-radius: 16px; background: #ef4444;
+        }
+        .delete-swipe-action {
+            position: absolute; right: 0; top: 0; bottom: 0; width: 80px;
+            background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; gap: 4px; cursor: pointer;
+        }
+
         .cart-item {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 12px; display: flex; align-items: center; justify-content: space-between;
-            backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 14px; position: relative; z-index: 2;
+            transition: transform 0.2s ease; backdrop-filter: blur(10px);
         }
+        
+        .cart-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .cart-item-info { display: flex; align-items: center; gap: 12px; }
         .cart-item-img { width: 55px; height: 55px; background: #0b0f19; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
         
         .cart-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
-        .cart-item-price { margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #fbbf24; }
+        .cart-item-price { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
         
-        /* Size Change Selector in Cart */
         .cart-size-select {
             background: #0b0f19; border: 1px solid var(--card-border); color: #fff;
             padding: 2px 6px; border-radius: 6px; font-size: 10px; outline: none; font-weight: bold;
@@ -55,6 +66,18 @@
         .quantity-control { display: flex; align-items: center; gap: 8px; background: #0b0f19; border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 8px; }
         .qty-btn { background: none; border: none; color: #c084fc; cursor: pointer; font-size: 12px; font-weight: bold; }
         .qty-val { font-size: 12px; font-weight: bold; color: #fff; }
+
+        /* Duplicate Button Under Each Dress */
+        .cart-item-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 8px;
+        }
+        .duplicate-btn {
+            background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.4);
+            color: #d8b4fe; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
+        }
+        .duplicate-btn:active { background: #7c3aed; color: #fff; }
 
         /* Summary Card */
         .summary-card {
@@ -103,60 +126,42 @@
             <a href="shop.html" class="back-btn"><i class="fa-solid fa-store"></i> Shop</a>
         </div>
 
-        <!-- Cart Items List (Duplicate/Same Dress Different Sizes Supported) -->
-        <div class="cart-list">
+        <!-- Cart Items List with Swipe & Duplicate -->
+        <div class="cart-list" id="cartContainer">
             
-            <!-- Item 1 (Size M) -->
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <div class="cart-item-img">
-                        <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp" alt="Gown">
-                    </div>
-                    <div>
-                        <h4 class="cart-item-title">Royal Silk Gown</h4>
-                        <p class="cart-item-price">৳ 8,500</p>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-size: 10px; color: var(--text-muted);">Size:</span>
-                            <select class="cart-size-select">
-                                <option value="S">S</option>
-                                <option value="M" selected>M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                            </select>
+            <!-- Item 1 -->
+            <div class="cart-item-wrapper">
+                <div class="delete-swipe-action" onclick="removeItem(this)"><i class="fa-solid fa-trash"></i> Delete</div>
+                <div class="cart-item" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                    <div class="cart-item-top">
+                        <div class="cart-item-info">
+                            <div class="cart-item-img">
+                                <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp" alt="Gown">
+                            </div>
+                            <div>
+                                <h4 class="cart-item-title">Royal Silk Gown</h4>
+                                <p class="cart-item-price" data-base="8500">৳ 8,500</p>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="font-size: 10px; color: var(--text-muted);">Size:</span>
+                                    <select class="cart-size-select">
+                                        <option value="S">S</option>
+                                        <option value="M" selected>M</option>
+                                        <option value="L">L</option>
+                                        <option value="XL">XL</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="quantity-control">
+                            <button class="qty-btn" onclick="updateQty(this, -1)">-</button>
+                            <span class="qty-val">1</span>
+                            <button class="qty-btn" onclick="updateQty(this, 1)">+</button>
                         </div>
                     </div>
-                </div>
-                <div class="quantity-control">
-                    <button class="qty-btn">-</button>
-                    <span class="qty-val">1</span>
-                    <button class="qty-btn">+</button>
-                </div>
-            </div>
-
-            <!-- Item 2 (Same Dress Duplicate - Size L) -->
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <div class="cart-item-img">
-                        <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp" alt="Gown">
+                    <div class="cart-item-footer">
+                        <span style="font-size: 10px; color: var(--text-muted);"><i class="fa-solid fa-arrow-left-long"></i> Swipe left to delete</span>
+                        <button class="duplicate-btn" onclick="duplicateItem(this)"><i class="fa-solid fa-copy"></i> Duplicate</button>
                     </div>
-                    <div>
-                        <h4 class="cart-item-title">Royal Silk Gown</h4>
-                        <p class="cart-item-price">৳ 8,500</p>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-size: 10px; color: var(--text-muted);">Size:</span>
-                            <select class="cart-size-select">
-                                <option value="S">S</option>
-                                <option value="M">M</option>
-                                <option value="L" selected>L</option>
-                                <option value="XL">XL</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="quantity-control">
-                    <button class="qty-btn">-</button>
-                    <span class="qty-val">1</span>
-                    <button class="qty-btn">+</button>
                 </div>
             </div>
 
@@ -164,12 +169,12 @@
 
         <!-- Order Summary -->
         <div class="summary-card">
-            <div class="summary-row"><span>Subtotal</span><span>৳ 17,000</span></div>
+            <div class="summary-row"><span>Subtotal</span><span id="subTotal">৳ 8,500</span></div>
             <div class="summary-row"><span>Delivery Fee</span><span>৳ 100</span></div>
-            <div class="summary-row total"><span>Total Amount</span><span>৳ 17,100</span></div>
+            <div class="summary-row total"><span>Total Amount</span><span id="grandTotal">৳ 8,600</span></div>
         </div>
 
-        <!-- Change Address Box at the Bottom -->
+        <!-- Change Address Option at the Bottom -->
         <div class="change-address-box">
             <span><i class="fa-solid fa-location-dot" style="color: #c084fc;"></i> Delivery Address: <b>Not Set</b></span>
             <button class="change-addr-btn" onclick="location.href='address.html'">Change Address</button>
@@ -191,8 +196,63 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Simulated check for user address in Profile
-        let userHasAddress = false; // যদি প্রোফাইলে অ্যাড্রেস সেভ করা না থাকে
+        let userHasAddress = false; // প্রোফাইলে অ্যাড্রেস না থাকলে চেকআউটের সময় প্রম্পট করবে
+
+        // Quantity Update & Double Price Logic
+        function updateQty(btn, change) {
+            let qtyVal = btn.parentElement.querySelector('.qty-val');
+            let priceEl = btn.closest('.cart-item').querySelector('.cart-item-price');
+            let basePrice = parseInt(priceEl.getAttribute('data-base'));
+            
+            let currentQty = parseInt(qtyVal.innerText) + change;
+            if(currentQty < 1) return;
+
+            qtyVal.innerText = currentQty;
+            let calculatedPrice = basePrice * currentQty;
+            priceEl.innerText = `৳ ${calculatedPrice.toLocaleString()}`;
+            
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('.cart-item').forEach(item => {
+                let priceText = item.querySelector('.cart-item-price').innerText.replace('৳', '').replace(/,/g, '').trim();
+                total += parseInt(priceText);
+            });
+            document.getElementById('subTotal').innerText = `৳ ${total.toLocaleString()}`;
+            document.getElementById('grandTotal').innerText = `৳ ${(total + 100).toLocaleString()}`;
+        }
+
+        // Duplicate Item Logic
+        function duplicateItem(btn) {
+            let cardWrapper = btn.closest('.cart-item-wrapper');
+            let clone = cardWrapper.cloneNode(true);
+            document.getElementById('cartContainer').appendChild(clone);
+            calculateTotal();
+            tg.showAlert("✅ Dress duplicated successfully!");
+        }
+
+        // Remove Item
+        function removeItem(el) {
+            el.closest('.cart-item-wrapper').remove();
+            calculateTotal();
+            tg.showAlert("🗑️ Item removed from cart!");
+        }
+
+        // Swipe Gesture Logic for Mobile
+        let startX = 0;
+        function touchStart(e) { startX = e.touches[0].clientX; }
+        function touchMove(e) {
+            let diff = e.touches[0].clientX - startX;
+            let card = e.currentTarget;
+            if(diff < -30) {
+                card.style.transform = `translateX(-80px)`;
+            } else if(diff > 30) {
+                card.style.transform = `translateX(0px)`;
+            }
+        }
+        function touchEnd(e) {}
 
         function proceedToCheckout() {
             if(!userHasAddress) {
