@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Shop</title>
+    <title>WhiteFlowery - Pro Shop</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -33,14 +33,26 @@
 
         .search-box { position: relative; margin-bottom: 16px; }
         .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; }
+        .search-input:focus { border-color: #7c3aed; }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
+        .categories-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; scrollbar-width: none;
+        }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+        .cat-chip {
+            background: var(--card-bg); border: 1px solid var(--card-border); padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); transition: 0.2s;
+        }
+        .cat-chip.active, .cat-chip:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+
+        /* Products Grid */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
         .product-img-box { width: 100%; height: 120px; background: #0b0f19; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px; color: #ec4899; }
         .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price { margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
         .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
+        .add-to-cart-btn:active { transform: scale(0.96); }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -56,49 +68,195 @@
 <body>
 
     <div class="container">
+        <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-store"></i> All Floral Catalog</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-store"></i> WhiteFlowery Dresses</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Home</a>
         </div>
 
+        <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search products...">
+            <input type="text" class="search-input" placeholder="Search dresses, gowns, sets...">
         </div>
 
+        <!-- Categories Filter -->
+        <div class="categories-scroll">
+            <div class="cat-chip active">All Dresses</div>
+            <div class="cat-chip">Gowns</div>
+            <div class="cat-chip">Party Wear</div>
+            <div class="cat-chip">Casual Sets</div>
+            <div class="cat-chip">Bridal</div>
+        </div>
+
+        <!-- Products Grid (15 Dresses) -->
         <div class="products-grid">
+            <!-- Dress 1 -->
             <div class="product-card">
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-bouquet"></i></div>
-                    <h4 class="product-title">White Rose Bouquet</h4>
-                    <p class="product-price">$25.00</p>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Royal Silk Gown</h4>
+                    <p class="product-price">৳ 8,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('White Rose Bouquet', 25)">Add to Cart</button>
+                <button class="add-to-cart-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add to Cart</button>
             </div>
+
+            <!-- Dress 2 -->
             <div class="product-card">
                 <div>
-                    <div class="product-img-box"><i class="fa-solid fa-seedling"></i></div>
-                    <h4 class="product-title">Orchid Elegance</h4>
-                    <p class="product-price">$40.00</p>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">White Floral Maxi</h4>
+                    <p class="product-price">৳ 3,500</p>
                 </div>
-                <button class="add-to-cart-btn" onclick="addToCart('Orchid Elegance', 40)">Add to Cart</button>
+                <button class="add-to-cart-btn" onclick="addToCart('White Floral Maxi', 3500)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 3 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Designer Party Frock</h4>
+                    <p class="product-price">৳ 6,200</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Designer Party Frock', 6200)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 4 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">Chiffon Ethnic Set</h4>
+                    <p class="product-price">৳ 4,800</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 5 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Velvet Winter Gown</h4>
+                    <p class="product-price">৳ 9,500</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 6 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">Casual Linen Dress</h4>
+                    <p class="product-price">৳ 2,200</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 7 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Embroidered Anarkali</h4>
+                    <p class="product-price">৳ 7,500</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 8 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">Organza Party Dress</h4>
+                    <p class="product-price">৳ 5,500</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Organza Party Dress', 5500)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 9 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Georgette Long Dress</h4>
+                    <p class="product-price">৳ 4,200</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 10 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">Classic Cotton Kurti</h4>
+                    <p class="product-price">৳ 2,000</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 11 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Bridal White Lehenga</h4>
+                    <p class="product-price">৳ 10,000</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 12 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">Satin Evening Gown</h4>
+                    <p class="product-price">৳ 6,800</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 13 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Boho Summer Dress</h4>
+                    <p class="product-price">৳ 2,800</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 14 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-person-dress"></i></div>
+                    <h4 class="product-title">Net Layered Frock</h4>
+                    <p class="product-price">৳ 5,100</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Net Layered Frock', 5100)">Add to Cart</button>
+            </div>
+
+            <!-- Dress 15 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-box"><i class="fa-solid fa-shirt"></i></div>
+                    <h4 class="product-title">Luxury Printed Kaftan</h4>
+                    <p class="product-price">৳ 3,900</p>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add to Cart</button>
             </div>
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        window.addToCart = function(itemName, price) {
-            tg.showAlert(`✅ Added "${itemName}" to cart! ($${price})`);
+        function addToCart(itemName, price) {
+            tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
         }
     </script>
 </body>
