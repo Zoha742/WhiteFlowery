@@ -58,6 +58,11 @@
         .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
+        .color-box { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+        .color-pill { display: flex; align-items: center; gap: 4px; background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 8px 2px 4px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .color-pill.selected { border-color: #7c3aed; background: rgba(124, 58, 237, 0.2); color: #fff; }
+        .color-pill .swatch { width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.4); flex-shrink: 0; }
+
         .card-action-row { display: flex; gap: 4px; margin-bottom: 6px; }
         .btn-mini { background: #1e293b; border: 1px solid var(--card-border); color: #c084fc; font-size: 9px; padding: 4px 6px; border-radius: 6px; cursor: pointer; flex: 1; text-align: center; font-weight: bold; }
         
@@ -197,6 +202,16 @@
                     sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
                 });
 
+                let colorsArr = dress.colors || [];
+                let firstColor = colorsArr.length > 0 ? colorsArr[0] : '';
+                let colorPillsHtml = '';
+                colorsArr.forEach((color, cIdx) => {
+                    let cls = cIdx === 0 ? 'color-pill selected' : 'color-pill';
+                    let safeColor = color.replace(/'/g, "\\'");
+                    colorPillsHtml += `<span class="${cls}" onclick="selectColor(this, '${safeColor}', ${index})"><span class="swatch" style="background:${color};"></span>${color}</span>`;
+                });
+                let colorBoxHtml = colorsArr.length > 0 ? `<div class="color-box">${colorPillsHtml}</div>` : '';
+
                 let mainImg = dress.image || '';
                 if (dress.images && dress.images.length > 0) {
                     mainImg = dress.images[0];
@@ -205,7 +220,7 @@
                 let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
                 grid.innerHTML += `
-                    <div class="product-card" id="card-${index}">
+                    <div class="product-card" id="card-${index}" data-selected-size="${firstSize}" data-selected-color="${firstColor}">
                         <div class="product-img-box" onclick="openZoomModal(${index})">
                             <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
                         </div>
@@ -218,12 +233,13 @@
                             <div class="size-box">
                                 ${sizePillsHtml || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>'}
                             </div>
+                            ${colorBoxHtml}
                             <div class="card-action-row">
                                 <button class="btn-mini" onclick="openDetailsModal('${dress.name}', \`${dress.details || 'No details'}\`)"><i class="fa-solid fa-circle-info"></i> Details</button>
                                 ${videoBtn}
                             </div>
                         </div>
-                        <button class="add-to-cart-btn" onclick="addToCart('${dress.name}', ${dress.price})">Add to Cart</button>
+                        <button class="add-to-cart-btn" onclick="addToCart(${index})">Add to Cart</button>
                     </div>
                 `;
             });
@@ -234,6 +250,14 @@
             parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
             pill.classList.add('selected');
             document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${sizeKey}): ${qty} Pcs`;
+            document.getElementById(`card-${cardIndex}`).dataset.selectedSize = sizeKey;
+        }
+
+        function selectColor(pill, colorName, cardIndex) {
+            let parent = pill.parentElement;
+            parent.querySelectorAll('.color-pill').forEach(p => p.classList.remove('selected'));
+            pill.classList.add('selected');
+            document.getElementById(`card-${cardIndex}`).dataset.selectedColor = colorName;
         }
 
         function openZoomModal(index) {
@@ -285,8 +309,17 @@
             renderProducts();
         }
 
-        function addToCart(itemName, price) {
-            tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
+        function addToCart(cardIndex) {
+            let dress = currentFilteredDresses[cardIndex];
+            if (!dress) return;
+
+            let card = document.getElementById(`card-${cardIndex}`);
+            let selectedSize = card ? card.dataset.selectedSize : '';
+            let selectedColor = card ? card.dataset.selectedColor : '';
+            let variantText = [selectedSize, selectedColor].filter(Boolean).join(' / ');
+            let label = variantText ? `${dress.name} (${variantText})` : dress.name;
+
+            tg.showAlert(`✅ Added "${label}" to cart! (৳ ${Number(dress.price).toLocaleString()})`);
         }
     </script>
 </body>
