@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Pro Shop with Zoom</title>
+    <title>WhiteFlowery - Pro Shop with Stock & Size</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,6 +16,7 @@
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
             --accent-pink: #ec4899;
+            --stock-green: #10b981;
         }
 
         body {
@@ -49,34 +50,36 @@
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
-        /* Wishlist Icon Button */
+        /* Wishlist Button */
         .wishlist-btn {
-            position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.4); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 2; transition: 0.2s;
+            position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; z-index: 2; transition: 0.2s; backdrop-filter: blur(5px);
         }
         .wishlist-btn.active { color: #ec4899; }
 
         /* Zoomable Image Box */
         .product-img-box { 
-            width: 100%; height: 130px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; cursor: zoom-in;
+            width: 100%; height: 120px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: zoom-in;
         }
-        .product-img-box img {
-            width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;
-        }
-        .product-img-box:hover img {
-            transform: scale(1.3); /* Hover Zoom Effect */
-        }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .product-img-box:hover img { transform: scale(1.25); }
 
-        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-price { margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+        .product-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+
+        /* Stock & Size Meta Info */
+        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 10px; }
+        .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 6px; font-weight: bold; }
         
-        .card-actions { display: flex; gap: 6px; }
-        .action-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; flex: 1; text-align: center; }
-        .action-btn:active { transform: scale(0.96); }
+        /* Size Selector */
+        .size-box { display: flex; gap: 4px; margin-bottom: 10px; }
+        .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 5px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
-        /* Modal for Full Image Zoom */
-        #zoomModal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column;
-        }
+        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
+        .add-to-cart-btn:active { transform: scale(0.96); }
+
+        /* Fullscreen Image Zoom Modal */
+        #zoomModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; flex-direction: column; }
         #zoomModal img { max-width: 90%; max-height: 80%; border-radius: 12px; border: 2px solid var(--card-border); }
         .close-zoom { margin-top: 15px; background: #ec4899; color: #fff; border: none; padding: 8px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
@@ -96,14 +99,14 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-store"></i> WhiteFlowery Dresses</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-store"></i> WhiteFlowery Pro Shop</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Home</a>
         </div>
 
         <!-- Search Bar -->
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="search-input" placeholder="Search dresses...">
+            <input type="text" class="search-input" placeholder="Search dresses by name...">
         </div>
 
         <!-- Categories Filter -->
@@ -115,8 +118,9 @@
             <div class="cat-chip">Bridal</div>
         </div>
 
-        <!-- Products Grid (Cloudinary Image Links & Zoom integrated) -->
+        <!-- Products Grid (15 Pro Dresses with Size, 10 Pcs Stock & Cloudinary Links) -->
         <div class="products-grid">
+            
             <!-- Dress 1 -->
             <div class="product-card">
                 <button class="wishlist-btn" onclick="toggleWishlist(this)"><i class="fa-solid fa-heart"></i></button>
@@ -126,10 +130,17 @@
                 <div>
                     <h4 class="product-title">Royal Silk Gown</h4>
                     <p class="product-price">৳ 8,500</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Royal Silk Gown', 8500)">Add to Cart</button>
             </div>
 
             <!-- Dress 2 -->
@@ -141,10 +152,17 @@
                 <div>
                     <h4 class="product-title">White Floral Maxi</h4>
                     <p class="product-price">৳ 3,500</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">S</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('White Floral Maxi', 3500)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('White Floral Maxi', 3500)">Add to Cart</button>
             </div>
 
             <!-- Dress 3 -->
@@ -156,10 +174,16 @@
                 <div>
                     <h4 class="product-title">Designer Party Frock</h4>
                     <p class="product-price">৳ 6,200</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Designer Party Frock', 6200)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Designer Party Frock', 6200)">Add to Cart</button>
             </div>
 
             <!-- Dress 4 -->
@@ -171,10 +195,16 @@
                 <div>
                     <h4 class="product-title">Chiffon Ethnic Set</h4>
                     <p class="product-price">৳ 4,800</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Chiffon Ethnic Set', 4800)">Add to Cart</button>
             </div>
 
             <!-- Dress 5 -->
@@ -186,10 +216,17 @@
                 <div>
                     <h4 class="product-title">Velvet Winter Gown</h4>
                     <p class="product-price">৳ 9,500</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                        <span class="size-pill" onclick="selectSize(this)">XXL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Velvet Winter Gown', 9500)">Add to Cart</button>
             </div>
 
             <!-- Dress 6 -->
@@ -201,10 +238,16 @@
                 <div>
                     <h4 class="product-title">Casual Linen Dress</h4>
                     <p class="product-price">৳ 2,200</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Casual Linen Dress', 2200)">Add to Cart</button>
             </div>
 
             <!-- Dress 7 -->
@@ -216,10 +259,16 @@
                 <div>
                     <h4 class="product-title">Embroidered Anarkali</h4>
                     <p class="product-price">৳ 7,500</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Embroidered Anarkali', 7500)">Add to Cart</button>
             </div>
 
             <!-- Dress 8 -->
@@ -231,10 +280,16 @@
                 <div>
                     <h4 class="product-title">Organza Party Dress</h4>
                     <p class="product-price">৳ 5,500</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Organza Party Dress', 5500)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Organza Party Dress', 5500)">Add to Cart</button>
             </div>
 
             <!-- Dress 9 -->
@@ -246,10 +301,16 @@
                 <div>
                     <h4 class="product-title">Georgette Long Dress</h4>
                     <p class="product-price">৳ 4,200</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Georgette Long Dress', 4200)">Add to Cart</button>
             </div>
 
             <!-- Dress 10 -->
@@ -261,10 +322,17 @@
                 <div>
                     <h4 class="product-title">Classic Cotton Kurti</h4>
                     <p class="product-price">৳ 2,000</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Classic Cotton Kurti', 2000)">Add to Cart</button>
             </div>
 
             <!-- Dress 11 -->
@@ -276,10 +344,16 @@
                 <div>
                     <h4 class="product-title">Bridal White Lehenga</h4>
                     <p class="product-price">৳ 10,000</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Bridal White Lehenga', 10000)">Add to Cart</button>
             </div>
 
             <!-- Dress 12 -->
@@ -291,10 +365,16 @@
                 <div>
                     <h4 class="product-title">Satin Evening Gown</h4>
                     <p class="product-price">৳ 6,800</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Satin Evening Gown', 6800)">Add to Cart</button>
             </div>
 
             <!-- Dress 13 -->
@@ -306,10 +386,16 @@
                 <div>
                     <h4 class="product-title">Boho Summer Dress</h4>
                     <p class="product-price">৳ 2,800</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">S</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Boho Summer Dress', 2800)">Add to Cart</button>
             </div>
 
             <!-- Dress 14 -->
@@ -321,10 +407,16 @@
                 <div>
                     <h4 class="product-title">Net Layered Frock</h4>
                     <p class="product-price">৳ 5,100</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill selected" onclick="selectSize(this)">M</span>
+                        <span class="size-pill" onclick="selectSize(this)">L</span>
+                        <span class="size-pill" onclick="selectSize(this)">XL</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Net Layered Frock', 5100)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Net Layered Frock', 5100)">Add to Cart</button>
             </div>
 
             <!-- Dress 15 -->
@@ -336,15 +428,22 @@
                 <div>
                     <h4 class="product-title">Luxury Printed Kaftan</h4>
                     <p class="product-price">৳ 3,900</p>
+                    <div class="meta-info">
+                        <span class="stock-badge"><i class="fa-solid fa-box"></i> Stock: 10 Pcs</span>
+                    </div>
+                    <div class="size-box">
+                        <span class="size-pill" onclick="selectSize(this)">S</span>
+                        <span class="size-pill" onclick="selectSize(this)">M</span>
+                        <span class="size-pill selected" onclick="selectSize(this)">L</span>
+                    </div>
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add Cart</button>
-                </div>
+                <button class="add-to-cart-btn" onclick="addToCart('Luxury Printed Kaftan', 3900)">Add to Cart</button>
             </div>
+
         </div>
     </div>
 
-    <!-- Image Zoom Fullscreen Modal -->
+    <!-- Fullscreen Image Zoom Modal -->
     <div id="zoomModal" onclick="closeZoom()">
         <img id="zoomedImg" src="" alt="Zoomed Dress">
         <button class="close-zoom">Close</button>
@@ -361,6 +460,12 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        function selectSize(pill) {
+            let parent = pill.parentElement;
+            parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
+            pill.classList.add('selected');
+        }
 
         function addToCart(itemName, price) {
             tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
