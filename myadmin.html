@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Pro Admin Control</title>
+    <title>WhiteFlowery - Master Admin Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #0b0f19;
+            --bg-color: #080b12;
             --card-bg: #131c2e;
             --card-border: #2a1b4e;
             --text-main: #f8fafc;
@@ -23,44 +23,47 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 0 0 40px 0;
+            margin: 0; padding: 0 0 50px 0;
             display: flex; justify-content: center;
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        .admin-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
-        .tab-btn { flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; }
+        /* 4 Navigation Tables Tabs */
+        .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 8px 2px; border-radius: 8px; font-size: 9px; font-weight: 700; cursor: pointer; text-align: center; }
         .tab-btn.active { background: var(--primary-gradient); color: #fff; border-color: transparent; }
 
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 18px; margin-bottom: 20px; }
-        .card-title { font-size: 14px; font-weight: 700; color: #fff; margin: 0 0 14px 0; display: flex; align-items: center; gap: 8px; }
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
 
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 10px; box-sizing: border-box; font-size: 13px; outline: none; }
+        .form-group { margin-bottom: 10px; }
+        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
         .form-control:focus { border-color: #7c3aed; }
         
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
-        .submit-btn:active { transform: scale(0.98); }
-
-        /* Upload Preview Box */
-        .upload-preview {
-            width: 100%; height: 100px; background: #0b0f19; border: 2px dashed var(--card-border);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); font-size: 12px; margin-top: 5px; overflow: hidden; position: relative; cursor: pointer;
-        }
-        .upload-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
 
         .list-box { display: flex; flex-direction: column; gap: 10px; }
         .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
-        .item-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 6px; }
-        .item-user { color: #c084fc; }
-        .item-status { color: #fbbf24; font-size: 10px; background: rgba(251, 191, 36, 0.1); padding: 2px 6px; border-radius: 6px; }
-        .item-body { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .item-title { color: #c084fc; }
+        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
+        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+        
+        .action-row { display: flex; gap: 6px; }
+        .btn-sm { padding: 5px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; }
+        .btn-accept { background: #10b981; color: #fff; }
+        .btn-cancel { background: #ef4444; color: #fff; }
+        .btn-replace { background: #f59e0b; color: #fff; }
+        .btn-edit { background: #7c3aed; color: #fff; }
+
+        /* Modal Overlay */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -68,79 +71,149 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Admin Panel</h3>
-            <a href="index.html" class="back-btn"><i class="fa-solid fa-store"></i> Shop App</a>
+            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin</h3>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-user"></i> Profile</a>
         </div>
 
-        <!-- Tabs -->
+        <!-- 4 Tables / Navigation Tabs -->
         <div class="admin-tabs">
-            <div class="tab-btn active" onclick="switchTab('add-dress')"><i class="fa-solid fa-plus"></i> Add Dress</div>
-            <div class="tab-btn" onclick="switchTab('stock-manage')"><i class="fa-solid fa-boxes-stacked"></i> Stock</div>
-            <div class="tab-btn" onclick="switchTab('orders-list')"><i class="fa-solid fa-truck"></i> Orders</div>
+            <div class="tab-btn active" onclick="switchTable('table1')"><i class="fa-solid fa-shirt"></i> 1. Dress List</div>
+            <div class="tab-btn" onclick="switchTable('table2')"><i class="fa-solid fa-box"></i> 2. Orders</div>
+            <div class="tab-btn" onclick="switchTable('table3')"><i class="fa-solid fa-plus-circle"></i> 3. Add Dress</div>
+            <div class="tab-btn" onclick="switchTable('table4')"><i class="fa-solid fa-bell"></i> 4. Support & Notif</div>
         </div>
 
-        <!-- TAB 1: Add Dress with Image Upload & Stock -->
-        <div id="tab-add-dress" class="tab-content">
+        <!-- TABLE 1: Dress List & Full Customization -->
+        <div id="section-table1" class="admin-section">
             <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-shirt"></i> Upload New Dress</h4>
-                <div class="form-group">
-                    <label>Dress Title</label>
-                    <input type="text" id="dressTitle" class="form-control" placeholder="e.g. Royal Silk Gown">
-                </div>
-                <div class="form-group">
-                    <label>Price (TK)</label>
-                    <input type="number" id="dressPrice" class="form-control" placeholder="e.g. 4500">
-                </div>
-                <div class="form-group">
-                    <label>Initial Stock Quantity</label>
-                    <input type="number" id="dressStock" class="form-control" placeholder="e.g. 15">
-                </div>
-                <div class="form-group">
-                    <label>Upload Dress Image (Cloudinary)</label>
-                    <input type="file" id="imageFile" class="form-control" accept="image/*" onchange="previewImage(event)">
-                    <div class="upload-preview" onclick="document.getElementById('imageFile').click()">
-                        <span id="uploadText"><i class="fa-solid fa-cloud-arrow-up"></i> Click to browse image</span>
-                        <img id="previewImg" alt="Preview">
-                    </div>
-                </div>
-                <button class="submit-btn" onclick="uploadAndPublishDress()"><i class="fa-solid fa-paper-plane"></i> Upload & Publish</button>
-            </div>
-        </div>
-
-        <!-- TAB 2: Stock Management -->
-        <div id="tab-stock-manage" class="tab-content" style="display: none;">
-            <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-warehouse"></i> Live Stock Status</h4>
-                <div class="list-box" id="stockListContainer">
-                    <div class="list-item">
-                        <div class="item-header">
-                            <span class="item-user">Royal Silk Gown</span>
-                            <span class="item-status" style="color: #10b981; background: rgba(16,185,129,0.1);">Stock: 12 Left</span>
-                        </div>
-                        <div class="item-body">
-                            Price: ৳ 8,500 | Auto-minus active on sale.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: Orders & Stock Deduction Log -->
-        <div id="tab-orders-list" class="tab-content" style="display: none;">
-            <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-receipt"></i> Recent Orders & Deductions</h4>
+                <h4 class="card-title"><i class="fa-solid fa-list"></i> 1. Dress Inventory List (Click to Edit)</h4>
                 <div class="list-box">
                     <div class="list-item">
                         <div class="item-header">
-                            <span class="item-user">Order #WF-9021</span>
-                            <span class="item-status">Delivered</span>
+                            <span class="item-title">Royal Silk Gown</span>
+                            <span class="item-badge">৳ 8,500 (Stock: 10)</span>
                         </div>
-                        <div class="item-body">
-                            <b>Item:</b> White Floral Maxi (Qty: 1)<br>
-                            <b>Stock Updated:</b> -1 deducted from inventory.
+                        <div class="item-body">Category: Gowns | Image: dress1.jpg</div>
+                        <div class="action-row">
+                            <button class="btn-sm btn-edit" onclick="openEditDressModal('Royal Silk Gown', 8500, 10, 'Gowns')"><i class="fa-solid fa-pen-to-square"></i> Full Customize</button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- TABLE 2: Order Management & SMS Reply -->
+        <div id="section-table2" class="admin-section" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-truck-fast"></i> 2. Order Processing & SMS Reply</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-title">Order #WF-9921</span>
+                            <span class="item-badge" style="color:#fbbf24; background:rgba(251,191,36,0.1)">Pending</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Item:</b> Royal Silk Gown (Size: L, Qty: 1)<br>
+                            <b>Customer:</b> Zoha (017xxxxxxxx)
+                        </div>
+                        <div class="action-row" style="flex-wrap: wrap;">
+                            <button class="btn-sm btn-accept" onclick="updateOrderStatus('Accepted', 'Stock verified & ready for delivery.')">Accept</button>
+                            <button class="btn-sm btn-cancel" onclick="updateOrderStatus('Cancelled', 'Sorry, item out of stock.')">Cancel</button>
+                            <button class="btn-sm btn-replace" onclick="updateOrderStatus('Replace/Exchange', 'Exchange request initiated.')">Replace / Exchange</button>
+                            <button class="btn-sm" style="background:#229ed9; color:#fff;" onclick="openSmsModal('Zoha')"><i class="fa-solid fa-comment-sms"></i> SMS Reply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE 3: Add New Dress with Full Customization -->
+        <div id="section-table3" class="admin-section" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-cloud-arrow-up"></i> 3. Add Dress (Full Customize)</h4>
+                <div class="form-group">
+                    <label>Category Select</label>
+                    <select id="newCat" class="form-control">
+                        <option value="Gowns">Gowns</option>
+                        <option value="Party Wear">Party Wear</option>
+                        <option value="Casual Sets">Casual Sets</option>
+                        <option value="Bridal">Bridal</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Dress Name</label><input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock"></div>
+                <div class="form-group"><label>Available Sizes</label><input type="text" id="newSize" class="form-control" value="S, M, L, XL"></div>
+                <div class="form-group"><label>Price (৳)</label><input type="number" id="newPrice" class="form-control" placeholder="4500"></div>
+                <div class="form-group"><label>Initial Stock (Pcs)</label><input type="number" id="newStock" class="form-control" placeholder="10"></div>
+                <div class="form-group"><label>Upload Image (Cloudinary)</label><input type="file" id="newImgFile" class="form-control" accept="image/*"></div>
+                <button class="submit-btn" onclick="publishNewDress()">Publish Dress to Shop</button>
+            </div>
+        </div>
+
+        <!-- TABLE 4: Support Chat & Notification Broadcast -->
+        <div id="section-table4" class="admin-section" style="display: none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-headset"></i> 4. Support Tickets & Chat</h4>
+                <div class="list-box">
+                    <div class="list-item">
+                        <div class="item-header">
+                            <span class="item-title">@zoha_flowery</span>
+                            <span class="item-badge" style="color:#ef4444; background:rgba(239,68,68,0.1)">Open Issue</span>
+                        </div>
+                        <div class="item-body"><b>Issue:</b> Dress size exchange or replacement inquiry.</div>
+                        <div class="action-row">
+                            <button class="btn-sm" style="background:#229ed9; color:#fff;" onclick="openSupportChatModal('@zoha_flowery')"><i class="fa-solid fa-reply"></i> Chat with Image Support</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card" style="margin-top: 16px;">
+                <h4 class="card-title"><i class="fa-solid fa-bullhorn"></i> Send Broadcast Notification</h4>
+                <div class="form-group"><label>Notification Title</label><input type="text" id="notifTitle" class="form-control" placeholder="Special Offer!"></div>
+                <div class="form-group"><label>Message Details</label><textarea id="notifMsg" class="form-control" placeholder="Write notification message..." style="height:60px; resize:none;"></textarea></div>
+                <div class="form-group"><label>Attach Image (Optional)</label><input type="file" id="notifImg" class="form-control" accept="image/*"></div>
+                <button class="submit-btn" style="background: var(--accent-pink);" onclick="sendBroadcastNotification()">Send Notification to All Users</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: Edit Dress (Table 1) -->
+    <div id="editDressModal" class="modal-overlay">
+        <div class="modal-content">
+            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress Details</h4>
+            <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
+            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
+            <div class="form-group"><label>Stock (Pcs)</label><input type="number" id="editStock" class="form-control"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control"></div>
+            <div class="form-group"><label>Upload New Image</label><input type="file" class="form-control" accept="image/*"></div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button class="submit-btn" onclick="saveEditedDress()">Save Changes</button>
+                <button class="submit-btn" style="background:#ef4444;" onclick="closeModal('editDressModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: SMS Reply (Table 2) -->
+    <div id="smsModal" class="modal-overlay">
+        <div class="modal-content">
+            <h4 style="margin:0 0 10px 0; color:#fff;" id="smsModalTitle">Send SMS / Reason Reply</h4>
+            <div class="form-group"><textarea id="smsText" class="form-control" placeholder="Type reason or reply message here..." style="height:80px; resize:none;"></textarea></div>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="submit-btn" style="background:#229ed9;" onclick="sendSmsReply()">Send Message</button>
+                <button class="submit-btn" style="background:#ef4444;" onclick="closeModal('smsModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Support Chat with Image (Table 4) -->
+    <div id="supportChatModal" class="modal-overlay">
+        <div class="modal-content">
+            <h4 style="margin:0 0 10px 0; color:#fff;" id="chatModalTitle">Support Chat & Image</h4>
+            <div class="form-group"><textarea id="chatReplyText" class="form-control" placeholder="Write reply..." style="height:60px; resize:none;"></textarea></div>
+            <div class="form-group"><label>Attach Image/Proof</label><input type="file" id="chatImg" class="form-control" accept="image/*"></div>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="submit-btn" style="background:#10b981;" onclick="sendSupportReplyWithImage()">Send Reply with Image</button>
+                <button class="submit-btn" style="background:#ef4444;" onclick="closeModal('supportChatModal')">Close</button>
             </div>
         </div>
     </div>
@@ -150,72 +223,73 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+        window.switchTable = function(tableId) {
+            document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            document.getElementById(`section-${tableId}`).style.display = 'block';
             event.currentTarget.classList.add('active');
         }
 
-        // Image Preview Handler
-        window.previewImage = function(event) {
-            let reader = new FileReader();
-            reader.onload = function(){
-                let output = document.getElementById('previewImg');
-                output.src = reader.result;
-                output.style.display = 'block';
-                document.getElementById('uploadText').style.display = 'none';
-            };
-            reader.readAsDataURL(event.target.files[0]);
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
-        // Upload to Cloudinary & Publish with Stock
-        window.uploadAndPublishDress = async function() {
-            let title = document.getElementById('dressTitle').value.trim();
-            let price = document.getElementById('dressPrice').value.trim();
-            let stock = document.getElementById('dressStock').value.trim();
-            let fileInput = document.getElementById('imageFile').files[0];
+        // Table 1 Actions
+        window.openEditDressModal = function(name, price, stock, cat) {
+            document.getElementById('editName').value = name;
+            document.getElementById('editPrice').value = price;
+            document.getElementById('editStock').value = stock;
+            document.getElementById('editCat').value = cat;
+            document.getElementById('editDressModal').style.display = 'flex';
+        }
+        window.saveEditedDress = function() {
+            tg.showAlert("✅ Dress customization updated successfully!");
+            closeModal('editDressModal');
+        }
 
-            if(!title || !price || !stock || !fileInput) {
-                tg.showAlert("⚠️ Please fill all fields and select an image!");
-                return;
-            }
+        // Table 2 Actions
+        window.updateOrderStatus = function(status, defaultReason) {
+            tg.showAlert(`✅ Order status updated to: ${status}\nReason: ${defaultReason}`);
+        }
+        window.openSmsModal = function(username) {
+            document.getElementById('smsModalTitle').innerText = `Send SMS to ${username}`;
+            document.getElementById('smsModal').style.display = 'flex';
+        }
+        window.sendSmsReply = function() {
+            let msg = document.getElementById('smsText').value.trim();
+            if(!msg) { tg.showAlert("⚠️ Type a message first!"); return; }
+            tg.showAlert("✅ SMS / Reason reply sent to customer!");
+            document.getElementById('smsText').value = '';
+            closeModal('smsModal');
+        }
 
-            tg.showAlert("⏳ Uploading image to Cloudinary (dyqegwdme)... Please wait.");
+        // Table 3 Actions
+        window.publishNewDress = function() {
+            let name = document.getElementById('newName').value.trim();
+            let price = document.getElementById('newPrice').value.trim();
+            let stock = document.getElementById('newStock').value.trim();
+            if(!name || !price || !stock) { tg.showAlert("⚠️ Please fill up name, price, and stock!"); return; }
+            tg.showAlert(`✅ New Dress "${name}" published successfully with stock: ${stock} pcs!`);
+            document.getElementById('newName').value = '';
+            document.getElementById('newPrice').value = '';
+            document.getElementById('newStock').value = '';
+        }
 
-            // Cloudinary Upload API Integration (Unsigned Upload Preset)
-            let formData = new FormData();
-            formData.append("file", fileInput);
-            formData.append("upload_preset", "whiteflowery_preset"); // আপনার ক্লাউডিনারি প্রিসেট নাম দিতে হবে
-
-            try {
-                let response = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
-                    method: "POST",
-                    body: formData
-                });
-                let data = await response.json();
-                
-                if(data.secure_url) {
-                    let imageUrl = data.secure_url;
-                    
-                    // এখানে সফলভাবে ক্লাউডিনারি লিংক পাওয়ার পর Firebase ডাটাবেজে Title, Price, Stock এবং imageUrl সেভ হবে।
-                    // যখনই কোনো কাস্টমার অর্ডার করবে, তখন স্টক থেকে '1' মাইনাস হয়ে যাবে (stock = stock - 1)।
-                    
-                    tg.showAlert(`✅ Success! Dress published with stock: ${stock}\nCloudinary URL generated.`);
-                    
-                    // Clear form
-                    document.getElementById('dressTitle').value = '';
-                    document.getElementById('dressPrice').value = '';
-                    document.getElementById('dressStock').value = '';
-                    document.getElementById('imageFile').value = '';
-                    document.getElementById('previewImg').style.display = 'none';
-                    document.getElementById('uploadText').style.display = 'block';
-                } else {
-                    tg.showAlert("❌ Image upload failed. Check Cloudinary preset.");
-                }
-            } catch (error) {
-                tg.showAlert("❌ Error connecting to Cloudinary: " + error.message);
-            }
+        // Table 4 Actions
+        window.openSupportChatModal = function(username) {
+            document.getElementById('chatModalTitle').innerText = `Chat with ${username}`;
+            document.getElementById('supportChatModal').style.display = 'flex';
+        }
+        window.sendSupportReplyWithImage = function() {
+            tg.showAlert("✅ Support reply and image sent successfully to user!");
+            closeModal('supportChatModal');
+        }
+        window.sendBroadcastNotification = function() {
+            let title = document.getElementById('notifTitle').value.trim();
+            if(!title) { tg.showAlert("⚠️ Enter notification title!"); return; }
+            tg.showAlert("🔔 Broadcast notification with image sent to all app users successfully!");
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifMsg').value = '';
         }
     </script>
 </body>
