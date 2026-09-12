@@ -37,6 +37,7 @@
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: 18px; padding: 16px; backdrop-filter: blur(10px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
         }
         .invoice-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
         .invoice-id { font-size: 13px; font-weight: bold; color: #c084fc; }
@@ -56,7 +57,7 @@
         }
         .download-btn:active { transform: scale(0.96); }
 
-        .no-invoice { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 13px; }
+        .no-invoice { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 13px; line-height: 1.6; }
 
         /* Bottom Navigation Bar */
         .bottom-nav {
@@ -69,6 +70,11 @@
         .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
         .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -83,7 +89,10 @@
         <!-- Invoice Chart Container -->
         <div class="invoice-list" id="invoiceContainer">
             <!-- Dynamic Invoices will load here -->
-            <div class="no-invoice">No invoices generated yet! Admin will issue invoice upon order confirmation.</div>
+            <div class="no-invoice">
+                <i class="fa-solid fa-receipt" style="font-size: 32px; color: #4c1d95; margin-bottom: 10px; display: block;"></i>
+                No invoices generated yet!<br>Admin will issue invoice upon order confirmation.
+            </div>
         </div>
     </div>
 
@@ -99,7 +108,7 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Load Invoices automatically saved when admin receives/confirms order
+        // Load Invoices saved from Admin Panel automatically
         window.addEventListener('DOMContentLoaded', () => {
             let container = document.getElementById('invoiceContainer');
             let savedInvoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
@@ -120,7 +129,9 @@
                             </div>
                             <div class="invoice-footer">
                                 <span class="invoice-total">৳ ${inv.amount.toLocaleString()}</span>
-                                <button class="download-btn" onclick="downloadInvoice('${inv.orderId}')"><i class="fa-solid fa-download"></i> Download</button>
+                                <button class="download-btn" onclick="downloadInvoice('${inv.orderId}', '${inv.itemName}', ${inv.amount})">
+                                    <i class="fa-solid fa-download"></i> Download
+                                </button>
                             </div>
                         </div>
                     `;
@@ -128,7 +139,26 @@
             }
         });
 
-        function downloadInvoice(orderId) {
+        // Download Invoice Simulation / File Generation
+        function downloadInvoice(orderId, itemName, amount) {
+            let receiptText = `WHITEFLOWERY OFFICIAL INVOICE\\n` +
+                              `--------------------------------\\n` +
+                              `Order ID: #${orderId}\\n` +
+                              `Item: ${itemName}\\n` +
+                              `Total Amount: ৳ ${amount}\\n` +
+                              `Status: Paid & Verified\\n` +
+                              `--------------------------------\\n` +
+                              `Thank you for shopping with us!`;
+
+            let blob = new Blob([receiptText.replace(/\\n/g, '\\r\\n')], { type: 'text/plain;charset=utf-8' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = `Invoice_${orderId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
             tg.showAlert(`📥 Invoice #${orderId} downloaded successfully!`);
         }
     </script>
