@@ -97,7 +97,8 @@
         <div class="modal-content" style="text-align: center;">
             <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('viewModal')">&times;</span>
             <h4 style="color:#fff; margin-bottom:10px;" id="viewTitle">Dress Details</h4>
-            <img id="viewImg" src="" alt="Dress" style="width:100%; max-height:250px; object-fit:contain; border-radius:8px; margin-bottom:10px; border:1px solid var(--card-border);">
+            <img id="viewImg" src="" alt="Dress" style="width:100%; max-height:250px; object-fit:contain; border-radius:8px; margin-bottom:8px; border:1px solid var(--card-border);">
+            <div id="viewThumbRow" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;"></div>
             <div id="viewDetails" style="font-size:12px; color:var(--text-muted); text-align:left; line-height:1.6;"></div>
         </div>
     </div>
@@ -156,7 +157,10 @@
             });
         }
 
+        let currentViewIndex = null;
+
         function viewDress(index) {
+            currentViewIndex = index;
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let d = dresses[index];
             let sizesObj = d.sizes || {};
@@ -166,8 +170,11 @@
                 ? Object.entries(sizesObj).map(([k, v]) => `&nbsp;&bull; ${k} Size: ${v} Pcs`).join('<br>')
                 : 'No size info';
 
+            let images = (d.images && d.images.length > 0) ? d.images : (d.image ? [d.image] : []);
+
             document.getElementById('viewTitle').innerText = d.name;
-            document.getElementById('viewImg').src = d.image;
+            document.getElementById('viewImg').src = images[0] || d.image || '';
+            renderViewThumbnails(images);
             document.getElementById('viewDetails').innerHTML = `
                 <b>Product ID:</b> ${d.id || 'N/A'}<br>
                 <b>Category:</b> ${d.category || 'General'}<br>
@@ -177,6 +184,48 @@
                 <b>Overall Total Stock:</b> ${total} Pcs
             `;
             document.getElementById('viewModal').style.display = 'flex';
+        }
+
+        function renderViewThumbnails(images) {
+            let row = document.getElementById('viewThumbRow');
+            if (images.length <= 1) {
+                // Nothing to pick between / nothing removable when only 1 photo exists
+                row.innerHTML = '';
+                return;
+            }
+            row.innerHTML = images.map((imgUrl, i) => `
+                <div style="position:relative; width:55px; height:65px;">
+                    <img src="${imgUrl}" onclick="document.getElementById('viewImg').src='${imgUrl}'"
+                         style="width:100%; height:100%; object-fit:cover; border-radius:6px; border:1px solid var(--card-border); cursor:pointer;">
+                    <button onclick="removeDressImage(${currentViewIndex}, ${i})" title="Remove this photo"
+                            style="position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:#ef4444; color:#fff; border:none; font-size:10px; line-height:1; cursor:pointer; padding:0;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeDressImage(dressIndex, imgIndex) {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let d = dresses[dressIndex];
+            let images = (d.images && d.images.length > 0) ? [...d.images] : (d.image ? [d.image] : []);
+
+            if (images.length <= 1) {
+                tg.showAlert("⚠️ Can't remove the last photo — a product needs at least 1 image.");
+                return;
+            }
+
+            if (!confirm("Remove this photo from the product?")) return;
+
+            images.splice(imgIndex, 1);
+            d.images = images;
+            d.image = images[0]; // keep main thumbnail in sync
+            dresses[dressIndex] = d;
+            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+
+            tg.showAlert("🗑️ Photo removed!");
+            viewDress(dressIndex); // refresh modal with updated gallery
+            loadInventory(); // refresh list thumbnail too
         }
 
         function openEditModal(index) {
