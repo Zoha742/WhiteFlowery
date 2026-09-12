@@ -37,6 +37,11 @@
         .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
+        .color-chip-box { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+        .color-chip { display: flex; align-items: center; gap: 6px; background: #0b0f19; border: 1px solid var(--card-border); border-radius: 20px; padding: 4px 6px 4px 10px; font-size: 11px; }
+        .color-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0; }
+        .del-color { background: #ef4444; color: #fff; border: none; width: 18px; height: 18px; border-radius: 50%; font-size: 9px; cursor: pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
     </style>
@@ -120,6 +125,19 @@
                 </tbody>
             </table>
 
+            <!-- Color Setup (optional, for multi-color dresses) -->
+            <div class="size-row-input">
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Add Color (optional)</label>
+                    <input type="text" id="colorInput" class="form-control" placeholder="e.g. Red, Navy Blue, Maroon">
+                </div>
+                <button type="button" class="add-size-btn" onclick="addColorToList()"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+
+            <div class="color-chip-box" id="colorChipBox">
+                <span style="color: var(--text-muted); font-size: 10px;">No colors added yet (optional).</span>
+            </div>
+
             <!-- 3 Image Uploads (Min 1, Max 3) -->
             <div class="form-group">
                 <label>Product Photo 1 (Required - Cloudinary)</label>
@@ -154,6 +172,7 @@
         tg.expand();
 
         let addedSizesList = {};
+        let addedColorsList = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             loadCategoriesDropdown();
@@ -262,6 +281,39 @@
             });
         }
 
+        function addColorToList() {
+            let input = document.getElementById('colorInput');
+            let color = input.value.trim();
+            if (!color) { tg.showAlert("⚠️ Enter a color name!"); return; }
+            if (addedColorsList.some(c => c.toLowerCase() === color.toLowerCase())) {
+                tg.showAlert("⚠️ This color is already added!");
+                return;
+            }
+            addedColorsList.push(color);
+            input.value = '';
+            renderColorChips();
+        }
+
+        function removeColor(color) {
+            addedColorsList = addedColorsList.filter(c => c !== color);
+            renderColorChips();
+        }
+
+        function renderColorChips() {
+            let box = document.getElementById('colorChipBox');
+            if (addedColorsList.length === 0) {
+                box.innerHTML = `<span style="color: var(--text-muted); font-size: 10px;">No colors added yet (optional).</span>`;
+                return;
+            }
+            box.innerHTML = addedColorsList.map(color => `
+                <span class="color-chip">
+                    <span class="color-swatch" style="background:${color};"></span>
+                    ${color}
+                    <button class="del-color" onclick="removeColor('${color.replace(/'/g, "\\'")}')"><i class="fa-solid fa-xmark"></i></button>
+                </span>
+            `).join('');
+        }
+
         async function uploadToCloudinary(file) {
             let formData = new FormData();
             formData.append("file", file);
@@ -355,6 +407,7 @@
                 image: images[0], // Main thumbnail fallback
                 video: videoUrl,
                 sizes: addedSizesList,
+                colors: addedColorsList, // Array of color names (optional)
                 totalStock: totalStock
             };
 
@@ -374,6 +427,8 @@
             document.getElementById('productVideoFile').value = '';
             addedSizesList = {};
             renderSizeTable();
+            addedColorsList = [];
+            renderColorChips();
         }
     </script>
 </body>
