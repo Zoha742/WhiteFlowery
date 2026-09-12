@@ -15,55 +15,42 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-pink: #ec4899;
-            --success-green: #10b981;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 0 0 50px 0;
+            margin: 0; padding: 16px;
             display: flex; justify-content: center;
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
-        /* 4 Navigation Tabs */
-        .admin-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
-        .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 8px 2px; border-radius: 8px; font-size: 9px; font-weight: 700; cursor: pointer; text-align: center; }
-        .tab-btn.active { background: var(--primary-gradient); color: #fff; border-color: transparent; }
-
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
-        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
-
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
-        .form-control:focus { border-color: #7c3aed; }
+        /* Admin Grid Hub (Linking to individual files) */
+        .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
         
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
-
-        .list-box { display: flex; flex-direction: column; gap: 10px; }
-        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; }
-        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
-        .item-title { color: #c084fc; }
-        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
-        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+        .admin-card-btn {
+            background: linear-gradient(135deg, rgba(19, 28, 46, 0.9) 0%, rgba(30, 27, 75, 0.8) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: 18px; padding: 20px 16px;
+            text-decoration: none; color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            gap: 12px; transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .admin-card-btn:active { transform: scale(0.96); border-color: #c084fc; }
         
-        .action-row { display: flex; gap: 6px; flex-wrap: wrap; }
-        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; }
-        .btn-accept { background: #10b981; color: #fff; }
-        .btn-cancel { background: #ef4444; color: #fff; }
-        .btn-screenshot { background: #3b82f6; color: #fff; }
-        .btn-edit { background: #7c3aed; color: #fff; }
-
-        /* Modal Overlay */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .card-icon {
+            width: 45px; height: 45px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .card-title { margin: 0; font-size: 13px; font-weight: 700; color: #fff; }
     </style>
 </head>
 <body>
@@ -71,273 +58,49 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin Hub</h3>
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-user"></i> Profile</a>
         </div>
 
-        <!-- Search Bar by User ID -->
-        <div class="form-group" style="margin-bottom: 14px;">
-            <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID (e.g. 884920)..." onkeyup="filterOrdersByUserId()">
-        </div>
-
-        <!-- 4 Navigation Tabs -->
-        <div class="admin-tabs">
-            <div class="tab-btn active" onclick="switchTable('table1')"><i class="fa-solid fa-shirt"></i> Dress List</div>
-            <div class="tab-btn" onclick="switchTable('table2')"><i class="fa-solid fa-box"></i> Orders</div>
-            <div class="tab-btn" onclick="switchTable('table3')"><i class="fa-solid fa-plus-circle"></i> Add Dress</div>
-            <div class="tab-btn" onclick="switchTable('table4')"><i class="fa-solid fa-bell"></i> Support</div>
-        </div>
-
-        <!-- TABLE 1: Dress List -->
-        <div id="section-table1" class="admin-section">
-            <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-list"></i> Dress Inventory List</h4>
-                <div class="list-box">
-                    <div class="list-item">
-                        <div class="item-header">
-                            <span class="item-title">Royal Silk Gown</span>
-                            <span class="item-badge">৳ 8,500 (Stock: 10)</span>
-                        </div>
-                        <div class="item-body">Category: Gowns</div>
-                        <div class="action-row">
-                            <button class="btn-sm btn-edit" onclick="openEditDressModal('Royal Silk Gown', 8500, 10, 'Gowns')"><i class="fa-solid fa-pen-to-square"></i> Customize</button>
-                        </div>
-                    </div>
+        <!-- 4 Cards linking directly to your individual files -->
+        <div class="admin-grid">
+            <!-- 1. Dress List & Customize -->
+            <a href="dresslist.html" class="admin-card-btn">
+                <div class="card-icon" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);">
+                    <i class="fa-solid fa-shirt"></i>
                 </div>
-            </div>
-        </div>
+                <h4 class="card-title">Dress List & Edit</h4>
+            </a>
 
-        <!-- TABLE 2: Orders & History (Live, Accepted, Rejected) -->
-        <div id="section-table2" class="admin-section" style="display: none;">
-            <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-truck-fast"></i> Order Processing & History</h4>
-                
-                <!-- Sub tabs for Orders -->
-                <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-                    <button class="btn-sm" style="background:#7c3aed; color:#fff;" onclick="switchOrderSub('live')">Live Orders</button>
-                    <button class="btn-sm" style="background:#10b981; color:#fff;" onclick="switchOrderSub('accepted')">Accepted History</button>
-                    <button class="btn-sm" style="background:#ef4444; color:#fff;" onclick="switchOrderSub('rejected')">Rejected History</button>
+            <!-- 2. Order Management & History -->
+            <a href="ordermanage.html" class="admin-card-btn">
+                <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);">
+                    <i class="fa-solid fa-box-archive"></i>
                 </div>
+                <h4 class="card-title">Order Management</h4>
+            </a>
 
-                <!-- Live Orders -->
-                <div id="sub-live" class="order-sub-section">
-                    <div class="list-box" id="liveOrdersContainer">
-                        <div class="list-item" data-userid="884920">
-                            <div class="item-header">
-                                <span class="item-title">Order #WF-9921 (ID: 884920)</span>
-                                <span class="item-badge" style="color:#fbbf24; background:rgba(251,191,36,0.1)">Pending</span>
-                            </div>
-                            <div class="item-body">
-                                <b>Item:</b> Royal Silk Gown (Size: L, Qty: 1)<br>
-                                <b>Total:</b> ৳ 8,600<br>
-                                <b>Customer:</b> Zoha (017xxxxxxxx)
-                            </div>
-                            <div class="action-row">
-                                <!-- View Payment Slip / Screenshot Button -->
-                                <button class="btn-sm btn-screenshot" onclick="viewPaymentScreenshot('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')"><i class="fa-solid fa-receipt"></i> View Payment Slip</button>
-                                <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept & Make Invoice</button>
-                                <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- 3. Add New Dress -->
+            <a href="dressadd.html" class="admin-card-btn">
+                <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                    <i class="fa-solid fa-plus-circle"></i>
                 </div>
+                <h4 class="card-title">Add New Dress</h4>
+            </a>
 
-                <!-- Accepted History -->
-                <div id="sub-accepted" class="order-sub-section" style="display:none;">
-                    <div class="list-box" id="acceptedOrdersContainer">
-                        <div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>
-                    </div>
+            <!-- 4. Support & Notification -->
+            <a href="support.html" class="admin-card-btn">
+                <div class="card-icon" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                    <i class="fa-solid fa-headset"></i>
                 </div>
-
-                <!-- Rejected History -->
-                <div id="sub-rejected" class="order-sub-section" style="display:none;">
-                    <div class="list-box" id="rejectedOrdersContainer">
-                        <div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TABLE 3: Add New Dress -->
-        <div id="section-table3" class="admin-section" style="display: none;">
-            <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-cloud-arrow-up"></i> Add New Dress</h4>
-                <div class="form-group"><label>Dress Name</label><input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock"></div>
-                <div class="form-group"><label>Price (৳)</label><input type="number" id="newPrice" class="form-control" placeholder="4500"></div>
-                <div class="form-group"><label>Initial Stock (Pcs)</label><input type="number" id="newStock" class="form-control" placeholder="10"></div>
-                <button class="submit-btn" onclick="publishNewDress()">Publish Dress to Shop</button>
-            </div>
-        </div>
-
-        <!-- TABLE 4: Support & Broadcast -->
-        <div id="section-table4" class="admin-section" style="display: none;">
-            <div class="admin-card">
-                <h4 class="card-title"><i class="fa-solid fa-headset"></i> Support Tickets</h4>
-                <div class="list-box">
-                    <div class="list-item">
-                        <div class="item-header">
-                            <span class="item-title">@zoha_flowery</span>
-                            <span class="item-badge" style="color:#ef4444; background:rgba(239,68,68,0.1)">Open</span>
-                        </div>
-                        <div class="item-body"><b>Issue:</b> Dress size exchange inquiry.</div>
-                        <div class="action-row">
-                            <button class="btn-sm" style="background:#229ed9; color:#fff;" onclick="openSupportChatModal('@zoha_flowery')"><i class="fa-solid fa-reply"></i> Chat & Proof</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-card" style="margin-top: 16px;">
-                <h4 class="card-title"><i class="fa-solid fa-bullhorn"></i> Send Broadcast Notification</h4>
-                <div class="form-group"><label>Notification Title</label><input type="text" id="notifTitle" class="form-control" placeholder="Special Offer!"></div>
-                <div class="form-group"><label>Message Details</label><textarea id="notifMsg" class="form-control" placeholder="Write message..." style="height:60px; resize:none;"></textarea></div>
-                <button class="submit-btn" style="background: var(--accent-pink);" onclick="sendBroadcastNotification()">Send to All Users</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: View Payment Screenshot -->
-    <div id="screenshotModal" class="modal-overlay">
-        <div class="modal-content" style="text-align: center;">
-            <span style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer;" onclick="closeModal('screenshotModal')">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;">Payment Slip / Screenshot</h4>
-            <img id="modalReceiptImg" src="" alt="Payment Receipt" style="width:100%; max-height:350px; object-fit:contain; border-radius:10px; border:1px solid var(--card-border);">
-            <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">Verified transaction receipt uploaded by user.</p>
-        </div>
-    </div>
-
-    <!-- MODAL 1: Edit Dress -->
-    <div id="editDressModal" class="modal-overlay">
-        <div class="modal-content">
-            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress</h4>
-            <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
-            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
-            <div style="display:flex; gap:8px; margin-top:12px;">
-                <button class="submit-btn" onclick="saveEditedDress()">Save</button>
-                <button class="submit-btn" style="background:#ef4444;" onclick="closeModal('editDressModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: Support Chat -->
-    <div id="supportChatModal" class="modal-overlay">
-        <div class="modal-content">
-            <h4 style="margin:0 0 10px 0; color:#fff;" id="chatModalTitle">Support Chat</h4>
-            <div class="form-group"><textarea id="chatReplyText" class="form-control" placeholder="Write reply..." style="height:60px; resize:none;"></textarea></div>
-            <div style="display:flex; gap:8px; margin-top:10px;">
-                <button class="submit-btn" style="background:#10b981;" onclick="sendSupportReplyWithImage()">Send Reply</button>
-                <button class="submit-btn" style="background:#ef4444;" onclick="closeModal('supportChatModal')">Close</button>
-            </div>
+                <h4 class="card-title">Support & Notif</h4>
+            </a>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-
-        window.switchTable = function(tableId) {
-            document.querySelectorAll('.admin-section').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`section-${tableId}`).style.display = 'block';
-            event.currentTarget.classList.add('active');
-        }
-
-        window.switchOrderSub = function(subId) {
-            document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
-            document.getElementById(`sub-${subId}`).style.display = 'block';
-        }
-
-        window.closeModal = function(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // View Payment Screenshot Slip Modal
-        window.viewPaymentScreenshot = function(imgUrl) {
-            document.getElementById('modalReceiptImg').src = imgUrl;
-            document.getElementById('screenshotModal').style.display = 'flex';
-        }
-
-        // Move order to Accepted/Rejected history, Auto Generate Invoice & Update Profile Badge
-        window.moveOrder = function(btn, type, orderId, userId, itemName, amount) {
-            let itemCard = btn.closest('.list-item');
-            itemCard.querySelector('.action-row').remove();
-
-            let badge = itemCard.querySelector('.item-badge');
-            if(type === 'accepted') {
-                badge.innerText = "Accepted & Invoiced";
-                badge.style.color = "#10b981";
-                badge.style.background = "rgba(16, 185, 129, 0.15)";
-                
-                document.getElementById('acceptedOrdersContainer').appendChild(itemCard);
-
-                // Update Profile Delivered Orders Counter Badge
-                let currentCount = parseInt(localStorage.getItem('deliveredOrdersCount') || 0) + 1;
-                localStorage.setItem('deliveredOrdersCount', currentCount);
-
-                // Auto Generate Invoice for User
-                let invoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
-                invoices.unshift({ 
-                    orderId: orderId, 
-                    itemName: itemName, 
-                    amount: amount, 
-                    method: 'bKash / Nagad', 
-                    date: new Date().toLocaleDateString() 
-                });
-                localStorage.setItem('userInvoices', JSON.stringify(invoices));
-
-                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice automatically generated and saved for user.`);
-            } else {
-                badge.innerText = "Rejected";
-                badge.style.color = "#ef4444";
-                badge.style.background = "rgba(239, 68, 68, 0.15)";
-                
-                document.getElementById('rejectedOrdersContainer').appendChild(itemCard);
-                tg.showAlert(`❌ Order #${orderId} Rejected! Moved to Rejected History.`);
-            }
-        }
-
-        // Search Orders by User ID Code
-        window.filterOrdersByUserId = function() {
-            let query = document.getElementById('searchUserId').value.trim().toLowerCase();
-            let items = document.querySelectorAll('.list-item');
-            
-            items.forEach(item => {
-                let uid = item.getAttribute('data-userid') || "";
-                if(uid.toLowerCase().includes(query)) {
-                    item.style.display = "block";
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        }
-
-        window.openEditDressModal = function(name, price, stock, cat) {
-            document.getElementById('editName').value = name;
-            document.getElementById('editPrice').value = price;
-            document.getElementById('editDressModal').style.display = 'flex';
-        }
-        window.saveEditedDress = function() {
-            tg.showAlert("✅ Dress updated successfully!");
-            closeModal('editDressModal');
-        }
-
-        window.publishNewDress = function() {
-            let name = document.getElementById('newName').value.trim();
-            if(!name) { tg.showAlert("⚠️ Enter dress name!"); return; }
-            tg.showAlert(`✅ New Dress "${name}" published successfully!`);
-        }
-
-        window.openSupportChatModal = function(username) {
-            document.getElementById('chatModalTitle').innerText = `Chat with ${username}`;
-            document.getElementById('supportChatModal').style.display = 'flex';
-        }
-        window.sendSupportReplyWithImage = function() {
-            tg.showAlert("✅ Support reply sent!");
-            closeModal('supportChatModal');
-        }
-        window.sendBroadcastNotification = function() {
-            tg.showAlert("🔔 Broadcast notification sent to all users!");
-        }
     </script>
 </body>
 </html>
