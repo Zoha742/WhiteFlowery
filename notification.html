@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Notifications</title>
+    <title>WhiteFlowery - Notifications & Inbox</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
+            --card-bg: rgba(19, 28, 46, 0.75);
+            --card-border: rgba(124, 58, 237, 0.25);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
@@ -22,98 +22,245 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 0 0 90px 0;
+            margin: 0; padding: 0 0 110px 0;
             display: flex; justify-content: center;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .header-banner {
+            background: linear-gradient(135deg, #131c2e 0%, #1e1b4b 100%);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 20px; padding: 22px; color: #fff; text-align: center;
+            margin-bottom: 20px; box-shadow: 0 10px 30px rgba(124, 58, 237, 0.25);
+        }
+        .header-banner h2 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-banner p { margin: 0; font-size: 12px; color: var(--text-muted); }
 
-        /* Notification List */
-        .notif-list { display: flex; flex-direction: column; gap: 12px; }
+        .notif-list { display: flex; flex-direction: column; gap: 14px; }
         .notif-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 14px; position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-radius: 16px; padding: 16px; display: flex; gap: 14px; align-items: flex-start;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); cursor: pointer; transition: 0.2s;
+            backdrop-filter: blur(10px);
         }
-        .notif-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .notif-title { font-size: 14px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 6px; }
-        .notif-title i { color: #ec4899; }
-        .notif-time { font-size: 10px; color: var(--text-muted); }
-        .notif-body { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px; }
+        .notif-card:active { transform: scale(0.98); }
         
-        /* Optional Notification Image */
-        .notif-img-box {
-            width: 100%; height: 130px; background: #0b0f19; border-radius: 10px;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        .notif-icon {
+            width: 42px; height: 42px; background: rgba(124, 58, 237, 0.15);
+            border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: #c084fc; font-size: 18px; flex-shrink: 0;
         }
-        .notif-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .notif-content h4 { margin: 0 0 6px 0; font-size: 15px; color: #fff; font-weight: 600; }
+        .notif-content p { 
+            margin: 0 0 10px 0; font-size: 13px; color: #d1d1d6; line-height: 1.5; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; 
+        }
+        
+        .notif-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px; font-size: 11px; color: var(--text-muted);
+        }
+        .notif-time { color: #fbbf24; font-weight: 500; }
 
-        /* Bottom Navigation Bar */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: var(--card-bg);
-            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
-            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+        .no-notif { text-align: center; color: var(--text-muted); margin-top: 60px; font-size: 13px; }
+
+        /* মেসেজ বড় করে দেখানোর অ্যানিমেটেড পপআপ মোডাল */
+        .msg-modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0); 
+            z-index: 4000; align-items: center; justify-content: center; padding: 20px; 
+            box-sizing: border-box; transition: background 0.4s ease; 
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .msg-modal.show { background: rgba(0,0,0,0.85); }
+        .msg-modal-content { 
+            background: #131c2e; border: 1px solid var(--card-border); border-radius: 20px; 
+            padding: 24px; width: 100%; max-width: 420px; max-height: 80vh; overflow-y: auto; 
+            position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transform: scale(0.85);
+            opacity: 0; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; 
+        }
+        .msg-modal.show .msg-modal-content { transform: scale(1); opacity: 1; }
+        .msg-modal-content h3 { margin-top: 0; font-size: 18px; color: #fff; }
+        .msg-modal-content p { font-size: 14px; color: #d1d1d6; line-height: 1.6; word-break: break-word; }
+
+        /* নেভিগেশন বার ও গোল ব্যাক বাটন */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); 
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95); 
+            backdrop-filter: blur(15px); border-top: 1px solid var(--card-border); 
+            display: flex; justify-content: space-around; align-items: center; 
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 100; 
+        }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; cursor: pointer; flex: 1; }
         .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        
+        .center-back-container { position: fixed; bottom: 75px; left: 50%; transform: translateX(-50%); z-index: 101; text-align: center; }
+        .circle-back-btn {
+            background: var(--primary-gradient); border: none; color: #fff; width: 46px; height: 46px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; box-shadow: 0 4px 18px rgba(124, 58, 237, 0.6); transition: 0.2s; margin: 0 auto;
+        }
+        .circle-back-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header -->
-        <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-bell"></i> Notifications</h3>
-            <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
+        <div class="header-banner">
+            <h2>🔔 Admin Inbox & Updates</h2>
+            <p>Announcements, offers & notices</p>
         </div>
 
-        <!-- Notifications Container -->
-        <div class="notif-list">
-            
-            <!-- Notification Item 1 -->
-            <div class="notif-card">
-                <div class="notif-top">
-                    <div class="notif-title"><i class="fa-solid fa-bullhorn"></i> Special Spring Offer!</div>
-                    <div class="notif-time">10 mins ago</div>
-                </div>
-                <div class="notif-body">
-                    Get up to 30% off on all fresh white floral arrangements and luxury dresses. Grab your favorite outfit now!
-                </div>
-                <div class="notif-img-box">
-                    <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1/WhiteFlowery/dress1.jpg" alt="Offer Image">
-                </div>
-            </div>
-
-            <!-- Notification Item 2 -->
-            <div class="notif-card">
-                <div class="notif-top">
-                    <div class="notif-title"><i class="fa-solid fa-box-check"></i> Order Accepted</div>
-                    <div class="notif-time">2 hours ago</div>
-                </div>
-                <div class="notif-body">
-                    Your order #WF-9021 has been accepted by the admin and is currently being packed for express delivery.
-                </div>
-            </div>
-
+        <div class="notif-list" id="notifications-container">
+            <div class="no-notif">Loading messages...</div>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- মেসেজ বড় করে দেখানোর অ্যানিমেটেড পপআপ মোডাল -->
+    <div class="msg-modal" id="msgModal" onclick="closeMsgModal()">
+        <div class="msg-modal-content" onclick="event.stopPropagation()">
+            <span style="color:var(--text-muted); position:absolute; top:15px; right:20px; font-size:26px; cursor:pointer;" onclick="closeMsgModal()">&times;</span>
+            <h3 id="modalTitle">Title</h3>
+            <div id="modalMedia" style="margin-bottom: 12px;"></div>
+            <p id="modalText" style="white-space: pre-wrap;"></p>
+            <small id="modalTime" style="color: var(--text-muted); display: block; margin-top: 15px;"></small>
+        </div>
+    </div>
+
+    <!-- ব্যাক অ্যারো (হোমে যাওয়ার জন্য গোল বাটন) -->
+    <div class="center-back-container">
+        <button class="circle-back-btn" onclick="location.href='index.html'"><i class="fa-solid fa-arrow-left"></i></button>
+    </div>
+
+    <!-- বটম নেভিগেশন বার -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
         <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
-        <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+        <a class="nav-item active" href="notification.html"><i class="fa-solid fa-bell"></i>Inbox</a>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeekTPKMLpOhBH_fMB3eIqWgGy8APQFa8",
+            authDomain: "heycen-9a9d8.firebaseapp.com",
+            databaseURL: "https://heycen-9a9d8-default-rtdb.firebaseio.com",
+            projectId: "heycen-9a9d8",
+            storageBucket: "heycen-9a9d8.firebasestorage.app",
+            messagingSenderId: "442359961958",
+            appId: "1:442359961958:web:815606d4836a66003d50a7",
+            measurementId: "G-XNQSP1R3JR"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        let user = tg.initDataUnsafe.user;
+        let userId = user ? user.id.toString() : "8849201"; 
+
+        let notifRef = db.ref('users/' + userId + '/notifications');
+        notifRef.on('value', (snapshot) => {
+            const container = document.getElementById('notifications-container');
+            container.innerHTML = '';
+
+            if (snapshot.exists()) {
+                let notifs = snapshot.val();
+                let keys = Object.keys(notifs).reverse();
+
+                let updates = {};
+                keys.forEach(key => {
+                    updates[key + '/isRead'] = true;
+                });
+                notifRef.update(updates);
+
+                keys.forEach(key => {
+                    let item = notifs[key];
+                    let title = item.title || "Admin Update";
+                    let message = item.message || item.text || "";
+                    
+                    let dateObj = item.timestamp ? new Date(item.timestamp) : new Date();
+                    let timeStr = dateObj.toLocaleString();
+
+                    let safeTitle = encodeURIComponent(title);
+                    let safeMsg = encodeURIComponent(message);
+                    let safeMedia = encodeURIComponent(item.media || "");
+                    let safeTime = encodeURIComponent(timeStr);
+
+                    let mediaPreview = "";
+                    if (item.media) {
+                        if (item.media.startsWith("data:video") || item.media.includes("video")) {
+                            mediaPreview = `<small style="color:#c084fc;"><i class="fa-solid fa-video"></i> Video attached</small><br>`;
+                        } else {
+                            mediaPreview = `<small style="color:#c084fc;"><i class="fa-solid fa-image"></i> Image attached</small><br>`;
+                        }
+                    }
+
+                    container.innerHTML += `
+                        <div class="notif-card" onclick="openFullMessage('${safeTitle}', '${safeMsg}', '${safeMedia}', '${safeTime}')">
+                            <div class="notif-icon"><i class="fa-solid fa-bell"></i></div>
+                            <div class="notif-content" style="width: 100%;">
+                                <h4>${title}</h4>
+                                ${mediaPreview}
+                                <p>${message}</p>
+                                <div class="notif-footer">
+                                    <span>Tap to read full message</span>
+                                    <span class="notif-time">${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                container.innerHTML = `<div class="no-notif">No messages or updates found!</div>`;
+            }
+        });
+
+        function openFullMessage(title, msg, media, time) {
+            document.getElementById('modalTitle').innerText = decodeURIComponent(title);
+            document.getElementById('modalText').innerText = decodeURIComponent(msg);
+            document.getElementById('modalTime').innerText = "Time: " + decodeURIComponent(time);
+            
+            let mediaBox = document.getElementById('modalMedia');
+            mediaBox.innerHTML = '';
+            let mediaUrl = decodeURIComponent(media);
+            if (mediaUrl) {
+                if (mediaUrl.startsWith("data:video") || mediaUrl.includes("video")) {
+                    mediaBox.innerHTML = `<video src="${mediaUrl}" controls style="width:100%; max-height:250px; border-radius:10px;"></video>`;
+                } else {
+                    mediaBox.innerHTML = `<img src="${mediaUrl}" style="width:100%; max-height:250px; object-fit:cover; border-radius:10px;">`;
+                }
+            }
+
+            let modal = document.getElementById('msgModal');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.classList.add('show'); }, 10);
+        }
+
+        function closeMsgModal() {
+            let modal = document.getElementById('msgModal');
+            modal.classList.remove('show');
+            setTimeout(() => { modal.style.display = 'none'; }, 400);
+        }
+
+        // সোয়াইপ সিস্টেম (সোয়াইপ করলেই হোমে চলে যাবে)
+        let touchStartX = 0;
+        window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+        window.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            let diff = touchEndX - touchStartX;
+            if (Math.abs(diff) > 70) {
+                window.location.href = "index.html";
+            }
+        });
     </script>
 </body>
 </html>
