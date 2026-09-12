@@ -23,15 +23,12 @@
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
         .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; margin-bottom: 14px; }
-        
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
         .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
         
         .list-box { display: flex; flex-direction: column; gap: 10px; }
         .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: center; }
-        
         .order-img { width: 65px; height: 75px; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; }
-        
         .order-info { flex: 1; }
         .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
         .item-title { color: #c084fc; }
@@ -39,10 +36,10 @@
         .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
         
         .action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; }
-        .btn-accept { background: #10b981; color: #fff; }
-        .btn-cancel { background: #ef4444; color: #fff; }
-        .btn-screenshot { background: #3b82f6; color: #fff; }
+        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
+        .btn-accept { background: #10b981; }
+        .btn-cancel { background: #ef4444; }
+        .btn-screenshot { background: #3b82f6; }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
@@ -59,21 +56,17 @@
         <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID (e.g. 884920)..." onkeyup="filterOrdersByUserId()">
 
         <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-            <button class="btn-sm" style="background:#7c3aed; color:#fff;" onclick="switchOrderSub('live')">Live Orders</button>
-            <button class="btn-sm" style="background:#10b981; color:#fff;" onclick="switchOrderSub('accepted')">Accepted History</button>
-            <button class="btn-sm" style="background:#ef4444; color:#fff;" onclick="switchOrderSub('rejected')">Rejected History</button>
+            <button class="btn-sm" style="background:#7c3aed;" onclick="switchOrderSub('live')">Live Orders</button>
+            <button class="btn-sm btn-accept" onclick="switchOrderSub('accepted')">Accepted History</button>
+            <button class="btn-sm btn-cancel" onclick="switchOrderSub('rejected')">Rejected History</button>
         </div>
 
         <!-- Live Orders -->
         <div id="sub-live" class="order-sub-section admin-card">
             <h4 class="card-title">Live Orders</h4>
             <div class="list-box" id="liveOrdersContainer">
-                
-                <!-- Order Item Example -->
                 <div class="list-item" data-userid="884920">
-                    <!-- Product Photo -->
-                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" class="order-img" onclick="viewModalImage(this.src)" title="Click to view product">
-                    
+                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" class="order-img" onclick="viewModalImage(this.src)">
                     <div class="order-info">
                         <div class="item-header">
                             <span class="item-title">Order #WF-9921</span>
@@ -81,21 +74,16 @@
                         </div>
                         <div class="item-body">
                             <b>ID:</b> 884920 | <b>Customer:</b> Zoha<br>
-                            <b>Item:</b> Royal Silk Gown (Size: L)<br>
-                            <b>Total:</b> ৳ 8,600<br>
-                            <b>Type:</b> <span style="color:#38bdf8;">Online Payment (Bkash)</span>
+                            <b>Item:</b> Royal Silk Gown<br>
+                            <b>Total:</b> ৳ 8,600 | <span style="color:#38bdf8;">Online Payment</span>
                         </div>
                         <div class="action-row">
-                            <!-- Payment Slip Button -->
-                            <button class="btn-sm btn-screenshot" onclick="viewModalImage('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')">
-                                <i class="fa-solid fa-receipt"></i> Slip
-                            </button>
+                            <button class="btn-sm btn-screenshot" onclick="viewModalImage('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')"><i class="fa-solid fa-receipt"></i> Slip</button>
                             <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept</button>
                             <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -116,11 +104,10 @@
         </div>
     </div>
 
-    <!-- Universal Image Modal (For Product Photo & Payment Slip) -->
     <div id="imageModal" class="modal-overlay">
         <div class="modal-content">
             <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal()">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;" id="modalTitle">Image Preview</h4>
+            <h4 style="color:#fff; margin-bottom:10px;">Preview</h4>
             <img id="modalImgSrc" src="" alt="Preview" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px;">
         </div>
     </div>
@@ -133,16 +120,11 @@
             document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
             document.getElementById(`sub-${subId}`).style.display = 'block';
         }
-
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-
+        function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
         function viewModalImage(imgUrl) {
             document.getElementById('modalImgSrc').src = imgUrl;
             document.getElementById('imageModal').style.display = 'flex';
         }
-
         function moveOrder(btn, type, orderId, userId, itemName, amount) {
             let itemCard = btn.closest('.list-item');
             itemCard.querySelector('.action-row').remove();
@@ -153,15 +135,13 @@
                 badge.style.color = "#10b981";
                 document.getElementById('acceptedOrdersContainer').appendChild(itemCard);
 
-                // Update Profile Badge & Auto Invoice
                 let currentCount = parseInt(localStorage.getItem('deliveredOrdersCount') || 0) + 1;
                 localStorage.setItem('deliveredOrdersCount', currentCount);
 
                 let invoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
-                invoices.unshift({ orderId, itemName, amount, method: 'Online Payment / COD', date: new Date().toLocaleDateString() });
+                invoices.unshift({ orderId, itemName, amount, method: 'Online / COD', date: new Date().toLocaleDateString() });
                 localStorage.setItem('userInvoices', JSON.stringify(invoices));
-
-                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice automatically generated.`);
+                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice generated.`);
             } else {
                 badge.innerText = "Rejected";
                 badge.style.color = "#ef4444";
@@ -169,7 +149,6 @@
                 tg.showAlert(`❌ Order #${orderId} Rejected.`);
             }
         }
-
         function filterOrdersByUserId() {
             let query = document.getElementById('searchUserId').value.trim().toLowerCase();
             document.querySelectorAll('.list-item').forEach(item => {
