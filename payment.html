@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Payment Methods</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #080b12;
+            --card-bg: #131c2e;
+            --card-border: #2a1b4e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 90px 0;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+
+        .payment-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .pay-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.2s;
+        }
+        .pay-card.selected { border-color: #ec4899; background: rgba(236, 72, 153, 0.08); }
+        .pay-left { display: flex; align-items: center; gap: 14px; }
+        .pay-icon { width: 42px; height: 42px; background: rgba(124, 58, 237, 0.15); color: #c084fc; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .pay-info h4 { margin: 0 0 2px 0; font-size: 14px; font-weight: 700; color: #fff; }
+        .pay-info p { margin: 0; font-size: 11px; color: var(--text-muted); }
+        .radio-check { width: 18px; height: 18px; border: 2px solid var(--card-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .pay-card.selected .radio-check { border-color: #ec4899; background: #ec4899; }
+        .pay-card.selected .radio-check::after { content: ''; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
+
+        .submit-btn {
+            background: var(--primary-gradient); color: #fff; border: none;
+            padding: 14px; border-radius: 14px; font-weight: 700; width: 100%;
+            cursor: pointer; font-size: 14px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: var(--card-bg);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+        }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-wallet"></i> Payment Methods</h3>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
+        </div>
+
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Select your preferred payment gateway for secure checkout:</p>
+
+        <!-- Payment Options List -->
+        <div class="payment-list">
+            <div class="pay-card selected" onclick="selectPayment(this)">
+                <div class="pay-left">
+                    <div class="pay-icon" style="color: #e2136e; background: rgba(226, 19, 110, 0.15);"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <div class="pay-info">
+                        <h4>bKash Personal / Merchant</h4>
+                        <p>Instant automated verification</p>
+                    </div>
+                </div>
+                <div class="radio-check"></div>
+            </div>
+
+            <div class="pay-card" onclick="selectPayment(this)">
+                <div class="pay-left">
+                    <div class="pay-icon" style="color: #f37021; background: rgba(243, 112, 33, 0.15);"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="pay-info">
+                        <h4>Nagad Wallet</h4>
+                        <p>Fast & secure mobile transaction</p>
+                    </div>
+                </div>
+                <div class="radio-check"></div>
+            </div>
+
+            <div class="pay-card" onclick="selectPayment(this)">
+                <div class="pay-left">
+                    <div class="pay-icon" style="color: #8a3ffc; background: rgba(138, 63, 252, 0.15);"><i class="fa-solid fa-building-columns"></i></div>
+                    <div class="pay-info">
+                        <h4>Rocket (DBBL)</h4>
+                        <p>Direct bank transfer</p>
+                    </div>
+                </div>
+                <div class="radio-check"></div>
+            </div>
+
+            <div class="pay-card" onclick="selectPayment(this)">
+                <div class="pay-left">
+                    <div class="pay-icon" style="color: #38bdf8; background: rgba(56, 189, 248, 0.15);"><i class="fa-solid fa-credit-card"></i></div>
+                    <div class="pay-info">
+                        <h4>Credit / Debit Card</h4>
+                        <p>Visa, MasterCard, or Amex</p>
+                    </div>
+                </div>
+                <div class="radio-check"></div>
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="savePaymentMethod()">Save Preferred Method</button>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function selectPayment(card) {
+            document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+        }
+
+        function savePaymentMethod() {
+            tg.showAlert("✅ Payment method preference saved successfully!");
+            window.location.href = "profile.html";
+        }
+    </script>
+</body>
+</html>
