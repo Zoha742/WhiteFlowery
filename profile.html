@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - User Profile</title>
+    <title>WhiteFlowery - Pro Profile</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -22,38 +22,98 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 0 0 90px 0;
+            margin: 0; padding: 0 0 100px 0;
             display: flex; justify-content: center;
         }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
+        /* Top Header */
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 
-        .profile-card { background: var(--primary-gradient); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 16px; box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4); }
-        .profile-avatar { width: 70px; height: 70px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff; margin: 0 auto 10px auto; border: 2px solid rgba(255, 255, 255, 0.4); }
+        /* User Profile Card */
+        .profile-card {
+            background: var(--primary-gradient);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
+            position: relative;
+        }
+        .profile-avatar {
+            width: 70px; height: 70px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; color: #fff;
+            margin: 0 auto 10px auto;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
         .profile-name { margin: 0 0 4px 0; font-size: 18px; font-weight: 800; color: #fff; }
         .profile-username { margin: 0 0 14px 0; font-size: 12px; color: #f3e8ff; opacity: 0.85; }
-
-        .wallet-stats { display: flex; background: rgba(0, 0, 0, 0.2); border-radius: 14px; padding: 10px; justify-content: space-around; backdrop-filter: blur(5px); }
+        
+        .wallet-stats {
+            display: flex;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 14px;
+            padding: 10px;
+            justify-content: space-around;
+            backdrop-filter: blur(5px);
+        }
         .stat-item h4 { margin: 0 0 2px 0; font-size: 11px; color: #d8b4fe; font-weight: 600; }
-        .stat-item p { margin: 0; font-size: 15px; font-weight: bold; color: #fbbf24; }
+        .stat-item p { margin: 0; font-size: 14px; font-weight: bold; color: #fbbf24; }
 
-        .menu-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; overflow: hidden; margin-bottom: 16px; }
-        .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--card-border); text-decoration: none; color: var(--text-main); }
+        /* Menu Section Groups */
+        .menu-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 8px 4px;
+        }
+        .menu-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--card-border);
+            text-decoration: none; color: var(--text-main);
+            transition: background 0.2s;
+        }
         .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover { background: rgba(124, 58, 237, 0.08); }
+        
         .menu-left { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; }
-        .menu-left i { width: 32px; height: 32px; background: rgba(124, 58, 237, 0.15); color: #c084fc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .menu-right { font-size: 12px; color: var(--text-muted); }
+        .menu-left i {
+            width: 32px; height: 32px;
+            background: rgba(124, 58, 237, 0.15);
+            color: #c084fc;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+        .menu-right { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
 
+        /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 480px; background: var(--card-bg);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item {
+            text-align: center; color: var(--text-muted);
+            text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; transition: 0.2s;
+        }
         .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
@@ -61,37 +121,87 @@
 <body>
 
     <div class="container">
+        <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-user-gear"></i> My Account</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-user-gear"></i> Pro Profile</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> Home</a>
         </div>
 
+        <!-- Profile Card -->
         <div class="profile-card">
             <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
             <p class="profile-username" id="userUsernameDisplay">@username</p>
             
             <div class="wallet-stats">
-                <div class="stat-item"><h4>Total Orders</h4><p>0</p></div>
-                <div class="stat-item"><h4>Reward Points</h4><p>150 FLW</p></div>
-                <div class="stat-item"><h4>Status</h4><p style="color: #34d399;">Active</p></div>
+                <div class="stat-item">
+                    <h4>Orders</h4>
+                    <p id="totalOrdersCount">3</p>
+                </div>
+                <div class="stat-item">
+                    <h4>Rewards</h4>
+                    <p>250 FLW</p>
+                </div>
+                <div class="stat-item">
+                    <h4>VIP Level</h4>
+                    <p style="color: #34d399;">Gold Tier</p>
+                </div>
             </div>
         </div>
 
+        <!-- Section: Shopping & Orders -->
+        <div class="section-label">Shopping Activity</div>
         <div class="menu-section">
-            <a href="#" class="menu-item"><div class="menu-left"><i class="fa-solid fa-box-archive"></i> My Orders</div><div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div></a>
-            <a href="#" class="menu-item"><div class="menu-left"><i class="fa-solid fa-location-dot"></i> Delivery Address</div><div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div></a>
+            <a href="orders.html" class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-box-archive"></i> My Orders</div>
+                <div class="menu-right"><span>View All</span><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="wishlist.html" class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-heart"></i> Wishlist</div>
+                <div class="menu-right"><span>5 Items</span><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="address.html" class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-location-dot"></i> Delivery Address</div>
+                <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- Section: Wallet & Settings -->
+        <div class="section-label">Account & Preferences</div>
+        <div class="menu-section">
+            <a href="#" class="menu-item" onclick="tg.showAlert('Payment methods integration active.')">
+                <div class="menu-left"><i class="fa-solid fa-wallet"></i> Payment Methods</div>
+                <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item" onclick="tg.showAlert('Referral program coming soon!')">
+                <div class="menu-left"><i class="fa-solid fa-share-nodes"></i> Invite Friends</div>
+                <div class="menu-right"><span style="color: #fbbf24;">Earn 50 FLW</span><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- Section: Support & Info -->
+        <div class="section-label">Support & System</div>
+        <div class="menu-section">
+            <a href="support.html" class="menu-item">
+                <div class="menu-left"><i class="fa-solid fa-headset"></i> Customer Support</div>
+                <div class="menu-right"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item" onclick="tg.showAlert('WhiteFlowery Version 1.0.0 (Pro)')">
+                <div class="menu-left"><i class="fa-solid fa-circle-info"></i> About App</div>
+                <div class="menu-right"><span>v1.0.0</span></div>
+            </a>
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
