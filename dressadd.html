@@ -7,23 +7,13 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-        }
+        :root { --bg-color: #080b12; --card-bg: #131c2e; --card-border: #2a1b4e; --text-main: #f8fafc; --text-muted: #94a3b8; --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 480px; box-sizing: border-box; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
-
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
-        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
-
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
@@ -31,44 +21,24 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Dress</h3>
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
-
         <div class="admin-card">
-            <h4 class="card-title">Dress Details</h4>
-            <div class="form-group">
-                <label>Category</label>
-                <select id="newCat" class="form-control">
-                    <option value="Gowns">Gowns</option>
-                    <option value="Party Wear">Party Wear</option>
-                    <option value="Casual Sets">Casual Sets</option>
-                    <option value="Bridal">Bridal</option>
-                </select>
-            </div>
             <div class="form-group"><label>Dress Name</label><input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock"></div>
             <div class="form-group"><label>Price (৳)</label><input type="number" id="newPrice" class="form-control" placeholder="4500"></div>
             <div class="form-group"><label>Initial Stock (Pcs)</label><input type="number" id="newStock" class="form-control" placeholder="10"></div>
-            <div class="form-group"><label>Upload Image</label><input type="file" id="newImg" class="form-control" accept="image/*"></div>
+            <div class="form-group"><label>Upload Image</label><input type="file" id="newImg" class="form-control" accept="image/*" style="color:var(--text-muted);"></div>
             <button class="submit-btn" onclick="publishDress()">Publish Dress to Shop</button>
         </div>
     </div>
-
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
+        let tg = window.Telegram.WebApp; tg.expand();
         function publishDress() {
             let name = document.getElementById('newName').value.trim();
-            let price = document.getElementById('newPrice').value.trim();
-            let stock = document.getElementById('newStock').value.trim();
-            if(!name || !price || !stock) {
-                tg.showAlert("⚠️ Please fill up name, price, and stock!");
-                return;
-            }
+            if(!name) { tg.showAlert("⚠️ Enter dress name!"); return; }
             tg.showAlert(`✅ New Dress "${name}" published successfully!`);
             document.getElementById('newName').value = '';
             document.getElementById('newPrice').value = '';
