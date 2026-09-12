@@ -3,61 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Wishlist</title>
+    <title>WhiteFlowery - My Wishlist</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
+            --bg-color: #080b12;
+            --card-bg: rgba(19, 28, 46, 0.85);
+            --card-border: rgba(124, 58, 237, 0.25);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-pink: #ec4899;
         }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0 0 90px 0; display: flex; justify-content: center; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 100px 0;
+            display: flex; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
+        }
         .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
 
-        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-img-box { width: 100%; height: 120px; background: #0b0f19; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 10px; color: #ec4899; }
-        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; }
-        .product-price { margin: 0 0 10px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
-        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
+        /* Wishlist Items List & Swipe Container */
+        .wishlist-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+        
+        .wish-item-wrapper {
+            position: relative; overflow: hidden; border-radius: 16px; background: #ef4444;
+        }
+        .delete-swipe-action {
+            position: absolute; right: 0; top: 0; bottom: 0; width: 80px;
+            background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: bold; gap: 4px; cursor: pointer;
+        }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--card-border); display: flex; justify-content: space-around; padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999; }
+        .wish-item {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 14px; position: relative; z-index: 2;
+            transition: transform 0.2s ease; backdrop-filter: blur(10px);
+        }
+        
+        .wish-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .wish-item-info { display: flex; align-items: center; gap: 12px; }
+        .wish-item-img { width: 55px; height: 55px; background: #0b0f19; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .wish-item-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .wish-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .wish-item-price { margin: 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+
+        /* Footer Move to Cart Button */
+        .wish-item-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 8px;
+        }
+        .move-cart-btn {
+            background: var(--primary-gradient); border: none;
+            color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+        }
+        .move-cart-btn:active { transform: scale(0.96); }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
+        }
         .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
+
     <div class="container">
+        <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-heart"></i> My Wishlist</h3>
-            <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
+            <h3 class="brand-title"><i class="fa-solid fa-heart" style="color: #ec4899;"></i> My Wishlist</h3>
+            <a href="shop.html" class="back-btn"><i class="fa-solid fa-store"></i> Shop</a>
         </div>
 
-        <div class="products-grid">
-            <div class="product-card">
-                <div>
-                    <div class="product-img-box"><i class="fa-solid fa-bouquet"></i></div>
-                    <h4 class="product-title">White Rose Bouquet</h4>
-                    <p class="product-price">$25.00</p>
+        <!-- Wishlist Items List with Swipe & Move to Cart -->
+        <div class="wishlist-list" id="wishlistContainer">
+            
+            <!-- Item 1 -->
+            <div class="wish-item-wrapper">
+                <div class="delete-swipe-action" onclick="removeItem(this)"><i class="fa-solid fa-trash"></i> Delete</div>
+                <div class="wish-item" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                    <div class="wish-item-top">
+                        <div class="wish-item-info">
+                            <div class="wish-item-img">
+                                <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp" alt="Gown">
+                            </div>
+                            <div>
+                                <h4 class="wish-item-title">Royal Silk Gown</h4>
+                                <p class="wish-item-price">৳ 8,500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wish-item-footer">
+                        <span style="font-size: 10px; color: var(--text-muted);"><i class="fa-solid fa-arrow-left-long"></i> Swipe left to delete</span>
+                        <button class="move-cart-btn" onclick="moveToCart('Royal Silk Gown')"><i class="fa-solid fa-cart-arrow-down"></i> Move to Cart</button>
+                    </div>
                 </div>
-                <button class="add-to-cart-btn" onclick="tg.showAlert('Added to cart!')">Move to Cart</button>
             </div>
+
+            <!-- Item 2 -->
+            <div class="wish-item-wrapper">
+                <div class="delete-swipe-action" onclick="removeItem(this)"><i class="fa-solid fa-trash"></i> Delete</div>
+                <div class="wish-item" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
+                    <div class="wish-item-top">
+                        <div class="wish-item-info">
+                            <div class="wish-item-img">
+                                <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/4_jwi1bs.webp" alt="Maxi">
+                            </div>
+                            <div>
+                                <h4 class="wish-item-title">White Floral Maxi</h4>
+                                <p class="wish-item-price">৳ 3,500</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wish-item-footer">
+                        <span style="font-size: 10px; color: var(--text-muted);"><i class="fa-solid fa-arrow-left-long"></i> Swipe left to delete</span>
+                        <button class="move-cart-btn" onclick="moveToCart('White Floral Maxi')"><i class="fa-solid fa-cart-arrow-down"></i> Move to Cart</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
         <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
-        <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+        <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
-    <script>let tg = window.Telegram.WebApp; tg.expand();</script>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Move to Cart Action
+        function moveToCart(itemName) {
+            tg.showAlert(`✅ "${itemName}" moved to cart successfully!`);
+            window.location.href = "cart.html";
+        }
+
+        // Remove Item
+        function removeItem(el) {
+            el.closest('.wish-item-wrapper').remove();
+            tg.showAlert("🗑️ Removed from wishlist!");
+        }
+
+        // Swipe Gesture Logic for Mobile
+        let startX = 0;
+        function touchStart(e) { startX = e.touches[0].clientX; }
+        function touchMove(e) {
+            let diff = e.touches[0].clientX - startX;
+            let card = e.currentTarget;
+            if(diff < -30) {
+                card.style.transform = `translateX(-80px)`;
+            } else if(diff > 30) {
+                card.style.transform = `translateX(0px)`;
+            }
+        }
+        function touchEnd(e) {}
+    </script>
 </body>
 </html>
