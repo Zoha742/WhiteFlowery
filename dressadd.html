@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Add New Dress</title>
+    <title>WhiteFlowery - Track All Dress List</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -16,218 +16,232 @@
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 60px; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
         .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        
+        .list-box { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; }
+        .dress-thumb { width: 60px; height: 75px; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
+        .dress-info { flex: 1; }
+        .item-header { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; margin-bottom: 3px; }
+        .item-title { color: #c084fc; }
+        .item-badge { color: #fbbf24; font-size: 10px; background: rgba(251, 191, 36, 0.15); padding: 2px 6px; border-radius: 4px; }
+        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
 
-        .form-group { margin-bottom: 12px; }
+        /* Size Badges Style */
+        .size-badges-container { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+        .size-tag { background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: #e2e8f0; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+        .action-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .btn-sm { padding: 5px 9px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
+        .btn-edit { background: #7c3aed; }
+        .btn-delete { background: #ef4444; }
+        .btn-view { background: #3b82f6; }
+
+        .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
-        
-        .size-row-input { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
-        .add-size-btn { background: #3b82f6; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
+        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .size-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
+        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
 
-        .size-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; background: #0b0f19; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
-        .size-table th, .size-table td { padding: 8px; font-size: 11px; text-align: center; border-bottom: 1px solid var(--card-border); }
-        .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
-        .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
-
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
-        
-        .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Dress</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-shirt"></i> All Tracked Dresses</h3>
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Cloudinary Upload</h4>
-            
-            <div class="form-group">
-                <label>Dress Name</label>
-                <input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock">
+            <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
+            <div class="list-box" id="inventoryListContainer">
+                <div class="item-body" style="text-align:center; color: var(--text-muted);">Loading all dresses...</div>
             </div>
-
-            <div class="form-group">
-                <label>Category (Always Tracked)</label>
-                <select id="newCat" class="form-control">
-                    <option value="Gowns">Gowns</option>
-                    <option value="Party Wear">Party Wear</option>
-                    <option value="Casual Sets">Casual Sets</option>
-                    <option value="Bridal">Bridal</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Price (৳)</label>
-                <input type="number" id="newPrice" class="form-control" placeholder="4500">
-            </div>
-
-            <!-- Size Setup -->
-            <div class="size-row-input">
-                <div style="flex: 1;">
-                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
-                    <select id="sizeDropdown" class="form-control">
-                        <option value="S">S Size</option>
-                        <option value="M">M Size</option>
-                        <option value="L">L Size</option>
-                        <option value="XL">XL Size</option>
-                        <option value="XXL">XXL Size</option>
-                        <option value="Free Size">Free Size</option>
-                    </select>
-                </div>
-                <div style="flex: 1;">
-                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
-                    <input type="number" id="sizeQty" class="form-control" placeholder="10" value="1">
-                </div>
-                <button type="button" class="add-size-btn" onclick="addSizeToTable()"><i class="fa-solid fa-plus"></i> Add</button>
-            </div>
-
-            <table class="size-table">
-                <thead>
-                    <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
-                </thead>
-                <tbody id="sizeTableBody">
-                    <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
-                </tbody>
-            </table>
-
-            <div class="form-group">
-                <label>Upload Product Photo (Goes to Cloudinary: shop/Product add)</label>
-                <input type="file" id="productImgFile" class="form-control" accept="image/*" style="color: #94a3b8;">
-            </div>
-
-            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Upload & Publish</button>
         </div>
     </div>
 
-    <!-- Uploading Loader -->
-    <div id="uploadOverlay" class="uploading-overlay">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #c084fc;"></i>
-        <span>Processing image & publishing dress...</span>
+    <!-- Edit & Size Stock Customize Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('editModal')">&times;</span>
+            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress & Size Stock</h4>
+            <input type="hidden" id="editIndex">
+            <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
+            <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control"></div>
+            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
+            
+            <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:6px;">Stock Breakdown by Size (Pcs)</label>
+            <div class="size-grid" id="editSizesContainer">
+                <!-- Size fields loaded dynamically -->
+            </div>
+
+            <button class="submit-btn" onclick="saveDressChanges()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- View Dress Modal -->
+    <div id="viewModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('viewModal')">&times;</span>
+            <h4 style="color:#fff; margin-bottom:10px;" id="viewTitle">Dress Details</h4>
+            <img id="viewImg" src="" alt="Dress" style="width:100%; max-height:250px; object-fit:contain; border-radius:8px; margin-bottom:10px; border:1px solid var(--card-border);">
+            <div id="viewDetails" style="font-size:12px; color:var(--text-muted); text-align:left; line-height:1.6;"></div>
+        </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let addedSizesList = {};
+        window.addEventListener('DOMContentLoaded', () => {
+            loadInventory();
+        });
 
-        function addSizeToTable() {
-            let size = document.getElementById('sizeDropdown').value;
-            let qty = parseInt(document.getElementById('sizeQty').value) || 0;
-            if (qty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
-            addedSizesList[size] = qty;
-            renderSizeTable();
-        }
+        function loadInventory() {
+            let container = document.getElementById('inventoryListContainer');
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
 
-        function removeSize(sizeKey) {
-            delete addedSizesList[sizeKey];
-            renderSizeTable();
-        }
-
-        function renderSizeTable() {
-            let tbody = document.getElementById('sizeTableBody');
-            let keys = Object.keys(addedSizesList);
-            if (keys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>`;
+            if (dresses.length === 0) {
+                container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);">No dresses found. Add new dresses from 'Add New Dress' panel.</div>`;
                 return;
             }
-            tbody.innerHTML = '';
-            keys.forEach(size => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><b>${size}</b></td>
-                        <td style="color:#fbbf24; font-weight:bold;">${addedSizesList[size]} Pcs</td>
-                        <td><button class="del-size" onclick="removeSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
-                    </tr>
+
+            container.innerHTML = '';
+            dresses.forEach((dress, index) => {
+                let sizesObj = dress.sizes || {};
+                let totalCurrentStock = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
+                
+                // Create nice size badges HTML
+                let sizeBadgesHtml = '';
+                if (Object.keys(sizesObj).length > 0) {
+                    for (let [sizeKey, qty] of Object.entries(sizesObj)) {
+                        sizeBadgesHtml += `<span class="size-tag">${sizeKey}: ${qty} Pcs</span>`;
+                    }
+                } else {
+                    sizeBadgesHtml = `<span style="color:#ef4444;">No size data</span>`;
+                }
+
+                container.innerHTML += `
+                    <div class="list-item">
+                        <img src="${dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'}" class="dress-thumb">
+                        <div class="dress-info">
+                            <div class="item-header">
+                                <span class="item-title">${dress.name}</span>
+                                <span class="item-badge">৳ ${Number(dress.price).toLocaleString()}</span>
+                            </div>
+                            <div class="item-body">
+                                <b>Category:</b> ${dress.category || 'General'}<br>
+                                <b>Sizes & Stock:</b>
+                                <div class="size-badges-container">
+                                    ${sizeBadgesHtml}
+                                </div>
+                                <div style="margin-top: 4px;"><b>Total Stock:</b> <span style="color:#fbbf24; font-weight:bold;">${totalCurrentStock} Pcs</span></div>
+                            </div>
+                            <div class="action-btns">
+                                <button class="btn-sm btn-view" onclick="viewDress(${index})">View</button>
+                                <button class="btn-sm btn-edit" onclick="openEditModal(${index})">Edit Stock</button>
+                                <button class="btn-sm btn-delete" onclick="deleteDress(${index})">Remove</button>
+                            </div>
+                        </div>
+                    </div>
                 `;
             });
         }
 
-        function publishDress() {
-            let name = document.getElementById('newName').value.trim();
-            let cat = document.getElementById('newCat').value;
-            let price = parseFloat(document.getElementById('newPrice').value) || 0;
-            let fileInput = document.getElementById('productImgFile');
-            let sizeKeys = Object.keys(addedSizesList);
-
-            if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Please add at least one size & quantity!"); return; }
-            if (fileInput.files.length === 0) { tg.showAlert("⚠️ Please select a product photo!"); return; }
-
-            document.getElementById('uploadOverlay').style.display = 'flex';
-            let file = fileInput.files[0];
-
-            let formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "ml_default"); 
-            formData.append("folder", "shop/Product add");
-
-            // Cloudinary Upload Attempt
-            fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('uploadOverlay').style.display = 'none';
-                if (data.secure_url) {
-                    saveDressToStorage(name, cat, price, data.secure_url, sizeKeys);
-                } else {
-                    fallbackToLocalSave(name, cat, price, file, sizeKeys);
-                }
-            })
-            .catch(error => {
-                console.warn("Cloudinary fetch error, using local fallback:", error);
-                fallbackToLocalSave(name, cat, price, file, sizeKeys);
-            });
-        }
-
-        function fallbackToLocalSave(name, cat, price, file, sizeKeys) {
-            let reader = new FileReader();
-            reader.onloadend = () => {
-                document.getElementById('uploadOverlay').style.display = 'none';
-                saveDressToStorage(name, cat, price, reader.result, sizeKeys);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function saveDressToStorage(name, category, price, imageUrl, sizeKeys) {
-            let totalStock = 0;
-            sizeKeys.forEach(s => totalStock += addedSizesList[s]);
-
-            let newDress = {
-                id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
-                name: name,
-                category: category,
-                price: price,
-                image: imageUrl,
-                sizes: addedSizesList,
-                totalStock: totalStock
-            };
-
+        function viewDress(index) {
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            dresses.unshift(newDress);
-            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            let d = dresses[index];
+            let sizesObj = d.sizes || {};
+            let total = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
 
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
-            if(!categories.includes(category)) {
-                categories.push(category);
-                localStorage.setItem('shopCategories', JSON.stringify(categories));
+            let sizeBreakdownHtml = Object.keys(sizesObj).length > 0 
+                ? Object.entries(sizesObj).map(([k, v]) => `&nbsp;&bull; ${k} Size: ${v} Pcs`).join('<br>')
+                : 'No size info';
+
+            document.getElementById('viewTitle').innerText = d.name;
+            document.getElementById('viewImg').src = d.image;
+            document.getElementById('viewDetails').innerHTML = `
+                <b>Product ID:</b> ${d.id || 'N/A'}<br>
+                <b>Category:</b> ${d.category || 'General'}<br>
+                <b>Price:</b> ৳ ${Number(d.price).toLocaleString()}<br>
+                <b>Size Breakdown:</b><br>
+                ${sizeBreakdownHtml}<br>
+                <b>Overall Total Stock:</b> ${total} Pcs
+            `;
+            document.getElementById('viewModal').style.display = 'flex';
+        }
+
+        function openEditModal(index) {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let d = dresses[index];
+            let sizesObj = d.sizes || {};
+
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editName').value = d.name;
+            document.getElementById('editCat').value = d.category || '';
+            document.getElementById('editPrice').value = d.price;
+
+            let sizeContainer = document.getElementById('editSizesContainer');
+            sizeContainer.innerHTML = '';
+            
+            if (Object.keys(sizesObj).length > 0) {
+                Object.keys(sizesObj).forEach(sizeKey => {
+                    sizeContainer.innerHTML += `
+                        <div>
+                            <label style="font-size:9px; color:#94a3b8;">${sizeKey} Size Qty</label>
+                            <input type="number" id="editSize_${sizeKey}" class="form-control edit-size-input" value="${sizesObj[sizeKey]}" data-size="${sizeKey}">
+                        </div>
+                    `;
+                });
+            } else {
+                sizeContainer.innerHTML = `<div style="font-size:10px; color:var(--text-muted);">No sizes recorded.</div>`;
             }
 
-            tg.showAlert(`✅ Dress published successfully!`);
-            window.location.href = "dresslist.html";
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function saveDressChanges() {
+            let index = document.getElementById('editIndex').value;
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+
+            dresses[index].name = document.getElementById('editName').value.trim();
+            dresses[index].category = document.getElementById('editCat').value.trim();
+            dresses[index].price = parseFloat(document.getElementById('editPrice').value) || 0;
+
+            let updatedSizes = {};
+            document.querySelectorAll('.edit-size-input').forEach(input => {
+                let sizeKey = input.getAttribute('data-size');
+                updatedSizes[sizeKey] = parseInt(input.value) || 0;
+            });
+            dresses[index].sizes = updatedSizes;
+
+            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            tg.showAlert("✅ Dress and size stocks updated successfully!");
+            closeModal('editModal');
+            loadInventory();
+        }
+
+        function deleteDress(index) {
+            if(confirm("Are you sure you want to remove this dress from inventory?")) {
+                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+                dresses.splice(index, 1);
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                tg.showAlert("🗑️ Dress removed successfully!");
+                loadInventory();
+            }
         }
     </script>
 </body>
