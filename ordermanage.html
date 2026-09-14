@@ -40,9 +40,17 @@
         .btn-accept { background: #059669; }
         .btn-cancel { background: #dc2626; }
         .btn-screenshot { background: #2563eb; }
+        .btn-exchange-toggle { background: #6b7280; }
+        .btn-exchange-toggle.on { background: #7c3aed; }
+
+        .tabs-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
 
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
         .modal-content { background: #fff; border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 12px; position: relative; text-align: center; }
+
+        .service-detail-box { background: #fff; border: 1px dashed var(--card-border); border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+        .service-detail-box b { color: #111; }
+        .service-type-pill { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 4px; }
     </style>
 </head>
 <body>
@@ -55,10 +63,11 @@
 
         <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID or Name..." onkeyup="filterOrdersByUserId()">
 
-        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <div class="tabs-row">
             <button class="btn-sm" style="background:#111;" onclick="switchOrderSub('live')">Live Orders</button>
             <button class="btn-sm btn-accept" onclick="switchOrderSub('accepted')">Accepted History</button>
             <button class="btn-sm btn-cancel" onclick="switchOrderSub('rejected')">Rejected History</button>
+            <button class="btn-sm" style="background:#7c3aed;" onclick="switchOrderSub('exchange')">Exchange & Refund</button>
         </div>
 
         <!-- Live Orders -->
@@ -84,6 +93,15 @@
                 <div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>
             </div>
         </div>
+
+        <!-- Exchange & Refund Requests -->
+        <div id="sub-exchange" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#7c3aed;">Exchange & Refund Requests</h4>
+            <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Delivered/Rejected requests stay listed here as history.</p>
+            <div class="list-box" id="exchangeOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No exchange/refund requests yet.</div>
+            </div>
+        </div>
     </div>
 
     <div id="imageModal" class="modal-overlay">
@@ -107,12 +125,14 @@
             let liveContainer = document.getElementById('liveOrdersContainer');
             let acceptedContainer = document.getElementById('acceptedOrdersContainer');
             let rejectedContainer = document.getElementById('rejectedOrdersContainer');
+            let exchangeContainer = document.getElementById('exchangeOrdersContainer');
 
             liveContainer.innerHTML = '';
             acceptedContainer.innerHTML = '';
             rejectedContainer.innerHTML = '';
+            exchangeContainer.innerHTML = '';
 
-            let hasLive = false, hasAccepted = false, hasRejected = false;
+            let hasLive = false, hasAccepted = false, hasRejected = false, hasExchange = false;
 
             orders.forEach((order, index) => {
                 let itemsDesc = '';
@@ -120,6 +140,18 @@
                     itemsDesc = order.items.map(i => `${i.name} (Size: ${i.size || 'N/A'}, Qty: ${i.qty})`).join(', ');
                 }
                 let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+
+                // Exchange/Refund enable toggle — only relevant once an order is Accepted
+                let exchangeToggleHtml = '';
+                if (order.status === 'Accepted') {
+                    exchangeToggleHtml = `
+                        <div class="action-row">
+                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled(${index})">
+                                <i class="fa-solid fa-rotate"></i> ${order.exchangeEnabled ? 'Exchange/Refund: ON' : 'Enable Exchange/Refund'}
+                            </button>
+                        </div>
+                    `;
+                }
 
                 let itemHtml = `
                     <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
@@ -140,6 +172,7 @@
                                     <button class="btn-sm btn-cancel" onclick="updateOrderStatus(${index}, 'Rejected')">Reject</button>
                                 </div>
                             ` : ''}
+                            ${exchangeToggleHtml}
                         </div>
                     </div>
                 `;
@@ -154,11 +187,67 @@
                     hasLive = true;
                     liveContainer.innerHTML += itemHtml;
                 }
+
+                // Exchange & Refund tab — any accepted order that has a customer service request on it
+                if (order.serviceRequest) {
+                    hasExchange = true;
+                    exchangeContainer.innerHTML += buildExchangeRequestItemHtml(order, index);
+                }
             });
 
             if(!hasLive) liveContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No live orders found.</div>`;
             if(!hasAccepted) acceptedContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>`;
             if(!hasRejected) rejectedContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>`;
+            if(!hasExchange) exchangeContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No exchange/refund requests yet.</div>`;
+        }
+
+        function buildExchangeRequestItemHtml(order, index) {
+            let sr = order.serviceRequest;
+            let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+            let typeColor = sr.type === 'exchange' ? '#7c3aed' : '#d97706';
+            let typeBg = sr.type === 'exchange' ? '#ede9fe' : '#fef3c7';
+
+            let statusColor = sr.status === 'Delivered' ? '#059669' : sr.status === 'Rejected' ? '#dc2626' : sr.status === 'Processing' ? '#2563eb' : '#d97706';
+            let statusBg = sr.status === 'Delivered' ? '#ecfdf5' : sr.status === 'Rejected' ? '#fee2e2' : sr.status === 'Processing' ? '#dbeafe' : '#fef3c7';
+
+            let newItemLine = (sr.type === 'exchange' && sr.newItem) ? `<br><b>Replacement Item:</b> ${sr.newItem.name} (৳ ${Number(sr.newItem.price).toLocaleString()})` : '';
+
+            let actionButtons = '';
+            if (sr.status === 'Requested') {
+                actionButtons = `
+                    <div class="action-row">
+                        <button class="btn-sm btn-accept" onclick="updateServiceStatus(${index}, 'Processing')">Start Processing</button>
+                        <button class="btn-sm btn-cancel" onclick="updateServiceStatus(${index}, 'Rejected')">Reject</button>
+                    </div>
+                `;
+            } else if (sr.status === 'Processing') {
+                actionButtons = `
+                    <div class="action-row">
+                        <button class="btn-sm btn-accept" onclick="updateServiceStatus(${index}, 'Delivered')">Mark Delivered</button>
+                    </div>
+                `;
+            }
+            // Delivered / Rejected: no more actions, stays here as history
+
+            return `
+                <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
+                    <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                    <div class="order-info">
+                        <div class="item-header">
+                            <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
+                            <span class="item-badge" style="color:${statusColor}; background:${statusBg};">${sr.status}</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Customer:</b> ${order.userName || 'Customer'}
+                            <span class="service-type-pill" style="color:${typeColor}; background:${typeBg};">${sr.type}</span>
+                        </div>
+                        <div class="service-detail-box">
+                            <b>Reason:</b> ${sr.reason}${newItemLine}
+                        </div>
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
         }
 
         function updateOrderStatus(index, newStatus) {
@@ -168,6 +257,28 @@
                 localStorage.setItem('userOrders', JSON.stringify(orders));
                 loadAllOrders();
                 tg.showAlert(`✅ Order #${orders[index].orderId} marked as ${newStatus}!`);
+            }
+        }
+
+        function toggleExchangeEnabled(index) {
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            if (orders[index]) {
+                orders[index].exchangeEnabled = !orders[index].exchangeEnabled;
+                localStorage.setItem('userOrders', JSON.stringify(orders));
+                loadAllOrders();
+                tg.showAlert(orders[index].exchangeEnabled
+                    ? `✅ Exchange/Refund enabled for Order #${orders[index].orderId}!`
+                    : `⚠️ Exchange/Refund disabled for Order #${orders[index].orderId}.`);
+            }
+        }
+
+        function updateServiceStatus(index, newStatus) {
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            if (orders[index] && orders[index].serviceRequest) {
+                orders[index].serviceRequest.status = newStatus;
+                localStorage.setItem('userOrders', JSON.stringify(orders));
+                loadAllOrders();
+                tg.showAlert(`✅ ${orders[index].serviceRequest.type} request marked as ${newStatus}!`);
             }
         }
 
