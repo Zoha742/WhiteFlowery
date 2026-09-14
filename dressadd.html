@@ -16,21 +16,22 @@
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 90px; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
 
         .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
         .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
-        .section-divider { border-top: 1px dashed var(--card-border); margin: 16px 0; padding-top: 4px; }
-        .sub-label { font-size: 11px; font-weight: 700; color: #c084fc; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
         textarea.form-control { resize: none; height: 70px; }
         
+        .checkbox-row { display: flex; gap: 15px; background: #0b0f19; border: 1px solid var(--card-border); padding: 10px; border-radius: 8px; margin-bottom: 12px; align-items: center; }
+        .checkbox-row label { font-size: 11px; color: #fff; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
+
         .size-row-input { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
         .add-size-btn { background: #3b82f6; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
 
@@ -39,35 +40,8 @@
         .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
-        .variant-card { display: flex; gap: 10px; align-items: center; background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
-        .variant-thumb { width: 44px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); flex-shrink: 0; }
-        .variant-swatch { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.4); margin-right: 5px; vertical-align: middle; }
-        .variant-info { flex: 1; font-size: 10px; color: var(--text-muted); }
-        .variant-color-name { color: #fff; font-weight: 700; font-size: 12px; }
-
-        .variant-builder-box { background: rgba(124,58,237,0.06); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; margin-bottom: 14px; }
-
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
-        .add-variant-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
-
-        .img-preview-row { margin-top: 6px; }
-        .preview-thumb-box { position: relative; width: 60px; height: 70px; display: inline-block; }
-        .preview-thumb-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
-        .preview-icon-btn { position: absolute; width: 20px; height: 20px; border-radius: 50%; border: none; color: #fff; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
-        .preview-view-btn { top: -6px; left: -6px; background: #3b82f6; }
-        .preview-remove-btn { top: -6px; right: -6px; background: #ef4444; }
-
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.97);
-            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
-            padding: 10px 12px 14px 12px; box-sizing: border-box; z-index: 9999; backdrop-filter: blur(15px); gap: 10px;
-        }
-        .bottom-nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; border-radius: 12px; text-decoration: none; font-size: 11px; font-weight: 700; border: none; cursor: pointer; color: #fff; }
-        .bottom-nav-btn i { font-size: 18px; }
-        .nav-btn-home { background: linear-gradient(135deg, #7c3aed, #c084fc); }
-        .nav-btn-back { background: linear-gradient(135deg, #ec4899, #f97316); }
     </style>
 </head>
 <body>
@@ -75,37 +49,29 @@
     <div class="container">
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Dress</h3>
+            <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product Info</h4>
-
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Home Section & Product Setup</h4>
+            
             <div class="form-group">
                 <label>Dress Name</label>
                 <input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock">
             </div>
 
-            <!-- Dynamic Category Management -->
+            <!-- Home Section Display Settings -->
+            <div class="checkbox-row">
+                <label><input type="checkbox" id="isTrending"> 🔥 Trending Dress</label>
+                <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
+            </div>
+
             <div class="form-group">
                 <label>Select Category</label>
                 <div style="display: flex; gap: 6px;">
-                    <select id="newCat" class="form-control" style="flex: 2;">
-                        <!-- Categories loaded from localStorage -->
-                    </select>
+                    <select id="newCat" class="form-control" style="flex: 2;"></select>
                     <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
                     <button type="button" class="add-size-btn" onclick="addNewCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
-                </div>
-            </div>
-
-            <!-- Rename Category -->
-            <div class="form-group">
-                <label>Rename Category</label>
-                <div style="display: flex; gap: 6px;">
-                    <select id="renameCatSelect" class="form-control" style="flex: 2;">
-                        <!-- Categories loaded from localStorage -->
-                    </select>
-                    <input type="text" id="renameCatInput" class="form-control" placeholder="New name..." style="flex: 1;">
-                    <button type="button" class="add-size-btn" onclick="renameCategory()" style="background:#f59e0b; height:38px;"><i class="fa-solid fa-pen"></i></button>
                 </div>
             </div>
 
@@ -119,80 +85,56 @@
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
             </div>
 
+            <!-- Size Setup -->
+            <div class="size-row-input">
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
+                    <select id="sizeDropdown" class="form-control">
+                        <option value="S">S Size</option>
+                        <option value="M">M Size</option>
+                        <option value="L">L Size</option>
+                        <option value="XL">XL Size</option>
+                        <option value="XXL">XXL Size</option>
+                        <option value="Free Size">Free Size</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
+                    <input type="number" id="sizeQty" class="form-control" placeholder="10" value="1">
+                </div>
+                <button type="button" class="add-size-btn" onclick="addSizeToTable()"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+
+            <table class="size-table">
+                <thead>
+                    <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
+                </thead>
+                <tbody id="sizeTableBody">
+                    <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
+                </tbody>
+            </table>
+
+            <!-- 3 Image Uploads -->
             <div class="form-group">
-                <label>Product Video (Optional, applies to whole product)</label>
+                <label>Product Photo 1 (Required - Cloudinary)</label>
+                <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
+            </div>
+            <div class="form-group">
+                <label>Product Photo 2 (Optional)</label>
+                <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
+            </div>
+            <div class="form-group">
+                <label>Product Photo 3 (Optional)</label>
+                <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
+            </div>
+
+            <div class="form-group">
+                <label>Product Video (Optional)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #94a3b8;">
             </div>
+
+            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
         </div>
-
-        <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-palette"></i> Add a Color Variant</h4>
-            <p style="font-size:10px; color:var(--text-muted); margin-top:-6px;">Proti color-er jonno alada photo + alada size/qty diye "Add This Color Variant" e click koro. Ekaadhik color add korte parবে.</p>
-
-            <div class="variant-builder-box">
-                <div class="sub-label"><i class="fa-solid fa-image"></i> Upload This Color's Photos</div>
-                <div class="form-group">
-                    <label>Photo 1 (Required)</label>
-                    <input type="file" id="variantImgFile1" class="form-control" accept="image/*" style="color: #94a3b8;" onchange="previewVariantImage(1)">
-                    <div class="img-preview-row" id="variantImgPreview1"></div>
-                </div>
-                <div class="form-group">
-                    <label>Photo 2 (Optional)</label>
-                    <input type="file" id="variantImgFile2" class="form-control" accept="image/*" style="color: #94a3b8;" onchange="previewVariantImage(2)">
-                    <div class="img-preview-row" id="variantImgPreview2"></div>
-                </div>
-                <div class="form-group">
-                    <label>Photo 3 (Optional)</label>
-                    <input type="file" id="variantImgFile3" class="form-control" accept="image/*" style="color: #94a3b8;" onchange="previewVariantImage(3)">
-                    <div class="img-preview-row" id="variantImgPreview3"></div>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <div class="form-group">
-                    <label>Color Name</label>
-                    <input type="text" id="variantColorInput" class="form-control" placeholder="e.g. Red, Navy Blue, Maroon">
-                </div>
-
-                <div class="sub-label"><i class="fa-solid fa-ruler"></i> This Color's Size & Stock</div>
-                <div class="size-row-input">
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
-                        <select id="variantSizeDropdown" class="form-control">
-                            <option value="S">S Size</option>
-                            <option value="M">M Size</option>
-                            <option value="L">L Size</option>
-                            <option value="XL">XL Size</option>
-                            <option value="XXL">XXL Size</option>
-                            <option value="Free Size">Free Size</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
-                        <input type="number" id="variantSizeQty" class="form-control" placeholder="10" value="1">
-                    </div>
-                    <button type="button" class="add-size-btn" onclick="addSizeToVariantTable()"><i class="fa-solid fa-plus"></i> Add</button>
-                </div>
-
-                <table class="size-table">
-                    <thead>
-                        <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
-                    </thead>
-                    <tbody id="variantSizeTableBody">
-                        <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
-                    </tbody>
-                </table>
-
-                <button type="button" class="add-variant-btn" onclick="addColorVariant()"><i class="fa-solid fa-circle-plus"></i> Add This Color Variant</button>
-            </div>
-
-            <div class="sub-label"><i class="fa-solid fa-layer-group"></i> Added Color Variants</div>
-            <div id="variantsListBox">
-                <span style="color: var(--text-muted); font-size: 10px;">No color variants added yet.</span>
-            </div>
-        </div>
-
-        <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
     </div>
 
     <div id="uploadOverlay" class="uploading-overlay">
@@ -200,26 +142,10 @@
         <span>Uploading images & publishing dress...</span>
     </div>
 
-    <div id="previewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
-        <div style="position:relative; max-width:90%;">
-            <span style="position:absolute; top:-34px; right:0; font-size:26px; cursor:pointer; color:#fff;" onclick="document.getElementById('previewModal').style.display='none'">&times;</span>
-            <img id="previewModalImg" src="" style="max-width:100%; max-height:75vh; border-radius:10px; border:1px solid var(--card-border);">
-        </div>
-    </div>
-
-    <div class="bottom-nav">
-        <a href="myadmin.html" class="bottom-nav-btn nav-btn-home"><i class="fa-solid fa-house"></i> Admin Home</a>
-        <button type="button" class="bottom-nav-btn nav-btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Back</button>
-    </div>
-
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-
-        // Sizes for the color variant currently being built (resets after each "Add This Color Variant")
-        let variantSizesList = {};
-        // Finalized color variants for the dress being created: [{ color, images, sizes }]
-        let addedVariantsList = [];
+        let addedSizesList = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             loadCategoriesDropdown();
@@ -227,22 +153,15 @@
 
         function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
-            let renameSelect = document.getElementById('renameCatSelect');
             let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
-
             catSelect.innerHTML = '';
-            renameSelect.innerHTML = '';
-            categories.forEach(cat => {
-                catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                renameSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
+            categories.forEach(cat => { catSelect.innerHTML += `<option value="${cat}">${cat}</option>`; });
         }
 
         function addNewCategory() {
             let customInput = document.getElementById('customCatInput');
             let newCat = customInput.value.trim();
             if(!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
-
             let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
             if(!categories.includes(newCat)) {
                 categories.push(newCat);
@@ -256,60 +175,22 @@
             }
         }
 
-        function renameCategory() {
-            let oldName = document.getElementById('renameCatSelect').value;
-            let newNameInput = document.getElementById('renameCatInput');
-            let newName = newNameInput.value.trim();
-
-            if (!oldName) { tg.showAlert("⚠️ No category selected!"); return; }
-            if (!newName) { tg.showAlert("⚠️ Enter the new category name!"); return; }
-
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
-
-            if (newName !== oldName && categories.includes(newName)) {
-                tg.showAlert(`⚠️ Category "${newName}" already exists! Choose a different name.`);
-                return;
-            }
-
-            categories = categories.map(c => c === oldName ? newName : c);
-            localStorage.setItem('shopCategories', JSON.stringify(categories));
-
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let updatedCount = 0;
-            dresses = dresses.map(d => {
-                if (d.category === oldName) {
-                    updatedCount++;
-                    return { ...d, category: newName };
-                }
-                return d;
-            });
-            localStorage.setItem('shopDresses', JSON.stringify(dresses));
-
-            loadCategoriesDropdown();
-            document.getElementById('newCat').value = newName;
-            document.getElementById('renameCatSelect').value = newName;
-            newNameInput.value = '';
-
-            tg.showAlert(`✅ Category renamed to "${newName}"! (${updatedCount} product(s) updated)`);
-        }
-
-        // ---------- Variant size table (per color, before it's added) ----------
-        function addSizeToVariantTable() {
-            let size = document.getElementById('variantSizeDropdown').value;
-            let qty = parseInt(document.getElementById('variantSizeQty').value) || 0;
+        function addSizeToTable() {
+            let size = document.getElementById('sizeDropdown').value;
+            let qty = parseInt(document.getElementById('sizeQty').value) || 0;
             if (qty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
-            variantSizesList[size] = qty;
-            renderVariantSizeTable();
+            addedSizesList[size] = qty;
+            renderSizeTable();
         }
 
-        function removeVariantSize(sizeKey) {
-            delete variantSizesList[sizeKey];
-            renderVariantSizeTable();
+        function removeSize(sizeKey) {
+            delete addedSizesList[sizeKey];
+            renderSizeTable();
         }
 
-        function renderVariantSizeTable() {
-            let tbody = document.getElementById('variantSizeTableBody');
-            let keys = Object.keys(variantSizesList);
+        function renderSizeTable() {
+            let tbody = document.getElementById('sizeTableBody');
+            let keys = Object.keys(addedSizesList);
             if (keys.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>`;
                 return;
@@ -319,201 +200,67 @@
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${size}</b></td>
-                        <td style="color:#fbbf24; font-weight:bold;">${variantSizesList[size]} Pcs</td>
-                        <td><button class="del-size" onclick="removeVariantSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
+                        <td style="color:#fbbf24; font-weight:bold;">${addedSizesList[size]} Pcs</td>
+                        <td><button class="del-size" onclick="removeSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
             });
         }
 
-        // ---------- Photo preview: show a thumbnail with an eye (view) + x (remove) button ----------
-        function previewVariantImage(num) {
-            let input = document.getElementById(`variantImgFile${num}`);
-            let previewBox = document.getElementById(`variantImgPreview${num}`);
-            let file = input.files[0];
-            if (!file) { previewBox.innerHTML = ''; return; }
-            let url = URL.createObjectURL(file);
-            previewBox.innerHTML = `
-                <div class="preview-thumb-box">
-                    <img src="${url}">
-                    <button type="button" class="preview-icon-btn preview-view-btn" onclick="viewImagePreview('${url}')" title="View"><i class="fa-solid fa-eye"></i></button>
-                    <button type="button" class="preview-icon-btn preview-remove-btn" onclick="clearVariantImage(${num})" title="Remove"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-            `;
-        }
-
-        function clearVariantImage(num) {
-            document.getElementById(`variantImgFile${num}`).value = '';
-            document.getElementById(`variantImgPreview${num}`).innerHTML = '';
-        }
-
-        function viewImagePreview(url) {
-            document.getElementById('previewModalImg').src = url;
-            document.getElementById('previewModal').style.display = 'flex';
-        }
-
-        // ---------- Cloudinary upload (unique public_id so a new photo never reuses an old asset's URL) ----------
         async function uploadToCloudinary(file) {
             let formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", "ml_default");
-            formData.append("folder", "shop/Product_add");
-
-            let uniqueId = "dress_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
-            formData.append("public_id", uniqueId);
+            formData.append("folder", "shop/Product add");
 
             try {
                 let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
                 let data = await res.json();
-
-                if (!res.ok || !data.secure_url) {
-                    console.error("Cloudinary upload rejected:", data.error ? data.error.message : data);
-                    throw new Error(data.error ? data.error.message : "Cloudinary upload failed");
-                }
-                return data.secure_url;
+                return data.secure_url || "";
             } catch (err) {
-                console.error("Cloudinary upload error, falling back to local image:", err);
                 return new Promise((resolve) => {
                     let reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = () => resolve("");
                     reader.readAsDataURL(file);
                 });
             }
         }
 
-        // ---------- Cloudinary VIDEO upload (separate endpoint — videos posted to the image
-        // endpoint get rejected by Cloudinary, which was silently breaking video uploads) ----------
-        async function uploadVideoToCloudinary(file) {
-            let formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "ml_default");
-            formData.append("folder", "shop/Product_add");
-
-            let uniqueId = "dress_video_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
-            formData.append("public_id", uniqueId);
-
-            try {
-                let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/video/upload", { method: "POST", body: formData });
-                let data = await res.json();
-                if (!res.ok || !data.secure_url) {
-                    console.error("Cloudinary video upload rejected:", data.error ? data.error.message : data);
-                    throw new Error(data.error ? data.error.message : "Cloudinary video upload failed");
-                }
-                return data.secure_url;
-            } catch (err) {
-                console.error("Video upload error:", err);
-                return "";
-            }
-        }
-
-        // ---------- Add a finished color variant (uploads its photos now) ----------
-        async function addColorVariant() {
-            let colorName = document.getElementById('variantColorInput').value.trim();
-            let file1 = document.getElementById('variantImgFile1').files[0];
-            let file2 = document.getElementById('variantImgFile2').files[0];
-            let file3 = document.getElementById('variantImgFile3').files[0];
-            let sizeKeys = Object.keys(variantSizesList);
-
-            if (addedVariantsList.some(v => colorName && v.color && v.color.toLowerCase() === colorName.toLowerCase())) {
-                tg.showAlert("⚠️ This color is already added for this dress!");
-                return;
-            }
-            if (!file1) { tg.showAlert("⚠️ At least 1 photo is required for this color!"); return; }
-            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Add at least one size & quantity for this color!"); return; }
-
-            document.getElementById('uploadOverlay').style.display = 'flex';
-
-            let images = [];
-            let url1 = await uploadToCloudinary(file1);
-            if (url1) {
-                images.push(url1);
-            } else {
-                document.getElementById('uploadOverlay').style.display = 'none';
-                tg.showAlert("❌ Photo could not be uploaded or read. Please try a different image.");
-                return;
-            }
-            if (file2) { let u2 = await uploadToCloudinary(file2); if (u2) images.push(u2); }
-            if (file3) { let u3 = await uploadToCloudinary(file3); if (u3) images.push(u3); }
-
-            document.getElementById('uploadOverlay').style.display = 'none';
-
-            addedVariantsList.push({
-                color: colorName,
-                images: images,
-                sizes: { ...variantSizesList }
-            });
-
-            // Reset the variant-builder fields so the next color starts fresh
-            document.getElementById('variantColorInput').value = '';
-            document.getElementById('variantImgFile1').value = '';
-            document.getElementById('variantImgFile2').value = '';
-            document.getElementById('variantImgFile3').value = '';
-            document.getElementById('variantImgPreview1').innerHTML = '';
-            document.getElementById('variantImgPreview2').innerHTML = '';
-            document.getElementById('variantImgPreview3').innerHTML = '';
-            variantSizesList = {};
-            renderVariantSizeTable();
-            renderAddedVariantsList();
-
-            tg.showAlert(`✅ "${colorName || 'This'}" variant added! Add another color or publish the dress.`);
-        }
-
-        function removeAddedVariant(idx) {
-            addedVariantsList.splice(idx, 1);
-            renderAddedVariantsList();
-        }
-
-        function renderAddedVariantsList() {
-            let box = document.getElementById('variantsListBox');
-            if (addedVariantsList.length === 0) {
-                box.innerHTML = `<span style="color: var(--text-muted); font-size: 10px;">No color variants added yet.</span>`;
-                return;
-            }
-            box.innerHTML = addedVariantsList.map((v, idx) => {
-                let sizeStr = Object.entries(v.sizes).map(([k, val]) => `${k}: ${val} Pcs`).join(' &nbsp;|&nbsp; ');
-                return `
-                    <div class="variant-card">
-                        <img src="${v.images[0]}" class="variant-thumb">
-                        <div class="variant-info">
-                            <span class="variant-swatch" style="background:${v.color || '#666'};"></span>
-                            <span class="variant-color-name">${v.color || 'Default (no color set)'}</span><br>
-                            ${sizeStr}
-                        </div>
-                        <button class="del-size" style="background:#3b82f6;" onclick="viewImagePreview('${v.images[0]}')" title="View photo"><i class="fa-solid fa-eye"></i></button>
-                        <button class="del-size" onclick="removeAddedVariant(${idx})" title="Remove"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // ---------- Final publish ----------
         async function publishDress() {
             let name = document.getElementById('newName').value.trim();
             let cat = document.getElementById('newCat').value;
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
             let details = document.getElementById('newDetails').value.trim();
+            let isTrending = document.getElementById('isTrending').checked;
+            let isNewArrival = document.getElementById('isNewArrival').checked;
+            
+            let file1 = document.getElementById('imgFile1').files[0];
+            let file2 = document.getElementById('imgFile2').files[0];
+            let file3 = document.getElementById('imgFile3').files[0];
             let videoInput = document.getElementById('productVideoFile');
+            let sizeKeys = Object.keys(addedSizesList);
 
             if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            if (addedVariantsList.length === 0) { tg.showAlert("⚠️ Add at least one color variant (with photo & size) before publishing!"); return; }
+            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Please add at least one size & quantity!"); return; }
+            if (!file1) { tg.showAlert("⚠️ Product Photo 1 is required!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
 
+            let images = [];
+            let url1 = await uploadToCloudinary(file1);
+            if(url1) images.push(url1);
+            if(file2) { let url2 = await uploadToCloudinary(file2); if(url2) images.push(url2); }
+            if(file3) { let url3 = await uploadToCloudinary(file3); if(url3) images.push(url3); }
+
             let videoUrl = "";
-            if (videoInput.files.length > 0) {
-                videoUrl = await uploadVideoToCloudinary(videoInput.files[0]);
-                if (!videoUrl) {
-                    tg.showAlert("⚠️ Video upload failed — publishing the dress without the video. You can try re-uploading the video later.");
-                }
+            if(videoInput.files.length > 0) {
+                videoUrl = await uploadToCloudinary(videoInput.files[0]);
             }
 
             document.getElementById('uploadOverlay').style.display = 'none';
 
             let totalStock = 0;
-            addedVariantsList.forEach(v => {
-                Object.values(v.sizes).forEach(q => totalStock += Number(q));
-            });
+            sizeKeys.forEach(s => totalStock += addedSizesList[s]);
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
@@ -521,29 +268,33 @@
                 category: cat,
                 price: price,
                 details: details || "No details provided.",
+                images: images,
+                image: images[0],
                 video: videoUrl,
-                variants: addedVariantsList, // [{ color, images, sizes }]
-                // Backward-compatible fallback fields (first variant), used by any older page
-                image: addedVariantsList[0].images[0],
-                images: addedVariantsList[0].images,
-                sizes: addedVariantsList[0].sizes,
-                colors: addedVariantsList.map(v => v.color),
-                totalStock: totalStock
+                sizes: addedSizesList,
+                totalStock: totalStock,
+                isTrending: isTrending,     // 🔥 Trending Flag
+                isNewArrival: isNewArrival  // ✨ New Arrival Flag
             };
 
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
-            tg.showAlert(`✅ Dress "${name}" published with ${addedVariantsList.length} color variant(s)! Add more if you want.`);
-
-            // Reset the whole form for the next dress
+            tg.showAlert(`✅ Dress "${name}" published successfully!`);
+            
+            // Reset Form
             document.getElementById('newName').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
+            document.getElementById('imgFile1').value = '';
+            document.getElementById('imgFile2').value = '';
+            document.getElementById('imgFile3').value = '';
             document.getElementById('productVideoFile').value = '';
-            addedVariantsList = [];
-            renderAddedVariantsList();
+            document.getElementById('isTrending').checked = false;
+            document.getElementById('isNewArrival').checked = false;
+            addedSizesList = {};
+            renderSizeTable();
         }
     </script>
 </body>
