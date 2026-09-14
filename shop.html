@@ -372,6 +372,33 @@
             let card = document.getElementById(`card-${cardIndex}`);
             let selectedSize = card ? card.dataset.selectedSize : '';
             let selectedColor = card ? card.dataset.selectedColor : '';
+            let variantIdx = card ? parseInt(card.dataset.selectedVariant || '0') : 0;
+            let variant = (currentCardVariants[cardIndex] && currentCardVariants[cardIndex][variantIdx]) || {};
+            let image = (variant.images && variant.images[0]) || dress.image || '';
+
+            // Same product + size + color = same cart line (just bump quantity).
+            // Anything different (including a different dress) becomes its own line.
+            let itemKey = `${dress.id || dress.name}_${selectedSize}_${selectedColor}`;
+
+            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+            let existing = cart.find(it => it.key === itemKey);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    key: itemKey,
+                    name: dress.name,
+                    price: Number(dress.price),
+                    size: selectedSize,
+                    color: selectedColor,
+                    image: image,
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+
             let variantText = [selectedSize, selectedColor].filter(Boolean).join(' / ');
             let label = variantText ? `${dress.name} (${variantText})` : dress.name;
 
