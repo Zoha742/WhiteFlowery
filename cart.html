@@ -272,7 +272,7 @@
         }
 
         function removeItem(key) {
-            let cart = getCart().filter(it => it.key !== key);
+            let cart = getCart().filter(it => it.key !== key); 
             saveCart(cart);
             renderCart();
             tg.showAlert("🗑️ Item removed from cart!");
