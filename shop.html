@@ -137,32 +137,20 @@
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         let currentFilteredDresses = [];
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // Force Universal Global Sync & Purge Old Cache Conflicts
-            let globalDresses = JSON.parse(localStorage.getItem('globalShopDresses')) || [];
-            let localDresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            
-            let combinedMap = new Map();
-            [...globalDresses, ...localDresses].forEach(d => {
-                if (d && d.name) combinedMap.set(d.name + d.price, d);
-            });
-            let freshDresses = Array.from(combinedMap.values());
-
-            localStorage.setItem('shopDresses', JSON.stringify(freshDresses));
-            localStorage.setItem('globalShopDresses', JSON.stringify(freshDresses));
-
-            loadCategoriesFilter();
-            renderProducts();
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadCategoriesFilter();
+            await renderProducts();
         });
 
-        function loadCategoriesFilter() {
+        async function loadCategoriesFilter() {
             let dropdown = document.getElementById('categoryFilterDropdown');
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
+            let categories = await getCategories();
             
             let currentSelected = dropdown.value;
             dropdown.innerHTML = `<option value="All">All Category</option>`;
@@ -173,10 +161,12 @@
             dropdown.value = currentSelected;
         }
 
-        function renderProducts() {
+        async function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
-            
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || JSON.parse(localStorage.getItem('globalShopDresses')) || [];
+            grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; padding:40px; font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</div>`;
+
+            // ক্লাউড ডাটাবেজ — সব অ্যাকাউন্ট/ডিভাইসে একই প্রোডাক্ট, নতুনগুলো আগে
+            let dresses = await getDresses();
 
             let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
@@ -191,10 +181,9 @@
             } else if (sortType === 'price-high') {
                 dresses.sort((a, b) => b.price - a.price);
             } else if (sortType === 'old') {
-                // keep original order
-            } else {
-                dresses.reverse();
+                dresses.reverse();   // পুরোনো আগে
             }
+            // default: getDresses() ইতিমধ্যেই নতুনগুলো আগে দিয়েছে
 
             currentFilteredDresses = dresses;
             grid.innerHTML = '';
