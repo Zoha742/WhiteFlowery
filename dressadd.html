@@ -53,11 +53,11 @@
         </div>
 
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Home Section & Product Setup</h4>
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Category & Product Setup</h4>
             
             <div class="form-group">
                 <label>Dress Name</label>
-                <input type="text" id="newName" class="form-control" placeholder="e.g. Elegant White Frock">
+                <input type="text" id="newName" class="form-control" placeholder="e.g. Winter Velvet Frock">
             </div>
 
             <!-- Home Section Display Settings -->
@@ -66,11 +66,12 @@
                 <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
             </div>
 
+            <!-- Dynamic Category Management -->
             <div class="form-group">
-                <label>Select Category</label>
+                <label>Select Category (Winter, Summer, etc.)</label>
                 <div style="display: flex; gap: 6px;">
                     <select id="newCat" class="form-control" style="flex: 2;"></select>
-                    <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
+                    <input type="text" id="customCatInput" class="form-control" placeholder="Add New Cat..." style="flex: 1;">
                     <button type="button" class="add-size-btn" onclick="addNewCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>
@@ -114,7 +115,7 @@
                 </tbody>
             </table>
 
-            <!-- 3 Image Uploads -->
+            <!-- Images & Video Upload -->
             <div class="form-group">
                 <label>Product Photo 1 (Required - Cloudinary)</label>
                 <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
@@ -127,7 +128,6 @@
                 <label>Product Photo 3 (Optional)</label>
                 <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
             </div>
-
             <div class="form-group">
                 <label>Product Video (Optional)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #94a3b8;">
@@ -153,16 +153,21 @@
 
         function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            // Default categories including Winter & Summer
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'Party Wear', 'Casual Sets', 'Gowns'];
+            
             catSelect.innerHTML = '';
-            categories.forEach(cat => { catSelect.innerHTML += `<option value="${cat}">${cat}</option>`; });
+            categories.forEach(cat => {
+                catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
         }
 
         function addNewCategory() {
             let customInput = document.getElementById('customCatInput');
             let newCat = customInput.value.trim();
             if(!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'Party Wear', 'Casual Sets', 'Gowns'];
             if(!categories.includes(newCat)) {
                 categories.push(newCat);
                 localStorage.setItem('shopCategories', JSON.stringify(categories));
@@ -273,8 +278,8 @@
                 video: videoUrl,
                 sizes: addedSizesList,
                 totalStock: totalStock,
-                isTrending: isTrending,     // 🔥 Trending Flag
-                isNewArrival: isNewArrival  // ✨ New Arrival Flag
+                isTrending: isTrending,
+                isNewArrival: isNewArrival
             };
 
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
@@ -283,7 +288,7 @@
 
             tg.showAlert(`✅ Dress "${name}" published successfully!`);
             
-            // Reset Form
+            // Reset Form fields
             document.getElementById('newName').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
