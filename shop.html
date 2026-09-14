@@ -9,14 +9,12 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: rgba(19, 28, 46, 0.85);
-            --card-border: rgba(124, 58, 237, 0.3);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-pink: #ec4899;
-            --stock-green: #10b981;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #222222;
+            --price-color: #111111;
         }
 
         body {
@@ -28,105 +26,98 @@
         }
         .container { width: 100%; max-width: 480px; padding: 12px; box-sizing: border-box; }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; }
+        /* Top Bar: Filter & Sort */
+        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
+        .filter-btn-box, .sort-select-box {
+            flex: 1; background: #ffffff; border: 1px solid #d1d5db; padding: 10px 12px;
+            border-radius: 6px; font-size: 13px; font-weight: 600; color: #374151;
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+            outline: none; box-sizing: border-box;
+        }
+        .sort-select-box select { background: transparent; border: none; font-size: 13px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
 
-        .search-box { position: relative; margin-bottom: 12px; }
-        .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; }
-        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-
-        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: none; }
-        .categories-scroll::-webkit-scrollbar { display: none; }
-        .cat-chip { background: var(--card-bg); border: 1px solid var(--card-border); padding: 7px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); }
-        .cat-chip.active, .cat-chip:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
-
-        /* Full Width / Large Card Grid Layout (1 Column per row for bigger display) */
-        .products-grid { display: flex; flex-direction: column; gap: 16px; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+        /* Products Grid (2 Columns, Big Portrait Image) */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .product-card { background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 10px; }
         
-        /* Larger Image Box with Website Style */
-        .product-img-box { width: 100%; height: 340px; background: #0b0f19; border-radius: 14px; overflow: hidden; position: relative; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        /* Big Portrait Image Box */
+        .product-img-box { width: 100%; height: 250px; background: #f3f4f6; border-radius: 4px; overflow: hidden; position: relative; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.05); }
 
-        .product-title { margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #fff; }
-        .product-price { margin: 0 0 8px 0; font-size: 15px; font-weight: bold; color: #fbbf24; }
+        /* Add to Cart Button directly under image */
+        .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 11px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 8px; text-align: center; letter-spacing: 0.3px; }
+        .add-to-cart-btn:active { opacity: 0.85; }
 
-        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 11px; }
-        .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.12); padding: 3px 8px; border-radius: 6px; font-weight: bold; }
-        
-        .size-box { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-        .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 500; color: #1f2937; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { margin: 0; font-size: 13px; font-weight: 700; color: var(--price-color); text-align: center; }
 
-        .card-action-row { display: flex; gap: 6px; margin-bottom: 10px; }
-        .btn-mini { background: #1e293b; border: 1px solid var(--card-border); color: #c084fc; font-size: 11px; padding: 6px 10px; border-radius: 8px; cursor: pointer; flex: 1; text-align: center; font-weight: bold; }
-        
-        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
+        /* Stock & Size info popup/display */
+        .info-tag { font-size: 10px; color: #059669; text-align: center; margin-bottom: 4px; font-weight: 600; }
 
         /* Modals & Zoom */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 99999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 92%; max-width: 420px; padding: 18px; border-radius: 18px; position: relative; text-align: center; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; }
+        .modal-content { background: #ffffff; border: 1px solid #e5e7eb; width: 90%; max-width: 400px; padding: 18px; border-radius: 12px; position: relative; text-align: center; color: #111; }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
-            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            width: 100%; max-width: 480px; background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999; backdrop-filter: blur(15px);
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #7c3aed; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-store"></i> WhiteFlowery Pro Shop</h3>
-            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Home</a>
-        </div>
-
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search dresses..." onkeyup="renderProducts()">
-        </div>
-
-        <!-- Dynamic Category Chips -->
-        <div class="categories-scroll" id="categoriesContainer">
-            <div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>
+        <!-- Top Filter & Sort Bar (Matched with reference screenshot) -->
+        <div class="top-filter-bar">
+            <div class="filter-btn-box" onclick="toggleFilterModal()">
+                <span><i class="fa-solid fa-sliders"></i> Filter By</span>
+                <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+            </div>
+            <div class="sort-select-box">
+                <select id="sortDropdown" onchange="sortProducts()">
+                    <option value="new">Date, new to old</option>
+                    <option value="old">Date, old to new</option>
+                    <option value="price-low">Price, low to high</option>
+                    <option value="price-high">Price, high to low</option>
+                </select>
+            </div>
         </div>
 
         <div class="products-grid" id="shopProductsGrid">
-            <!-- Dynamically populated -->
+            <!-- Dynamically loaded products -->
         </div>
     </div>
 
     <!-- Zoom Image Modal -->
     <div id="zoomModal" class="modal-overlay">
-        <div class="modal-content" style="background:#0b0f19;">
-            <span style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer; color:#fff; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
-            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:380px; object-fit:contain; border-radius:10px; margin-bottom:12px;">
-            <div id="zoomThumbnails" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;"></div>
+        <div class="modal-content" style="background:#fff;">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:320px; object-fit:contain; border-radius:8px; margin-bottom:10px;">
+            <div id="zoomThumbnails" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
         </div>
     </div>
 
     <!-- Details Modal -->
     <div id="detailsModal" class="modal-overlay">
         <div class="modal-content" style="text-align: left;">
-            <span style="position:absolute; top:12px; right:15px; font-size:24px; cursor:pointer; color:#fff;" onclick="closeModal('detailsModal')">&times;</span>
-            <h4 id="modalTitle" style="color:#c084fc; margin-top:0; font-size:16px;">Product Details</h4>
-            <p id="modalDescription" style="font-size:13px; color:var(--text-muted); line-height:1.6;"></p>
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('detailsModal')">&times;</span>
+            <h4 id="modalTitle" style="color:#111; margin-top:0;">Product Details</h4>
+            <p id="modalDescription" style="font-size:12px; color:#555; line-height:1.6;"></p>
         </div>
     </div>
 
     <!-- Video Modal -->
     <div id="videoModal" class="modal-overlay">
         <div class="modal-content">
-            <span style="position:absolute; top:12px; right:15px; font-size:24px; cursor:pointer; color:#fff;" onclick="closeModal('videoModal')">&times;</span>
-            <h4 style="color:#fff; margin-top:0; font-size:16px;">Product Video</h4>
-            <video id="modalVideoPlayer" src="" controls style="width:100%; max-height:300px; border-radius:10px; border:1px solid var(--card-border);"></video>
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('videoModal')">&times;</span>
+            <h4 style="color:#111; margin-top:0;">Product Video</h4>
+            <video id="modalVideoPlayer" src="" controls style="width:100%; max-height:280px; border-radius:8px;"></video>
         </div>
     </div>
 
@@ -141,12 +132,10 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        let currentCategory = 'All';
         let currentFilteredDresses = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             forceCleanStorage();
-            loadDynamicCategories();
             renderProducts();
         });
 
@@ -161,83 +150,58 @@
             localStorage.setItem('shopDresses', JSON.stringify(validDresses));
         }
 
-        function loadDynamicCategories() {
-            let container = document.getElementById('categoriesContainer');
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
-            
-            container.innerHTML = `<div class="cat-chip active" onclick="filterCategory('All', this)">All Dresses</div>`;
-            categories.forEach(cat => {
-                container.innerHTML += `<div class="cat-chip" onclick="filterCategory('${cat}', this)">${cat}</div>`;
-            });
-        }
-
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let searchVal = document.getElementById('searchInput').value.toLowerCase();
-            
+            let sortType = document.getElementById('sortDropdown').value;
+
+            // Sorting logic
+            if (sortType === 'price-low') {
+                dresses.sort((a, b) => a.price - b.price);
+            } else if (sortType === 'price-high') {
+                dresses.sort((a, b) => b.price - a.price);
+            } else if (sortType === 'old') {
+                // Keep original order
+            } else {
+                // New to old (Reverse)
+                dresses.reverse();
+            }
+
+            currentFilteredDresses = dresses;
             grid.innerHTML = '';
-            
-            currentFilteredDresses = dresses.filter(d => {
-                let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
-                let matchesSearch = (d.name || "").toLowerCase().includes(searchVal);
-                return matchesCat && matchesSearch;
-            });
 
             if (currentFilteredDresses.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 40px; font-size: 13px;">No dresses found. Please add from admin panel.</div>`;
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: #666; padding: 40px; font-size: 13px;">No dresses found. Please add from admin panel.</div>`;
                 return;
             }
 
             currentFilteredDresses.forEach((dress, index) => {
-                let sizesObj = dress.sizes || {};
-                let sizeKeys = Object.keys(sizesObj);
-                let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
-                let initialStock = firstSize ? sizesObj[firstSize] : 0;
-                
-                let sizePillsHtml = '';
-                sizeKeys.forEach((sizeKey, sIdx) => {
-                    let cls = sIdx === 0 ? 'size-pill selected' : 'size-pill';
-                    sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
-                });
-
                 let mainImg = dress.image || '';
                 if (dress.images && dress.images.length > 0) {
                     mainImg = dress.images[0];
                 }
-
-                let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
                         <div class="product-img-box" onclick="openZoomModal(${index})">
                             <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
                         </div>
+                        <button class="add-to-cart-btn" onclick="addToCart(${index})">Add to cart</button>
                         <div>
                             <h4 class="product-title">${dress.name}</h4>
-                            <p class="product-price">৳ ${Number(dress.price).toLocaleString()}</p>
-                            <div class="meta-info">
-                                <span class="stock-badge" id="stock-text-${index}">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
-                            </div>
-                            <div class="size-box">
-                                ${sizePillsHtml || '<span style="font-size:10px; color:#ef4444;">Stock Out</span>'}
-                            </div>
-                            <div class="card-action-row">
-                                <button class="btn-mini" onclick="openDetailsModal('${dress.name}', \`${dress.details || 'No details'}\`)"><i class="fa-solid fa-circle-info"></i> Details</button>
-                                ${videoBtn}
-                            </div>
+                            <p class="product-price">Tk ${Number(dress.price).toLocaleString()}.00</p>
                         </div>
-                        <button class="add-to-cart-btn" onclick="addToCart('${dress.name}', ${dress.price})">Add to Cart</button>
                     </div>
                 `;
             });
         }
 
-        function selectSize(pill, sizeKey, qty, cardIndex) {
-            let parent = pill.parentElement;
-            parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
-            pill.classList.add('selected');
-            document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${sizeKey}): ${qty} Pcs`;
+        function sortProducts() {
+            renderProducts();
+        }
+
+        function toggleFilterModal() {
+            tg.showAlert("💡 Filter options can be customized based on categories!");
         }
 
         function openZoomModal(index) {
@@ -254,7 +218,7 @@
             if (images.length > 1) {
                 images.forEach((imgUrl) => {
                     thumbContainer.innerHTML += `
-                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:50px; height:65px; object-fit:cover; border-radius:6px; border:1px solid #7c3aed; cursor:pointer;">
+                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:45px; height:55px; object-fit:cover; border-radius:4px; border:1px solid #7c3aed; cursor:pointer;">
                     `;
                 });
             }
@@ -262,35 +226,32 @@
             document.getElementById('zoomModal').style.display = 'flex';
         }
 
-        function openDetailsModal(title, desc) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDescription').innerText = desc;
-            document.getElementById('detailsModal').style.display = 'flex';
-        }
-
-        function openVideoModal(videoUrl) {
-            let player = document.getElementById('modalVideoPlayer');
-            player.src = videoUrl;
-            document.getElementById('videoModal').style.display = 'flex';
-            player.play();
-        }
-
         function closeModal(modalId) {
-            if(modalId === 'videoModal') {
-                document.getElementById('modalVideoPlayer').pause();
-            }
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function filterCategory(cat, chip) {
-            currentCategory = cat;
-            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            renderProducts();
-        }
+        function addToCart(cardIndex) {
+            let dress = currentFilteredDresses[cardIndex];
+            if (!dress) return;
 
-        function addToCart(itemName, price) {
-            tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
+            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+            let itemKey = dress.id || dress.name;
+            let existing = cart.find(it => it.key === itemKey);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    key: itemKey,
+                    name: dress.name,
+                    price: Number(dress.price),
+                    image: dress.image || '',
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+            tg.showAlert(`✅ Added "${dress.name}" to cart! (Tk ${Number(dress.price).toLocaleString()}.00)`);
         }
     </script>
 </body>
