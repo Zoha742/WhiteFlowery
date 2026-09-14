@@ -157,6 +157,7 @@
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -187,39 +188,90 @@
             return 'Official Invoice / Receipt';
         }
 
-        // Load Invoices saved from Admin Panel automatically
-        window.addEventListener('DOMContentLoaded', () => {
-            let container = document.getElementById('invoiceContainer');
-            allInvoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
+        // বায়ারের নিজের Accepted অর্ডারগুলো থেকেই ইনভয়েস তৈরি হয় (ক্লাউড ডাটাবেজ থেকে)।
+        // Exchange/Refund সম্পন্ন (Delivered) হলে সেটার জন্য আলাদা রিসিট যোগ হয়।
+        function ordersToInvoices(orders) {
+            let list = [];
+            orders.forEach(o => {
+                if (o.status !== 'Accepted') return;
+                let itemName = (o.items && o.items.length)
+                    ? o.items.map(i => i.name).join(', ')
+                    : 'N/A';
+                let d = new Date(o.createdAt || Date.now());
 
-            if (allInvoices.length > 0) {
-                container.innerHTML = '';
-                allInvoices.forEach((inv, idx) => {
-                    let status = getStatusInfo(inv);
-                    container.innerHTML += `
-                        <div class="invoice-card">
-                            <div class="invoice-header">
-                                <span class="invoice-id">#${inv.orderId}</span>
-                                <span class="invoice-status" style="color:${status.color}; background:${status.bg}; border:1px solid ${status.border};">${status.text}</span>
-                            </div>
-                            <div class="invoice-details">
-                                <span><b>Item:</b> ${inv.itemName}</span>
-                                <span><b>Date:</b> ${inv.date}${inv.time ? ' , ' + inv.time : ''}</span>
-                                <span><b>Payment:</b> ${inv.method}</span>
-                                ${inv.channel ? `<span><b>Ordered Via:</b> ${inv.channel}</span>` : ''}
-                            </div>
-                            <div class="invoice-footer">
-                                <span class="invoice-total">৳ ${Number(inv.amount).toLocaleString()}</span>
-                                <div class="invoice-btn-group">
-                                    <button class="view-btn" onclick="viewInvoice(${idx})"><i class="fa-solid fa-eye"></i> View</button>
-                                    <button class="download-btn" onclick="downloadInvoicePdfByIndex(${idx})"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                                </div>
+                list.push({
+                    orderId: o.orderId,
+                    itemName: itemName,
+                    date: d.toLocaleDateString(),
+                    time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    method: o.paymentMethod || 'N/A',
+                    amount: o.totalAmount || 0,
+                    userId: o.userId,
+                    userName: o.userName,
+                    type: 'purchase'
+                });
+
+                let sr = o.serviceRequest;
+                if (sr && sr.status === 'Delivered') {
+                    list.push({
+                        orderId: o.orderId,
+                        itemName: itemName,
+                        newItemName: sr.newItem ? sr.newItem.name : undefined,
+                        note: sr.reason,
+                        date: d.toLocaleDateString(),
+                        time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        method: o.paymentMethod || 'N/A',
+                        amount: sr.type === 'exchange' ? (sr.newItem ? sr.newItem.price : 0) : (o.totalAmount || 0),
+                        userId: o.userId,
+                        userName: o.userName,
+                        type: sr.type === 'exchange' ? 'exchange' : 'cashback'
+                    });
+                }
+            });
+            return list;
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            let container = document.getElementById('invoiceContainer');
+            container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px; font-size:12px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading invoices...</div>`;
+
+            let myOrders = await getMyOrders(currentUserId());
+            allInvoices = ordersToInvoices(myOrders);
+            renderInvoiceList();
+        });
+
+        function renderInvoiceList() {
+            let container = document.getElementById('invoiceContainer');
+            if (allInvoices.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px; font-size:12px;">No invoices yet.</div>`;
+                return;
+            }
+            container.innerHTML = '';
+            allInvoices.forEach((inv, idx) => {
+                let status = getStatusInfo(inv);
+                container.innerHTML += `
+                    <div class="invoice-card">
+                        <div class="invoice-header">
+                            <span class="invoice-id">#${inv.orderId}</span>
+                            <span class="invoice-status" style="color:${status.color}; background:${status.bg}; border:1px solid ${status.border};">${status.text}</span>
+                        </div>
+                        <div class="invoice-details">
+                            <span><b>Item:</b> ${inv.itemName}</span>
+                            <span><b>Date:</b> ${inv.date}${inv.time ? ' , ' + inv.time : ''}</span>
+                            <span><b>Payment:</b> ${inv.method}</span>
+                            ${inv.channel ? `<span><b>Ordered Via:</b> ${inv.channel}</span>` : ''}
+                        </div>
+                        <div class="invoice-footer">
+                            <span class="invoice-total">৳ ${Number(inv.amount).toLocaleString()}</span>
+                            <div class="invoice-btn-group">
+                                <button class="view-btn" onclick="viewInvoice(${idx})"><i class="fa-solid fa-eye"></i> View</button>
+                                <button class="download-btn" onclick="downloadInvoicePdfByIndex(${idx})"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                             </div>
                         </div>
-                    `;
-                });
-            }
-        });
+                    </div>
+                `;
+            });
+        }
 
         // Builds the clean, printable invoice markup shared by the View modal
         // and the direct-download hidden template (so both always look identical).
