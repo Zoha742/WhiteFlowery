@@ -162,7 +162,13 @@
 
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            
+            // Global Shared Storage Fallback Sync
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || JSON.parse(localStorage.getItem('globalShopDresses')) || [];
+            if (!localStorage.getItem('shopDresses') && dresses.length > 0) {
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            }
+
             let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
