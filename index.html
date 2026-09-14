@@ -165,27 +165,18 @@
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // Auto-Sync and clear old conflicting cache for index
-            let globalDresses = JSON.parse(localStorage.getItem('globalShopDresses')) || [];
-            let localDresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let mergedMap = new Map();
-            [...globalDresses, ...localDresses].forEach(d => {
-                if (d && d.name) mergedMap.set(d.name + d.price, d);
-            });
-            let freshDresses = Array.from(mergedMap.values());
-            localStorage.setItem('shopDresses', JSON.stringify(freshDresses));
-            localStorage.setItem('globalShopDresses', JSON.stringify(freshDresses));
-
-            loadHomeSections();
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadHomeSections();
         });
 
-        function loadHomeSections() {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+        async function loadHomeSections() {
+            // সব অ্যাকাউন্ট থেকে একই প্রোডাক্ট — ক্লাউড ডাটাবেজ থেকে
+            let dresses = await getDresses();
 
             let trendingGrid = document.getElementById('trendingGrid');
             let newArrivalGrid = document.getElementById('newArrivalGrid');
