@@ -142,89 +142,57 @@
         <a class="nav-item active" href="notification.html"><i class="fa-solid fa-bell"></i>Inbox</a>
     </div>
 
-    <!-- Firebase SDKs (Modular / Compat) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
-
+    <script src="db.js"></script>
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        let user = tg.initDataUnsafe.user;
-        let userId = user ? user.id.toString() : "8849201"; 
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadNotifications();
+        });
 
-        // Your exact shop app firebase configuration from screenshot
-        const firebaseConfig = {
-            apiKey: "AIzaSyAuaTbzGnxuFzVrpDnaby85YMIh99tynIY",
-            authDomain: "shop-6f00f.firebaseapp.com",
-            databaseURL: "https://shop-6f00f-default-rtdb.firebaseio.com",
-            projectId: "shop-6f00f",
-            storageBucket: "shop-6f00f.firebasestorage.app",
-            messagingSenderId: "460660837417",
-            appId: "1:460660837417:web:2dd32637a09f56b37ee038",
-            measurementId: "G-JCG759KF1G"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        const notifRef = ref(db, 'users/' + userId + '/notifications');
-        
-        onValue(notifRef, (snapshot) => {
+        async function loadNotifications() {
             const container = document.getElementById('notifications-container');
+            let notifs = await getNotifications();   // সব বায়ারের জন্য একই broadcast লিস্ট, ক্লাউড থেকে
+
+            if (notifs.length === 0) {
+                container.innerHTML = `<div class="no-notif">No messages or updates found!</div>`;
+                return;
+            }
+
             container.innerHTML = '';
+            notifs.forEach((item) => {
+                let title = item.title || "Admin Update";
+                let message = item.message || "";
+                let dateObj = item.createdAt ? new Date(item.createdAt) : new Date();
+                let timeStr = item.date || dateObj.toLocaleString();
 
-            if (snapshot.exists()) {
-                let notifs = snapshot.val();
-                let keys = Object.keys(notifs).reverse();
+                let safeTitle = encodeURIComponent(title);
+                let safeMsg = encodeURIComponent(message);
+                let safeMedia = encodeURIComponent(item.image || "");
+                let safeTime = encodeURIComponent(timeStr);
 
-                let updates = {};
-                keys.forEach(key => {
-                    updates[key + '/isRead'] = true;
-                });
-                update(ref(db, 'users/' + userId + '/notifications'), updates);
+                let mediaPreview = "";
+                if (item.image) {
+                    mediaPreview = `<small style="color:#c084fc;"><i class="fa-solid fa-image"></i> Image attached</small><br>`;
+                }
 
-                keys.forEach(key => {
-                    let item = notifs[key];
-                    let title = item.title || "Admin Update";
-                    let message = item.message || item.text || "";
-                    
-                    let dateObj = item.timestamp ? new Date(item.timestamp) : new Date();
-                    let timeStr = dateObj.toLocaleString();
-
-                    let safeTitle = encodeURIComponent(title);
-                    let safeMsg = encodeURIComponent(message);
-                    let safeMedia = encodeURIComponent(item.media || "");
-                    let safeTime = encodeURIComponent(timeStr);
-
-                    let mediaPreview = "";
-                    if (item.media) {
-                        if (item.media.startsWith("data:video") || item.media.includes("video")) {
-                            mediaPreview = `<small style="color:#c084fc;"><i class="fa-solid fa-video"></i> Video attached</small><br>`;
-                        } else {
-                            mediaPreview = `<small style="color:#c084fc;"><i class="fa-solid fa-image"></i> Image attached</small><br>`;
-                        }
-                    }
-
-                    container.innerHTML += `
-                        <div class="notif-card" onclick="openFullMessage('${safeTitle}', '${safeMsg}', '${safeMedia}', '${safeTime}')">
-                            <div class="notif-icon"><i class="fa-solid fa-bell"></i></div>
-                            <div class="notif-content" style="width: 100%;">
-                                <h4>${title}</h4>
-                                ${mediaPreview}
-                                <p>${message}</p>
-                                <div class="notif-footer">
-                                    <span>Tap to read full message</span>
-                                    <span class="notif-time">${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                </div>
+                container.innerHTML += `
+                    <div class="notif-card" onclick="openFullMessage('${safeTitle}', '${safeMsg}', '${safeMedia}', '${safeTime}')">
+                        <div class="notif-icon"><i class="fa-solid fa-bell"></i></div>
+                        <div class="notif-content" style="width: 100%;">
+                            <h4>${title}</h4>
+                            ${mediaPreview}
+                            <p>${message}</p>
+                            <div class="notif-footer">
+                                <span>Tap to read full message</span>
+                                <span class="notif-time">${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                         </div>
-                    `;
-                });
-            } else {
-                container.innerHTML = `<div class="no-notif">No messages or updates found!</div>`;
-            }
-        });
+                    </div>
+                `;
+            });
+        }
     </script>
 
     <script>
