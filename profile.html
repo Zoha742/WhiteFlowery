@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Colorful Animated Profile</title>
+    <title>WhiteFlowery - Profile</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -28,7 +28,7 @@
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
         .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
 
-        /* Profile Hero with Dynamic Style & Copy ID Tag */
+        /* Profile Hero */
         .profile-hero {
             background: linear-gradient(135deg, #f5f3ff 0%, #fdf2f8 100%);
             border: 1px solid #ddd6fe;
@@ -37,9 +37,6 @@
             text-align: center;
             margin-bottom: 20px;
             box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInDown 0.6s ease-out;
         }
         .profile-avatar {
             width: 75px; height: 75px;
@@ -56,32 +53,22 @@
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-name { margin: 0 0 4px 0; font-size: 19px; font-weight: 800; color: #111; }
         
-        /* Clickable Copy ID Tag */
         .profile-id-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #ede9fe;
-            border: 1px solid #c4b5fd;
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #ede9fe; border: 1px solid #c4b5fd;
             padding: 5px 14px; border-radius: 20px;
             font-size: 11px; color: #6d28d9; font-weight: bold;
-            margin-top: 4px;
-            cursor: pointer;
-            transition: 0.2s;
+            margin-top: 4px; cursor: pointer;
         }
-        .profile-id-tag:active { background: #ddd6fe; transform: scale(0.97); }
 
-        /* Admin Control Panel Banner */
+        /* Admin Control Panel Banner (Universal Free Access) */
         .admin-banner-card {
             background: linear-gradient(135deg, #fdf2f8 0%, #f5f3ff 100%);
             border: 1px solid #fbcfe8;
             border-radius: 18px; padding: 14px 16px; margin-bottom: 20px;
             display: flex; align-items: center; justify-content: space-between;
-            text-decoration: none; color: #111; transition: transform 0.2s, box-shadow 0.2s;
-            animation: fadeInUp 0.6s ease-out;
-            box-shadow: 0 4px 12px rgba(236,72,153,0.08);
+            text-decoration: none; color: #111; box-shadow: 0 4px 12px rgba(236,72,153,0.08);
         }
-        .admin-banner-card:active { transform: scale(0.98); }
         .admin-info { display: flex; align-items: center; gap: 12px; }
         .admin-icon-box {
             width: 40px; height: 40px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
@@ -91,96 +78,60 @@
         .admin-text h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
         .admin-text p { margin: 0; font-size: 10px; color: #6b7280; }
 
-        /* Colorful & Animated Cardview Grid */
+        /* Dashboard Hub Grid */
         .section-header { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 4px; }
-        
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         
         .card-view {
-            background: #ffffff;
-            border: 1px solid var(--card-border);
-            border-radius: 18px; padding: 16px;
-            text-decoration: none; color: var(--text-main);
+            background: #ffffff; border: 1px solid var(--card-border);
+            border-radius: 18px; padding: 16px; text-decoration: none; color: var(--text-main);
             display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 100px; position: relative; overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            animation: fadeIn 0.8s ease-out;
+            min-height: 100px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); transition: 0.2s;
         }
-        .card-view:hover, .card-view:active {
-            transform: translateY(-4px) scale(1.02);
-            border-color: #7c3aed;
-            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.15);
-        }
-        
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
-        
         .card-icon {
             width: 40px; height: 40px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 18px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        
         .corner-badge {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #fff; font-size: 11px; font-weight: 800;
-            padding: 3px 8px; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            color: #fff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 8px;
         }
-
         .card-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #111; }
 
-        /* Bottom Navigation Bar */
+        /* Bottom Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 480px; background: rgba(255, 255, 255, 0.95);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-            backdrop-filter: blur(15px); box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
         }
-        .nav-item {
-            text-align: center; color: var(--text-muted);
-            text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; transition: 0.2s;
-        }
-        .nav-item.active { color: #7c3aed; transform: translateY(-2px); font-weight: 700; }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #7c3aed; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-crown"></i> WhiteFlowery Pro</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> Home</a>
         </div>
 
-        <!-- Profile Hero with Real User Image & Clickable Copy ID Tag -->
+        <!-- Profile Hero -->
         <div class="profile-hero">
             <div class="profile-avatar" id="avatarContainer">
                 <i class="fa-solid fa-user" id="defaultUserIcon"></i>
             </div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
-            <div class="profile-id-tag" id="userIdDisplay" onclick="copyUserId()" title="Tap to copy ID">
-                <span id="idTextValue">ID: 884920</span> <i class="fa-regular fa-copy" style="font-size: 10px; color: #6d28d9;"></i>
+            <div class="profile-id-tag" id="userIdDisplay" onclick="copyUserId()">
+                <span id="idTextValue">ID: 884920</span> <i class="fa-regular fa-copy" style="font-size: 10px;"></i>
             </div>
         </div>
 
-        <!-- Admin Control Panel Banner -->
+        <!-- Universal Admin Panel Access Banner -->
         <a href="myadmin.html" class="admin-banner-card">
             <div class="admin-info">
                 <div class="admin-icon-box"><i class="fa-solid fa-user-shield"></i></div>
@@ -192,84 +143,43 @@
             <i class="fa-solid fa-chevron-right" style="color: #ec4899; font-size: 12px;"></i>
         </a>
 
-        <!-- Dashboard Hub -->
         <div class="section-header">Dashboard Hub</div>
 
         <div class="menu-grid">
-            <!-- My Orders Card -->
             <a href="orders.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);">
-                        <i class="fa-solid fa-box-archive"></i>
-                    </div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);"><i class="fa-solid fa-box-archive"></i></div>
                     <span class="corner-badge" id="deliveredCountBadge">0</span>
                 </div>
                 <h4 class="card-title">My Orders</h4>
             </a>
-
-            <!-- Cart Card -->
             <a href="cart.html" class="card-view">
-                <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                    </div>
-                </div>
+                <div class="card-top"><div class="card-icon" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);"><i class="fa-solid fa-cart-shopping"></i></div></div>
                 <h4 class="card-title">My Cart</h4>
             </a>
-
-            <!-- Wishlist Card -->
             <a href="wishlist.html" class="card-view">
-                <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
-                        <i class="fa-solid fa-heart"></i>
-                    </div>
-                </div>
+                <div class="card-top"><div class="card-icon" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);"><i class="fa-solid fa-heart"></i></div></div>
                 <h4 class="card-title">Wishlist</h4>
             </a>
-
-            <!-- Address Card -->
             <a href="address.html" class="card-view">
-                <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #34d399 0%, #059669 100%);">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                </div>
+                <div class="card-top"><div class="card-icon" style="background: linear-gradient(135deg, #34d399 0%, #059669 100%);"><i class="fa-solid fa-location-dot"></i></div></div>
                 <h4 class="card-title">Delivery Address</h4>
             </a>
-
-            <!-- Payment Methods Card -->
             <a href="payment.html" class="card-view">
-                <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                </div>
+                <div class="card-top"><div class="card-icon" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);"><i class="fa-solid fa-wallet"></i></div></div>
                 <h4 class="card-title">Payment Methods</h4>
             </a>
-
-            <!-- Invoices Card -->
             <a href="invoice.html" class="card-view">
-                <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                </div>
+                <div class="card-top"><div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);"><i class="fa-solid fa-file-invoice-dollar"></i></div></div>
                 <h4 class="card-title">My Invoices</h4>
             </a>
-
-            <!-- Support Card -->
-            <a href="support.html" class="card-view">
-                <div class="card-top">
-                    <div class="card-icon" style="background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);">
-                        <i class="fa-solid fa-headset"></i>
-                    </div>
-                </div>
+            <a href="support.html" class="card-view" style="grid-column: span 2;">
+                <div class="card-top"><div class="card-icon" style="background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);"><i class="fa-solid fa-headset"></i></div></div>
                 <h4 class="card-title">Support</h4>
             </a>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
@@ -286,37 +196,32 @@
 
         if (user) {
             document.getElementById('userNameDisplay').innerText = user.first_name || "Valued Customer";
-            
             let idStr = user.id.toString();
             rawUserId = idStr.length >= 6 ? idStr.slice(-6) : idStr.padStart(6, '0');
             document.getElementById('idTextValue').innerText = `ID: ${rawUserId}`;
-            
             if (user.photo_url) {
-                let avatarContainer = document.getElementById('avatarContainer');
-                avatarContainer.innerHTML = `<img src="${user.photo_url}" alt="User Photo">`;
+                document.getElementById('avatarContainer').innerHTML = `<img src="${user.photo_url}" alt="User Photo">`;
             }
         } else {
             document.getElementById('userNameDisplay').innerText = "Zoha";
             document.getElementById('idTextValue').innerText = "ID: 884920";
         }
 
-        // ID Copy Functionality
         function copyUserId() {
             navigator.clipboard.writeText(rawUserId).then(() => {
-                tg.showAlert(`✅ ID copied to clipboard: ${rawUserId}`);
-            }).catch(err => {
-                let tempInput = document.createElement("input");
-                tempInput.value = rawUserId;
-                document.body.appendChild(tempInput);
-                tempInput.select();
+                tg.showAlert(`✅ ID copied: ${rawUserId}`);
+            }).catch(() => {
+                let temp = document.createElement("input");
+                temp.value = rawUserId;
+                document.body.appendChild(temp);
+                temp.select();
                 document.execCommand("copy");
-                document.body.removeChild(tempInput);
-                tg.showAlert(`✅ ID copied to clipboard: ${rawUserId}`);
+                document.body.removeChild(temp);
+                tg.showAlert(`✅ ID copied: ${rawUserId}`);
             });
         }
 
-        let deliveredOrdersCount = localStorage.getItem('deliveredOrdersCount') || 0;
-        document.getElementById('deliveredCountBadge').innerText = deliveredOrdersCount;
+        document.getElementById('deliveredCountBadge').innerText = localStorage.getItem('deliveredOrdersCount') || 0;
     </script>
 </body>
 </html>
