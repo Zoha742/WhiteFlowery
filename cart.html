@@ -125,7 +125,7 @@
             <a href="shop.html" class="back-btn"><i class="fa-solid fa-store"></i> Shop</a>
         </div>
 
-        <!-- Cart Items List (rendered dynamically from localStorage) -->
+        <!-- Cart Items List -->
         <div class="cart-list" id="cartContainer"></div>
 
         <!-- Order Summary -->
@@ -295,24 +295,19 @@
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             let totalAmount = subtotal + 100;
 
-            let newOrder = {
+            let pendingOrder = {
                 orderId: 'WF-' + Math.floor(1000 + Math.random() * 9000),
                 userId: tg.initUnsafeUser && tg.initUnsafeUser.id ? tg.initUnsafeUser.id : '884920',
                 userName: tg.initUnsafeUser && tg.initUnsafeUser.first_name ? tg.initUnsafeUser.first_name : 'Zoha',
                 items: cart,
                 totalAmount: totalAmount,
                 status: 'Pending',
-                date: new Date().toLocaleDateString()
+                date: new Date().toLocaleDateString(),
+                createdAt: Date.now()
             };
 
-            let existingOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
-            existingOrders.unshift(newOrder);
-            localStorage.setItem('userOrders', JSON.stringify(existingOrders));
-
-            localStorage.removeItem('cartItems');
-
-            tg.showAlert("🎉 Order placed successfully! Check your orders list.");
-            window.location.href = "orders.html";
+            localStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
+            window.location.href = "payment.html";
         }
     </script>
 </body>
