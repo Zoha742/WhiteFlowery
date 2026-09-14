@@ -9,40 +9,40 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; background: #fff; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
 
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; margin-bottom: 14px; }
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
-        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        .form-control { width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; margin-bottom: 14px; }
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 13px; font-weight: 700; color: #111; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
         
         .list-box { display: flex; flex-direction: column; gap: 10px; }
-        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: center; }
-        .order-img { width: 65px; height: 75px; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); cursor: pointer; }
+        .list-item { background: #f9fafb; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; gap: 12px; align-items: center; }
+        .order-img { width: 65px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); cursor: pointer; background: #fff; }
         .order-info { flex: 1; }
         .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
-        .item-title { color: #c084fc; }
-        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
+        .item-title { color: #7c3aed; }
+        .item-badge { color: #d97706; font-size: 9px; background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
         .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
         
         .action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
         .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
-        .btn-accept { background: #10b981; }
-        .btn-cancel { background: #ef4444; }
-        .btn-screenshot { background: #3b82f6; }
+        .btn-accept { background: #059669; }
+        .btn-cancel { background: #dc2626; }
+        .btn-screenshot { background: #2563eb; }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 12px; position: relative; text-align: center; }
     </style>
 </head>
 <body>
@@ -53,10 +53,10 @@
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
-        <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID (e.g. 884920)..." onkeyup="filterOrdersByUserId()">
+        <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID or Name..." onkeyup="filterOrdersByUserId()">
 
         <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-            <button class="btn-sm" style="background:#7c3aed;" onclick="switchOrderSub('live')">Live Orders</button>
+            <button class="btn-sm" style="background:#111;" onclick="switchOrderSub('live')">Live Orders</button>
             <button class="btn-sm btn-accept" onclick="switchOrderSub('accepted')">Accepted History</button>
             <button class="btn-sm btn-cancel" onclick="switchOrderSub('rejected')">Rejected History</button>
         </div>
@@ -65,31 +65,13 @@
         <div id="sub-live" class="order-sub-section admin-card">
             <h4 class="card-title">Live Orders</h4>
             <div class="list-box" id="liveOrdersContainer">
-                <div class="list-item" data-userid="884920">
-                    <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" class="order-img" onclick="viewModalImage(this.src)">
-                    <div class="order-info">
-                        <div class="item-header">
-                            <span class="item-title">Order #WF-9921</span>
-                            <span class="item-badge" style="color:#fbbf24; background:rgba(251,191,36,0.1)">Pending</span>
-                        </div>
-                        <div class="item-body">
-                            <b>ID:</b> 884920 | <b>Customer:</b> Zoha<br>
-                            <b>Item:</b> Royal Silk Gown<br>
-                            <b>Total:</b> ৳ 8,600 | <span style="color:#38bdf8;">Online Payment</span>
-                        </div>
-                        <div class="action-row">
-                            <button class="btn-sm btn-screenshot" onclick="viewModalImage('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500')"><i class="fa-solid fa-receipt"></i> Slip</button>
-                            <button class="btn-sm btn-accept" onclick="moveOrder(this, 'accepted', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Accept</button>
-                            <button class="btn-sm btn-cancel" onclick="moveOrder(this, 'rejected', 'WF-9921', '884920', 'Royal Silk Gown', 8600)">Reject</button>
-                        </div>
-                    </div>
-                </div>
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No live orders found.</div>
             </div>
         </div>
 
         <!-- Accepted History -->
         <div id="sub-accepted" class="order-sub-section admin-card" style="display:none;">
-            <h4 class="card-title" style="color:#10b981;">Accepted Orders History</h4>
+            <h4 class="card-title" style="color:#059669;">Accepted Orders History</h4>
             <div class="list-box" id="acceptedOrdersContainer">
                 <div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>
             </div>
@@ -97,7 +79,7 @@
 
         <!-- Rejected History -->
         <div id="sub-rejected" class="order-sub-section admin-card" style="display:none;">
-            <h4 class="card-title" style="color:#ef4444;">Rejected Orders History</h4>
+            <h4 class="card-title" style="color:#dc2626;">Rejected Orders History</h4>
             <div class="list-box" id="rejectedOrdersContainer">
                 <div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>
             </div>
@@ -106,8 +88,8 @@
 
     <div id="imageModal" class="modal-overlay">
         <div class="modal-content">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal()">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;">Preview</h4>
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal()">&times;</span>
+            <h4 style="color:#111; margin-bottom:10px;">Preview</h4>
             <img id="modalImgSrc" src="" alt="Preview" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px;">
         </div>
     </div>
@@ -115,6 +97,79 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadAllOrders();
+        });
+
+        function loadAllOrders() {
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            let liveContainer = document.getElementById('liveOrdersContainer');
+            let acceptedContainer = document.getElementById('acceptedOrdersContainer');
+            let rejectedContainer = document.getElementById('rejectedOrdersContainer');
+
+            liveContainer.innerHTML = '';
+            acceptedContainer.innerHTML = '';
+            rejectedContainer.innerHTML = '';
+
+            let hasLive = false, hasAccepted = false, hasRejected = false;
+
+            orders.forEach((order, index) => {
+                let itemsDesc = '';
+                if(order.items && order.items.length > 0) {
+                    itemsDesc = order.items.map(i => `${i.name} (Size: ${i.size || 'N/A'}, Qty: ${i.qty})`).join(', ');
+                }
+                let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+
+                let itemHtml = `
+                    <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
+                        <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                        <div class="order-info">
+                            <div class="item-header">
+                                <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
+                                <span class="item-badge" style="${order.status === 'Accepted' ? 'color:#059669; background:#ecfdf5;' : order.status === 'Rejected' ? 'color:#dc2626; background:#fee2e2;' : ''}">${order.status || 'Pending'}</span>
+                            </div>
+                            <div class="item-body">
+                                <b>Customer:</b> ${order.userName || 'Customer'}<br>
+                                <b>Items:</b> ${itemsDesc}<br>
+                                <b>Total:</b> Tk ${Number(order.totalAmount || 0).toLocaleString()}.00
+                            </div>
+                            ${order.status === 'Pending' || !order.status ? `
+                                <div class="action-row">
+                                    <button class="btn-sm btn-accept" onclick="updateOrderStatus(${index}, 'Accepted')">Accept</button>
+                                    <button class="btn-sm btn-cancel" onclick="updateOrderStatus(${index}, 'Rejected')">Reject</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
+                if(order.status === 'Accepted') {
+                    hasAccepted = true;
+                    acceptedContainer.innerHTML += itemHtml;
+                } else if(order.status === 'Rejected') {
+                    hasRejected = true;
+                    rejectedContainer.innerHTML += itemHtml;
+                } else {
+                    hasLive = true;
+                    liveContainer.innerHTML += itemHtml;
+                }
+            });
+
+            if(!hasLive) liveContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No live orders found.</div>`;
+            if(!hasAccepted) acceptedContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>`;
+            if(!hasRejected) rejectedContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>`;
+        }
+
+        function updateOrderStatus(index, newStatus) {
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            if(orders[index]) {
+                orders[index].status = newStatus;
+                localStorage.setItem('userOrders', JSON.stringify(orders));
+                loadAllOrders();
+                tg.showAlert(`✅ Order #${orders[index].orderId} marked as ${newStatus}!`);
+            }
+        }
 
         function switchOrderSub(subId) {
             document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
@@ -124,30 +179,6 @@
         function viewModalImage(imgUrl) {
             document.getElementById('modalImgSrc').src = imgUrl;
             document.getElementById('imageModal').style.display = 'flex';
-        }
-        function moveOrder(btn, type, orderId, userId, itemName, amount) {
-            let itemCard = btn.closest('.list-item');
-            itemCard.querySelector('.action-row').remove();
-            let badge = itemCard.querySelector('.item-badge');
-
-            if(type === 'accepted') {
-                badge.innerText = "Accepted & Invoiced";
-                badge.style.color = "#10b981";
-                document.getElementById('acceptedOrdersContainer').appendChild(itemCard);
-
-                let currentCount = parseInt(localStorage.getItem('deliveredOrdersCount') || 0) + 1;
-                localStorage.setItem('deliveredOrdersCount', currentCount);
-
-                let invoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
-                invoices.unshift({ orderId, itemName, amount, method: 'Online / COD', date: new Date().toLocaleDateString() });
-                localStorage.setItem('userInvoices', JSON.stringify(invoices));
-                tg.showAlert(`✅ Order #${orderId} Accepted! Invoice generated.`);
-            } else {
-                badge.innerText = "Rejected";
-                badge.style.color = "#ef4444";
-                document.getElementById('rejectedOrdersContainer').appendChild(itemCard);
-                tg.showAlert(`❌ Order #${orderId} Rejected.`);
-            }
         }
         function filterOrdersByUserId() {
             let query = document.getElementById('searchUserId').value.trim().toLowerCase();
