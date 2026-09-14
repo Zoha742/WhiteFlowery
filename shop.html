@@ -143,13 +143,26 @@
         let currentFilteredDresses = [];
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Force Universal Global Sync & Purge Old Cache Conflicts
+            let globalDresses = JSON.parse(localStorage.getItem('globalShopDresses')) || [];
+            let localDresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            
+            let combinedMap = new Map();
+            [...globalDresses, ...localDresses].forEach(d => {
+                if (d && d.name) combinedMap.set(d.name + d.price, d);
+            });
+            let freshDresses = Array.from(combinedMap.values());
+
+            localStorage.setItem('shopDresses', JSON.stringify(freshDresses));
+            localStorage.setItem('globalShopDresses', JSON.stringify(freshDresses));
+
             loadCategoriesFilter();
             renderProducts();
         });
 
         function loadCategoriesFilter() {
             let dropdown = document.getElementById('categoryFilterDropdown');
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || JSON.parse(localStorage.getItem('globalShopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
             
             let currentSelected = dropdown.value;
             dropdown.innerHTML = `<option value="All">All Category</option>`;
@@ -163,18 +176,7 @@
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             
-            // Universal Free Global Sync for all accounts
-            let globalDresses = JSON.parse(localStorage.getItem('globalShopDresses')) || [];
-            let localDresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            
-            // Merge both to ensure zero missing products
-            let combinedMap = new Map();
-            [...globalDresses, ...localDresses].forEach(d => combinedMap.set(d.name + d.price, d));
-            let dresses = Array.from(combinedMap.values());
-
-            // Auto-sync back to both keys
-            localStorage.setItem('shopDresses', JSON.stringify(dresses));
-            localStorage.setItem('globalShopDresses', JSON.stringify(dresses));
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || JSON.parse(localStorage.getItem('globalShopDresses')) || [];
 
             let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
