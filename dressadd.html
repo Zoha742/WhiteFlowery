@@ -16,7 +16,7 @@
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 90px; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
@@ -50,6 +50,24 @@
         .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
         .add-variant-btn { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
+
+        .img-preview-row { margin-top: 6px; }
+        .preview-thumb-box { position: relative; width: 60px; height: 70px; display: inline-block; }
+        .preview-thumb-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
+        .preview-icon-btn { position: absolute; width: 20px; height: 20px; border-radius: 50%; border: none; color: #fff; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .preview-view-btn { top: -6px; left: -6px; background: #3b82f6; }
+        .preview-remove-btn { top: -6px; right: -6px; background: #ef4444; }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.97);
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 12px 14px 12px; box-sizing: border-box; z-index: 9999; backdrop-filter: blur(15px); gap: 10px;
+        }
+        .bottom-nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; border-radius: 12px; text-decoration: none; font-size: 11px; font-weight: 700; border: none; cursor: pointer; color: #fff; }
+        .bottom-nav-btn i { font-size: 18px; }
+        .nav-btn-home { background: linear-gradient(135deg, #7c3aed, #c084fc); }
+        .nav-btn-back { background: linear-gradient(135deg, #ec4899, #f97316); }
     </style>
 </head>
 <body>
@@ -57,7 +75,6 @@
     <div class="container">
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Dress</h3>
-            <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
         <div class="admin-card">
@@ -116,15 +133,18 @@
                 <div class="sub-label"><i class="fa-solid fa-image"></i> Upload This Color's Photos</div>
                 <div class="form-group">
                     <label>Photo 1 (Required)</label>
-                    <input type="file" id="variantImgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
+                    <input type="file" id="variantImgFile1" class="form-control" accept="image/*" style="color: #94a3b8;" onchange="previewVariantImage(1)">
+                    <div class="img-preview-row" id="variantImgPreview1"></div>
                 </div>
                 <div class="form-group">
                     <label>Photo 2 (Optional)</label>
-                    <input type="file" id="variantImgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
+                    <input type="file" id="variantImgFile2" class="form-control" accept="image/*" style="color: #94a3b8;" onchange="previewVariantImage(2)">
+                    <div class="img-preview-row" id="variantImgPreview2"></div>
                 </div>
                 <div class="form-group">
                     <label>Photo 3 (Optional)</label>
-                    <input type="file" id="variantImgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
+                    <input type="file" id="variantImgFile3" class="form-control" accept="image/*" style="color: #94a3b8;" onchange="previewVariantImage(3)">
+                    <div class="img-preview-row" id="variantImgPreview3"></div>
                 </div>
 
                 <div class="section-divider"></div>
@@ -178,6 +198,18 @@
     <div id="uploadOverlay" class="uploading-overlay">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #c084fc;"></i>
         <span>Uploading images & publishing dress...</span>
+    </div>
+
+    <div id="previewModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:99999; justify-content:center; align-items:center;">
+        <div style="position:relative; max-width:90%;">
+            <span style="position:absolute; top:-34px; right:0; font-size:26px; cursor:pointer; color:#fff;" onclick="document.getElementById('previewModal').style.display='none'">&times;</span>
+            <img id="previewModalImg" src="" style="max-width:100%; max-height:75vh; border-radius:10px; border:1px solid var(--card-border);">
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="myadmin.html" class="bottom-nav-btn nav-btn-home"><i class="fa-solid fa-house"></i> Admin Home</a>
+        <button type="button" class="bottom-nav-btn nav-btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Back</button>
     </div>
 
     <script>
@@ -294,6 +326,32 @@
             });
         }
 
+        // ---------- Photo preview: show a thumbnail with an eye (view) + x (remove) button ----------
+        function previewVariantImage(num) {
+            let input = document.getElementById(`variantImgFile${num}`);
+            let previewBox = document.getElementById(`variantImgPreview${num}`);
+            let file = input.files[0];
+            if (!file) { previewBox.innerHTML = ''; return; }
+            let url = URL.createObjectURL(file);
+            previewBox.innerHTML = `
+                <div class="preview-thumb-box">
+                    <img src="${url}">
+                    <button type="button" class="preview-icon-btn preview-view-btn" onclick="viewImagePreview('${url}')" title="View"><i class="fa-solid fa-eye"></i></button>
+                    <button type="button" class="preview-icon-btn preview-remove-btn" onclick="clearVariantImage(${num})" title="Remove"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `;
+        }
+
+        function clearVariantImage(num) {
+            document.getElementById(`variantImgFile${num}`).value = '';
+            document.getElementById(`variantImgPreview${num}`).innerHTML = '';
+        }
+
+        function viewImagePreview(url) {
+            document.getElementById('previewModalImg').src = url;
+            document.getElementById('previewModal').style.display = 'flex';
+        }
+
         // ---------- Cloudinary upload (unique public_id so a new photo never reuses an old asset's URL) ----------
         async function uploadToCloudinary(file) {
             let formData = new FormData();
@@ -324,6 +382,31 @@
             }
         }
 
+        // ---------- Cloudinary VIDEO upload (separate endpoint — videos posted to the image
+        // endpoint get rejected by Cloudinary, which was silently breaking video uploads) ----------
+        async function uploadVideoToCloudinary(file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "ml_default");
+            formData.append("folder", "shop/Product_add");
+
+            let uniqueId = "dress_video_" + Date.now() + "_" + Math.floor(Math.random() * 1000000);
+            formData.append("public_id", uniqueId);
+
+            try {
+                let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/video/upload", { method: "POST", body: formData });
+                let data = await res.json();
+                if (!res.ok || !data.secure_url) {
+                    console.error("Cloudinary video upload rejected:", data.error ? data.error.message : data);
+                    throw new Error(data.error ? data.error.message : "Cloudinary video upload failed");
+                }
+                return data.secure_url;
+            } catch (err) {
+                console.error("Video upload error:", err);
+                return "";
+            }
+        }
+
         // ---------- Add a finished color variant (uploads its photos now) ----------
         async function addColorVariant() {
             let colorName = document.getElementById('variantColorInput').value.trim();
@@ -332,8 +415,7 @@
             let file3 = document.getElementById('variantImgFile3').files[0];
             let sizeKeys = Object.keys(variantSizesList);
 
-            if (!colorName) { tg.showAlert("⚠️ Enter a color name for this variant!"); return; }
-            if (addedVariantsList.some(v => v.color.toLowerCase() === colorName.toLowerCase())) {
+            if (addedVariantsList.some(v => colorName && v.color && v.color.toLowerCase() === colorName.toLowerCase())) {
                 tg.showAlert("⚠️ This color is already added for this dress!");
                 return;
             }
@@ -367,11 +449,14 @@
             document.getElementById('variantImgFile1').value = '';
             document.getElementById('variantImgFile2').value = '';
             document.getElementById('variantImgFile3').value = '';
+            document.getElementById('variantImgPreview1').innerHTML = '';
+            document.getElementById('variantImgPreview2').innerHTML = '';
+            document.getElementById('variantImgPreview3').innerHTML = '';
             variantSizesList = {};
             renderVariantSizeTable();
             renderAddedVariantsList();
 
-            tg.showAlert(`✅ "${colorName}" color variant added! Add another color or publish the dress.`);
+            tg.showAlert(`✅ "${colorName || 'This'}" variant added! Add another color or publish the dress.`);
         }
 
         function removeAddedVariant(idx) {
@@ -391,11 +476,12 @@
                     <div class="variant-card">
                         <img src="${v.images[0]}" class="variant-thumb">
                         <div class="variant-info">
-                            <span class="variant-swatch" style="background:${v.color};"></span>
-                            <span class="variant-color-name">${v.color}</span><br>
+                            <span class="variant-swatch" style="background:${v.color || '#666'};"></span>
+                            <span class="variant-color-name">${v.color || 'Default (no color set)'}</span><br>
                             ${sizeStr}
                         </div>
-                        <button class="del-size" onclick="removeAddedVariant(${idx})"><i class="fa-solid fa-trash"></i></button>
+                        <button class="del-size" style="background:#3b82f6;" onclick="viewImagePreview('${v.images[0]}')" title="View photo"><i class="fa-solid fa-eye"></i></button>
+                        <button class="del-size" onclick="removeAddedVariant(${idx})" title="Remove"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `;
             }).join('');
@@ -416,7 +502,10 @@
 
             let videoUrl = "";
             if (videoInput.files.length > 0) {
-                videoUrl = await uploadToCloudinary(videoInput.files[0]);
+                videoUrl = await uploadVideoToCloudinary(videoInput.files[0]);
+                if (!videoUrl) {
+                    tg.showAlert("⚠️ Video upload failed — publishing the dress without the video. You can try re-uploading the video later.");
+                }
             }
 
             document.getElementById('uploadOverlay').style.display = 'none';
