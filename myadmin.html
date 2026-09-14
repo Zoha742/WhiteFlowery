@@ -106,9 +106,11 @@
         </div>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        // requireAdmin();       // ডেমোর জন্য সাময়িকভাবে বন্ধ — পরে আনকমেন্ট করে লক করুন
 
         function sendBroadcastNotification() {
             let title = document.getElementById('notifTitle').value.trim();
@@ -126,10 +128,9 @@
             }
         }
 
-        function saveAndBroadcast(title, msg, imgUrl) {
-            let notifs = JSON.parse(localStorage.getItem('globalUserNotifications')) || [];
-            notifs.unshift({ title, message: msg, image: imgUrl, date: new Date().toLocaleString() });
-            localStorage.setItem('globalUserNotifications', JSON.stringify(notifs));
+        async function saveAndBroadcast(title, msg, imgUrl) {
+            // ক্লাউড ডাটাবেজে সেভ — এখন সব বায়ারের notification.html এ এটা দেখা যাবে
+            await saveNotification({ title, message: msg, image: imgUrl, date: new Date().toLocaleString() });
             tg.showAlert("🔔 Photo Notification broadcasted successfully!");
             document.getElementById('notifTitle').value = '';
             document.getElementById('notifMsg').value = '';
