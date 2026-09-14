@@ -345,7 +345,7 @@
             let selectedSize = window.activeSelectedSize || defaultSize;
             let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
             let itemKey = `${name}_${selectedSize}`;
-            let existing = cart.find(it => it.key === itemKey);
+            let existing = cart.find(it => it.key === itemKey); 
 
             if (existing) {
                 existing.qty += 1;
