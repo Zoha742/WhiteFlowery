@@ -9,12 +9,12 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
 
         body {
@@ -24,52 +24,50 @@
             margin: 0; padding: 0 0 90px 0;
             display: flex; justify-content: center;
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
 
         /* Order Card Style */
         .orders-list { display: flex; flex-direction: column; gap: 14px; }
         .order-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 16px; position: relative;
+            border-radius: 12px; padding: 16px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .order-header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 12px;
             font-size: 12px;
         }
-        .order-id { color: #c084fc; font-weight: bold; }
+        .order-id { color: #7c3aed; font-weight: bold; }
         
         /* Status Badges */
         .status-badge { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
-        .status-accepted { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-cancelled { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-pending { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+        .status-accepted { background: #ecfdf5; color: #059669; border: 1px solid #10b981; }
+        .status-pending { background: #fef3c7; color: #d97706; border: 1px solid #f59e0b; }
 
-        .order-details { font-size: 13px; margin-bottom: 10px; }
-        .dress-name { font-weight: bold; color: #fff; margin-bottom: 4px; font-size: 14px; }
+        .dress-name { font-weight: bold; color: #111; margin-bottom: 4px; font-size: 14px; }
         .dress-specs { display: flex; gap: 12px; color: var(--text-muted); font-size: 12px; margin-bottom: 8px; }
-        .spec-item { background: #0b0f19; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--card-border); }
+        .spec-item { background: #f9fafb; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--card-border); }
 
         .order-footer {
             display: flex; justify-content: space-between; align-items: center;
             border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 10px;
         }
         .total-label { font-size: 11px; color: var(--text-muted); }
-        .total-amount { font-size: 15px; font-weight: bold; color: #fbbf24; }
+        .total-amount { font-size: 15px; font-weight: bold; color: #111; }
 
-        /* Bottom Navigation Bar */
+        /* White Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: var(--card-bg);
+            width: 100%; max-width: 480px; background: #ffffff;
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
@@ -83,71 +81,8 @@
         </div>
 
         <!-- Orders List Container -->
-        <div class="orders-list">
-            
-            <!-- Order Item 1 (Accepted Example) -->
-            <div class="order-card">
-                <div class="order-header">
-                    <span class="order-id">#WF-9021</span>
-                    <span class="status-badge status-accepted"><i class="fa-solid fa-check-circle"></i> Accepted</span>
-                </div>
-                <div class="order-details">
-                    <div class="dress-name">Royal Silk Gown</div>
-                    <div class="dress-specs">
-                        <span class="spec-item">Size: <b>L</b></span>
-                        <span class="spec-item">Qty: <b>2 Pcs</b></span>
-                    </div>
-                </div>
-                <div class="order-footer">
-                    <div>
-                        <span class="total-label">Total Payment</span>
-                    </div>
-                    <div class="total-amount">৳ 17,000</div>
-                </div>
-            </div>
-
-            <!-- Order Item 2 (Pending Example) -->
-            <div class="order-card">
-                <div class="order-header">
-                    <span class="order-id">#WF-9022</span>
-                    <span class="status-badge status-pending"><i class="fa-solid fa-clock"></i> Pending</span>
-                </div>
-                <div class="order-details">
-                    <div class="dress-name">White Floral Maxi</div>
-                    <div class="dress-specs">
-                        <span class="spec-item">Size: <b>M</b></span>
-                        <span class="spec-item">Qty: <b>1 Pc</b></span>
-                    </div>
-                </div>
-                <div class="order-footer">
-                    <div>
-                        <span class="total-label">Total Payment</span>
-                    </div>
-                    <div class="total-amount">৳ 3,500</div>
-                </div>
-            </div>
-
-            <!-- Order Item 3 (Cancelled Example) -->
-            <div class="order-card">
-                <div class="order-header">
-                    <span class="order-id">#WF-9018</span>
-                    <span class="status-badge status-cancelled"><i class="fa-solid fa-xmark-circle"></i> Cancelled</span>
-                </div>
-                <div class="order-details">
-                    <div class="dress-name">Velvet Winter Gown</div>
-                    <div class="dress-specs">
-                        <span class="spec-item">Size: <b>XL</b></span>
-                        <span class="spec-item">Qty: <b>1 Pc</b></span>
-                    </div>
-                </div>
-                <div class="order-footer">
-                    <div>
-                        <span class="total-label">Total Payment</span>
-                    </div>
-                    <div class="total-amount">৳ 9,500</div>
-                </div>
-            </div>
-
+        <div class="orders-list" id="ordersListContainer">
+            <!-- Dynamically populated from localStorage -->
         </div>
     </div>
 
@@ -162,6 +97,57 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUserOrders();
+        });
+
+        function loadUserOrders() {
+            let container = document.getElementById('ordersListContainer');
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+
+            container.innerHTML = '';
+
+            if (orders.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color: #666; padding: 40px; font-size: 13px;">No orders placed yet.</div>`;
+                return;
+            }
+
+            orders.forEach(order => {
+                let itemsHtml = '';
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        itemsHtml += `
+                            <div style="margin-bottom: 8px;">
+                                <div class="dress-name">${item.name}</div>
+                                <div class="dress-specs">
+                                    <span class="spec-item">Size: <b>${item.size || 'N/A'}</b></span>
+                                    <span class="spec-item">Qty: <b>${item.qty} Pcs</b></span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                container.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">#${order.orderId || 'WF-9021'}</span>
+                            <span class="status-badge status-pending"><i class="fa-solid fa-clock"></i> ${order.status || 'Pending'}</span>
+                        </div>
+                        <div class="order-details">
+                            ${itemsHtml}
+                        </div>
+                        <div class="order-footer">
+                            <div>
+                                <span class="total-label">Total Payment</span>
+                            </div>
+                            <div class="total-amount">Tk ${Number(order.totalAmount || 0).toLocaleString()}.00</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
     </script>
 </body>
 </html>
