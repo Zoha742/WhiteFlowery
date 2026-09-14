@@ -9,34 +9,60 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-pink: #ec4899;
+            --bg-color: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; background: #fff; }
+        
+        /* App Header (Profile removed from top) */
+        .app-header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; text-align: center; }
+        .brand-title { margin: 0; font-size: 19px; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
 
+        /* Colorful & Animated Grid Cards */
         .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px; }
         .admin-card-btn {
-            background: linear-gradient(135deg, rgba(19, 28, 46, 0.9) 0%, rgba(30, 27, 75, 0.8) 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border: 1px solid var(--card-border); border-radius: 18px; padding: 20px 16px;
-            text-decoration: none; color: var(--text-main); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            text-decoration: none; color: var(--text-main); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeIn 0.8s ease-out;
         }
-        .card-icon { width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        .card-title { margin: 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .admin-card-btn:hover, .admin-card-btn:active {
+            transform: translateY(-4px) scale(1.02);
+            border-color: #7c3aed;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.15);
+        }
+        .card-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .card-title { margin: 0; font-size: 13px; font-weight: 700; color: #111; }
 
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
+        /* Admin Form Card */
+        .admin-card { background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 18px; padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(236,72,153,0.05); }
         .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
-        .submit-btn { background: var(--accent-pink); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 4px; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+        .form-control { width: 100%; background: #ffffff; border: 1px solid #fbcfe8; color: #111; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .submit-btn { background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 4px; box-shadow: 0 4px 12px rgba(236,72,153,0.3); transition: 0.2s; }
+        .submit-btn:active { transform: scale(0.98); }
+
+        /* Downside & Center Back to Profile Button */
+        .downside-profile-box { text-align: center; margin-top: 20px; margin-bottom: 30px; }
+        .back-profile-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            color: #fff; border: none; padding: 12px 28px; border-radius: 25px;
+            font-size: 13px; font-weight: 700; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+            transition: 0.2s;
+        }
+        .back-profile-btn:active { transform: scale(0.96); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -44,7 +70,6 @@
     <div class="container">
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-user-shield"></i> Master Admin Hub</h3>
-            <a href="profile.html" class="back-btn"><i class="fa-solid fa-user"></i> Profile</a>
         </div>
 
         <div class="admin-grid">
@@ -64,13 +89,20 @@
 
         <!-- Notification with Photo Upload -->
         <div class="admin-card">
-            <h4 style="font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-bullhorn" style="color: var(--accent-pink);"></i> Broadcast Notification (With Photo)
+            <h4 style="font-size: 13px; font-weight: 700; color: #111; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-bullhorn" style="color: #ec4899;"></i> Broadcast Notification (With Photo)
             </h4>
             <div class="form-group"><label>Title</label><input type="text" id="notifTitle" class="form-control" placeholder="Special Offer!"></div>
             <div class="form-group"><label>Message</label><textarea id="notifMsg" class="form-control" placeholder="Write message..." style="height:60px; resize:none;"></textarea></div>
             <div class="form-group"><label>Upload Banner Image</label><input type="file" id="notifImgFile" class="form-control" accept="image/*" style="color: var(--text-muted);"></div>
             <button class="submit-btn" onclick="sendBroadcastNotification()">Send Notification with Photo</button>
+        </div>
+
+        <!-- Downside Center Back to Profile Button -->
+        <div class="downside-profile-box">
+            <a href="profile.html" class="back-profile-btn">
+                <i class="fa-solid fa-user"></i> Back to Profile
+            </a>
         </div>
     </div>
 
