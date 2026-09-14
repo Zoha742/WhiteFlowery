@@ -131,16 +131,16 @@
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    <script src="db.js"></script>
+    <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        window.fillSubject = function(selectObj) {
+        function fillSubject(selectObj) {
             document.getElementById('supportSubject').value = selectObj.value;
         }
 
-        window.sendSupportMessage = function() {
+        async function sendSupportMessage() {
             let subject = document.getElementById('supportSubject').value.trim();
             let message = document.getElementById('supportMessage').value.trim();
 
@@ -149,7 +149,12 @@
                 return;
             }
 
-            // ফায়ারবেস ডাটাবেজে টিকেট সেভ হওয়ার পর অ্যাডমিন প্যানেলে শো করবে
+            let savedKey = await saveSupportTicket({ subject: subject, message: message });
+            if (!savedKey) {
+                tg.showAlert("❌ Could not submit. Please check your internet and try again.");
+                return;
+            }
+
             tg.showAlert("✅ Support ticket submitted successfully! Admin will check it from the dashboard.");
             document.getElementById('issueDropdown').selectedIndex = 0;
             document.getElementById('supportSubject').value = '';
