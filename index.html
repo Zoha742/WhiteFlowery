@@ -9,12 +9,13 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: rgba(19, 28, 46, 0.75);
-            --card-border: rgba(124, 58, 237, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
         }
 
         body {
@@ -23,101 +24,123 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 95px 0;
             display: flex; justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
         .brand-title { 
             margin: 0; font-size: 20px; font-weight: 800; 
-            background: linear-gradient(135deg, #c084fc, #ec4899); 
+            background: linear-gradient(135deg, #7c3aed, #ec4899); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
             display: flex; align-items: center; gap: 8px; 
         }
         .icon-btn {
-            background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main);
+            background: #f9fafb; border: 1px solid var(--card-border); color: #111;
             width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; text-decoration: none; font-size: 15px; backdrop-filter: blur(10px);
+            cursor: pointer; text-decoration: none; font-size: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: 0.2s;
         }
+        .icon-btn:active { transform: scale(0.95); }
 
+        /* Colorful Promo Banner */
         .promo-banner {
-            background: linear-gradient(135deg, #1e1b4b 0%, #311042 100%);
-            border: 1px solid rgba(124, 58, 237, 0.4);
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            border: none;
             border-radius: 22px; padding: 22px; color: #fff; margin-bottom: 22px;
-            box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.3); position: relative; overflow: hidden;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25); position: relative; overflow: hidden;
+            animation: fadeInDown 0.6s ease-out;
         }
         .promo-banner h2 { margin: 0 0 6px 0; font-size: 19px; font-weight: 800; }
-        .promo-banner p { margin: 0 0 16px 0; font-size: 12px; opacity: 0.85; line-height: 1.4; }
+        .promo-banner p { margin: 0 0 16px 0; font-size: 12px; opacity: 0.9; line-height: 1.4; }
         .shop-now-btn {
-            background: #fff; color: #4c1d95; border: none; padding: 9px 20px;
+            background: #fff; color: #7c3aed; border: none; padding: 9px 20px;
             border-radius: 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.2s;
         }
+        .shop-now-btn:active { transform: scale(0.96); }
 
+        /* Dynamic Action Grid */
         .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
         .action-item {
-            background: var(--card-bg); border: 1px solid var(--card-border);
+            background: #f9fafb; border: 1px solid var(--card-border);
             border-radius: 16px; padding: 12px 4px; text-align: center; text-decoration: none;
             color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: 0.2s;
         }
+        .action-item:hover, .action-item:active { transform: translateY(-2px); border-color: #7c3aed; }
         .action-icon {
-            width: 42px; height: 42px; background: rgba(124, 58, 237, 0.15); color: #c084fc;
+            width: 42px; height: 42px; background: rgba(124, 58, 237, 0.1); color: #7c3aed;
             border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 17px;
         }
-        .action-item span { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+        .action-item span { font-size: 10px; font-weight: 600; color: #555; }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px; }
-        .section-title { font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
-        .see-all { font-size: 12px; color: #c084fc; text-decoration: none; font-weight: 600; cursor: pointer; }
+        .section-title { font-size: 15px; font-weight: 700; color: #111; display: flex; align-items: center; gap: 6px; }
+        .see-all { font-size: 12px; color: #7c3aed; text-decoration: none; font-weight: 600; cursor: pointer; }
 
+        /* Products Grid with Colorful Highlights */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .product-card {
-            background: var(--card-bg); border: 1px solid var(--card-border);
+            background: #ffffff; border: 1px solid var(--card-border);
             border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;
-            text-decoration: none; color: var(--text-main); cursor: pointer; backdrop-filter: blur(10px);
+            text-decoration: none; color: var(--text-main); cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: 0.2s;
         }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(124, 58, 237, 0.12); }
         .product-img-box {
-            width: 100%; height: 140px; background: #0b0f19; border-radius: 12px;
+            width: 100%; height: 150px; background: #f9fafb; border-radius: 12px;
             overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+            border: 1px solid var(--card-border);
         }
-        .product-img-box img { width: 100%; height: 1005px; object-fit: cover; }
-        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-price { margin: 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { margin: 0; font-size: 13px; font-weight: bold; color: #059669; }
 
+        /* White & Colorful Animated Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            width: 100%; max-width: 480px; background: rgba(255, 255, 255, 0.95);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999; backdrop-filter: blur(15px);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; transition: 0.2s; }
+        .nav-item.active { color: #7c3aed; transform: translateY(-2px); font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Header -->
         <div class="app-header">
             <h3 class="brand-title"><i class="fa-solid fa-spa"></i> WhiteFlowery</h3>
             <a href="notification.html" class="icon-btn"><i class="fa-regular fa-bell"></i></a>
         </div>
 
+        <!-- Colorful Promo Banner -->
         <div class="promo-banner">
             <h2>🌸 Luxury Spring Collection</h2>
             <p>Discover exclusive high-end white designer dresses crafted for elegance.</p>
             <button class="shop-now-btn" onclick="location.href='shop.html'">Explore Collection</button>
         </div>
 
+        <!-- Action Grid -->
         <div class="action-grid">
             <a href="shop.html" class="action-item"><div class="action-icon"><i class="fa-solid fa-store"></i></div><span>Shop</span></a>
-            <a href="orders.html" class="action-item"><div class="action-icon" style="color: #38bdf8;"><i class="fa-solid fa-box-archive"></i></div><span>Orders</span></a>
-            <a href="wishlist.html" class="action-item"><div class="action-icon" style="color: #ec4899;"><i class="fa-solid fa-heart"></i></div><span>Wishlist</span></a>
-            <a href="support.html" class="action-item"><div class="action-icon" style="color: #34d399;"><i class="fa-solid fa-headset"></i></div><span>Support</span></a>
+            <a href="orders.html" class="action-item"><div class="action-icon" style="color: #0284c7; background: rgba(2,132,199,0.1);"><i class="fa-solid fa-box-archive"></i></div><span>Orders</span></a>
+            <a href="wishlist.html" class="action-item"><div class="action-icon" style="color: #ec4899; background: rgba(236,72,153,0.1);"><i class="fa-solid fa-heart"></i></div><span>Wishlist</span></a>
+            <a href="support.html" class="action-item"><div class="action-icon" style="color: #059669; background: rgba(5,150,105,0.1);"><i class="fa-solid fa-headset"></i></div><span>Support</span></a>
         </div>
 
         <!-- Trending Section -->
         <div class="section-header">
-            <span class="section-title"><i class="fa-solid fa-fire" style="color: #fbbf24;"></i> Trending Dresses</span>
+            <span class="section-title"><i class="fa-solid fa-fire" style="color: #f59e0b;"></i> Trending Dresses</span>
             <span class="see-all" onclick="location.href='shop.html'">See All</span>
         </div>
         <div class="products-grid" id="trendingGrid">
@@ -126,7 +149,7 @@
 
         <!-- New Arrival Section -->
         <div class="section-header">
-            <span class="section-title"><i class="fa-solid fa-sparkles" style="color: #c084fc;"></i> New Arrivals</span>
+            <span class="section-title"><i class="fa-solid fa-sparkles" style="color: #7c3aed;"></i> New Arrivals</span>
             <span class="see-all" onclick="location.href='shop.html'">See All</span>
         </div>
         <div class="products-grid" id="newArrivalGrid">
@@ -165,14 +188,14 @@
             } else {
                 trendingGrid.innerHTML = '';
                 trendingItems.forEach(d => {
-                    let img = (d.images && d.images[0]) || d.image || '';
+                    let img = (d.images && d.images[0]) || d.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp';
                     trendingGrid.innerHTML += `
                         <a href="shop.html" class="product-card">
                             <div>
                                 <div class="product-img-box"><img src="${img}" alt="${d.name}"></div>
                                 <h4 class="product-title">${d.name}</h4>
                             </div>
-                            <p class="product-price">৳ ${Number(d.price).toLocaleString()}</p>
+                            <p class="product-price">Tk ${Number(d.price).toLocaleString()}.00</p>
                         </a>
                     `;
                 });
@@ -184,14 +207,14 @@
             } else {
                 newArrivalGrid.innerHTML = '';
                 newItems.forEach(d => {
-                    let img = (d.images && d.images[0]) || d.image || '';
+                    let img = (d.images && d.images[0]) || d.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp';
                     newArrivalGrid.innerHTML += `
                         <a href="shop.html" class="product-card">
                             <div>
                                 <div class="product-img-box"><img src="${img}" alt="${d.name}"></div>
                                 <h4 class="product-title">${d.name}</h4>
                             </div>
-                            <p class="product-price">৳ ${Number(d.price).toLocaleString()}</p>
+                            <p class="product-price">Tk ${Number(d.price).toLocaleString()}.00</p>
                         </a>
                     `;
                 });
