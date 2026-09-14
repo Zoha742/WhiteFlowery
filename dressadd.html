@@ -52,6 +52,19 @@
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
+        <!-- Category Rename & Management Card -->
+        <div class="admin-card">
+            <h4 class="card-title"><i class="fa-solid fa-folder-pen"></i> Manage Categories</h4>
+            <div class="form-group">
+                <label>Rename Selected Category</label>
+                <div style="display:flex; gap:6px;">
+                    <select id="renameCatSelect" class="form-control" style="flex:1;"></select>
+                    <input type="text" id="renameCatInput" class="form-control" placeholder="New Name..." style="flex:1;">
+                    <button type="button" class="add-size-btn" onclick="renameCategory()" style="background:#059669; height:38px;">Rename</button>
+                </div>
+            </div>
+        </div>
+
         <div class="admin-card">
             <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Category Setup</h4>
             
@@ -60,18 +73,21 @@
                 <input type="text" id="newName" class="form-control" placeholder="e.g. Winter Velvet Frock">
             </div>
 
+            <!-- Product Code Input -->
             <div class="form-group">
                 <label>Product Code (e.g. WF-101)</label>
                 <input type="text" id="newProductCode" class="form-control" placeholder="WF-101">
             </div>
 
+            <!-- Home Section Display Settings -->
             <div class="checkbox-row">
                 <label><input type="checkbox" id="isTrending"> 🔥 Trending Dress</label>
                 <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
             </div>
 
+            <!-- Main Category & Subcategory Setup -->
             <div class="form-group">
-                <label>Category</label>
+                <label>Category (Winter, Summer, All-Time, etc.)</label>
                 <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                     <select id="newCat" class="form-control" style="flex: 2;"></select>
                     <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
@@ -94,6 +110,7 @@
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
             </div>
 
+            <!-- Size Setup -->
             <div class="size-row-input">
                 <div style="flex: 1;">
                     <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
@@ -122,8 +139,9 @@
                 </tbody>
             </table>
 
+            <!-- Images & Video Upload -->
             <div class="form-group">
-                <label>Product Photo 1 (Required)</label>
+                <label>Product Photo 1 (Required - Cloudinary)</label>
                 <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111;">
             </div>
             <div class="form-group">
@@ -148,39 +166,68 @@
         <span>Uploading images & publishing dress...</span>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        requireAdmin();          // শুধু অ্যাডমিন এই পেজ খুলতে পারবে
         let addedSizesList = {};
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadCategoriesDropdown();
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadCategoriesDropdown();
         });
 
-        function loadCategoriesDropdown() {
+        async function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
+            let renameSelect = document.getElementById('renameCatSelect');
+            let categories = await getCategories();
+            
             catSelect.innerHTML = '';
+            renameSelect.innerHTML = '';
             categories.forEach(cat => {
                 catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                renameSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
         }
 
-        function addNewCategory() {
+        async function addNewCategory() {
             let customInput = document.getElementById('customCatInput');
             let newCat = customInput.value.trim();
             if(!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
 
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
+            let categories = await getCategories();
             if(!categories.includes(newCat)) {
                 categories.push(newCat);
-                localStorage.setItem('shopCategories', JSON.stringify(categories));
-                loadCategoriesDropdown();
+                await saveCategories(categories);
+                await loadCategoriesDropdown();
                 document.getElementById('newCat').value = newCat;
                 customInput.value = '';
                 tg.showAlert(`✅ Category "${newCat}" created successfully!`);
             } else {
                 tg.showAlert("⚠️ Category already exists!");
+            }
+        }
+
+        async function renameCategory() {
+            let oldCat = document.getElementById('renameCatSelect').value;
+            let newCatName = document.getElementById('renameCatInput').value.trim();
+            if(!newCatName) { tg.showAlert("⚠️ Enter new name for category!"); return; }
+
+            let categories = await getCategories();
+            let index = categories.indexOf(oldCat);
+            if(index !== -1) {
+                categories[index] = newCatName;
+                await saveCategories(categories);
+
+                // ক্লাউডে থাকা প্রোডাক্টগুলোর ক্যাটাগরিও বদলে দেওয়া হচ্ছে
+                let dresses = await getDresses();
+                for (const d of dresses) {
+                    if (d.category === oldCat) await updateDress(d._key, { category: newCatName });
+                }
+
+                await loadCategoriesDropdown();
+                document.getElementById('renameCatInput').value = '';
+                tg.showAlert(`✅ Category renamed from "${oldCat}" to "${newCatName}"!`);
             }
         }
 
@@ -268,8 +315,6 @@
                 videoUrl = await uploadToCloudinary(videoInput.files[0]);
             }
 
-            document.getElementById('uploadOverlay').style.display = 'none';
-
             let totalStock = 0;
             sizeKeys.forEach(s => totalStock += addedSizesList[s]);
 
@@ -290,18 +335,13 @@
                 isNewArrival: isNewArrival
             };
 
-            // Universal Free Global Storage Sync for Products
-            let globalDresses = JSON.parse(localStorage.getItem('globalShopDresses')) || [];
-            let localDresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            
-            let combinedMap = new Map();
-            [newDress, ...globalDresses, ...localDresses].forEach(d => {
-                if (d.name && d.price) combinedMap.set(d.name + d.price, d);
-            });
-            let updatedDresses = Array.from(combinedMap.values());
-
-            localStorage.setItem('shopDresses', JSON.stringify(updatedDresses));
-            localStorage.setItem('globalShopDresses', JSON.stringify(updatedDresses));
+            // ক্লাউড ডাটাবেজে সেভ — এখন সব অ্যাকাউন্ট থেকেই দেখা যাবে
+            let savedKey = await saveDress(newDress);
+            document.getElementById('uploadOverlay').style.display = 'none';
+            if (!savedKey) {
+                tg.showAlert("❌ Could not save to cloud. db.js এ DB_URL ঠিক আছে কিনা দেখুন।");
+                return;
+            }
 
             tg.showAlert(`✅ Dress "${name}" published successfully!`);
             
