@@ -8,45 +8,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 60px; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 60px; background: #fff; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
 
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
-        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 13px; font-weight: 700; color: #111; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
         
         .list-box { display: flex; flex-direction: column; gap: 10px; }
-        .list-item { background: #0b0f19; border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: center; }
-        .dress-thumb { width: 55px; height: 65px; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
+        .list-item { background: #f9fafb; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+        .dress-thumb { width: 55px; height: 65px; object-fit: contain; border-radius: 6px; border: 1px solid var(--card-border); background: #fff; }
         .dress-info { flex: 1; }
         .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 2px; }
-        .item-title { color: #c084fc; }
-        .item-badge { color: #fbbf24; font-size: 9px; background: rgba(251, 191, 36, 0.1); padding: 2px 5px; border-radius: 4px; }
-        .item-body { font-size: 10px; color: var(--text-muted); line-height: 1.4; margin-bottom: 6px; }
+        .item-title { color: #111; }
+        .item-badge { color: #111; font-size: 10px; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 6px; }
 
         .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn-sm { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
-        .btn-edit { background: #7c3aed; }
-        .btn-delete { background: #ef4444; }
-        .btn-view { background: #3b82f6; }
+        .btn-sm { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
+        .btn-edit { background: #2563eb; }
+        .btn-delete { background: #dc2626; }
+        .btn-view { background: #059669; }
 
         .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
+        .form-control { width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
         .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
+        .submit-btn { background: var(--btn-dark); color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; font-size: 12px; margin-top: 6px; }
 
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 12px; position: relative; max-height: 90vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -59,11 +59,11 @@
 
         <div class="admin-card">
             <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
-            <div id="bulkToolbar" style="display:flex; align-items:center; justify-content:space-between; background:#0b0f19; border:1px solid var(--card-border); border-radius:10px; padding:8px 10px; margin-bottom:10px; font-size:11px;">
+            <div id="bulkToolbar" style="display:flex; align-items:center; justify-content:space-between; background:#f9fafb; border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; margin-bottom:10px; font-size:11px;">
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color: var(--text-muted); font-weight:600;">
-                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"> Select All
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="accent-color:#111;"> Select All
                 </label>
-                <button class="btn-sm" id="bulkDeleteBtn" style="background:#ef4444; opacity:0.4; pointer-events:none;" onclick="deleteSelectedDresses()">
+                <button class="btn-sm" id="bulkDeleteBtn" style="background:#dc2626; opacity:0.4; pointer-events:none;" onclick="deleteSelectedDresses()">
                     <i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="selectedCount">0</span>)
                 </button>
             </div>
@@ -76,17 +76,25 @@
     <!-- Edit & Size Stock Customize Modal -->
     <div id="editModal" class="modal-overlay">
         <div class="modal-content">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('editModal')">&times;</span>
-            <h4 style="margin:0 0 10px 0; color:#fff;">Customize Dress & Size Stock</h4>
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('editModal')">&times;</span>
+            <h4 style="margin:0 0 10px 0; color:#111; font-size:14px;">Customize Dress & Size Stock</h4>
             <input type="hidden" id="editIndex">
             <div class="form-group"><label>Dress Name</label><input type="text" id="editName" class="form-control"></div>
+            <div class="form-group"><label>Product Code</label><input type="text" id="editCode" class="form-control"></div>
             <div class="form-group"><label>Category</label><input type="text" id="editCat" class="form-control" list="editCatOptions"><datalist id="editCatOptions"></datalist></div>
-            <div class="form-group"><label>Price (৳)</label><input type="number" id="editPrice" class="form-control"></div>
+            <div class="form-group"><label>Price (Tk)</label><input type="number" id="editPrice" class="form-control"></div>
             
-            <label style="font-size:10px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
-            <div class="size-grid" id="editSizesContainer">
-                <!-- Size fields will be loaded dynamically -->
+            <div class="form-group">
+                <label>Add New Photo (File / Optional)</label>
+                <input type="file" id="editNewImgFile" class="form-control" accept="image/*" style="color:#111;">
             </div>
+            <div class="form-group">
+                <label>Or Add Image Link (URL)</label>
+                <input type="text" id="editNewImgUrl" class="form-control" placeholder="https://res.cloudinary.com/...">
+            </div>
+
+            <label style="font-size:11px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">Stock by Size (Pcs)</label>
+            <div class="size-grid" id="editSizesContainer"></div>
 
             <button class="submit-btn" onclick="saveDressChanges()">Save Changes</button>
         </div>
@@ -95,9 +103,9 @@
     <!-- View Dress Modal -->
     <div id="viewModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('viewModal')">&times;</span>
-            <h4 style="color:#fff; margin-bottom:10px;" id="viewTitle">Dress Details</h4>
-            <img id="viewImg" src="" alt="Dress" style="width:100%; max-height:250px; object-fit:contain; border-radius:8px; margin-bottom:8px; border:1px solid var(--card-border);">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('viewModal')">&times;</span>
+            <h4 style="color:#111; margin-bottom:10px; font-size:14px;" id="viewTitle">Dress Details</h4>
+            <img id="viewImg" src="" alt="Dress" style="width:100%; max-height:250px; object-fit:contain; border-radius:6px; margin-bottom:8px; border:1px solid var(--card-border); background:#f9fafb;">
             <div id="viewThumbRow" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;"></div>
             <div id="viewDetails" style="font-size:12px; color:var(--text-muted); text-align:left; line-height:1.6;"></div>
         </div>
@@ -115,7 +123,6 @@
             let container = document.getElementById('inventoryListContainer');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
 
-            // Reset bulk-select toolbar on every render (indexes may have shifted)
             document.getElementById('selectAllCheckbox').checked = false;
             updateBulkToolbar();
 
@@ -126,25 +133,24 @@
 
             container.innerHTML = '';
             dresses.forEach((dress, index) => {
-                // Calculate total stock from size quantities
                 let sizesObj = dress.sizes || { S: 0, M: 0, L: 0, XL: 0 };
                 let totalCurrentStock = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
-                
                 let sizeStr = Object.entries(sizesObj).map(([k, v]) => `${k}:${v}`).join(' | ');
 
                 container.innerHTML += `
                     <div class="list-item">
-                        <input type="checkbox" class="dress-select-checkbox" data-index="${index}" onchange="onSelectionChange()" style="width:16px; height:16px; accent-color:#7c3aed; cursor:pointer; flex-shrink:0;">
-                        <img src="${dress.image || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300'}" class="dress-thumb">
+                        <input type="checkbox" class="dress-select-checkbox" data-index="${index}" onchange="onSelectionChange()" style="width:16px; height:16px; accent-color:#111; cursor:pointer; flex-shrink:0;">
+                        <img src="${dress.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'}" class="dress-thumb">
                         <div class="dress-info">
                             <div class="item-header">
                                 <span class="item-title">${dress.name}</span>
-                                <span class="item-badge">৳ ${Number(dress.price).toLocaleString()}</span>
+                                <span class="item-badge">Tk ${Number(dress.price).toLocaleString()}.00</span>
                             </div>
                             <div class="item-body">
+                                ${dress.productCode ? `<b>Code:</b> ${dress.productCode}<br>` : ''}
                                 <b>Category:</b> ${dress.category || 'General'}<br>
                                 <b>Sizes:</b> ${sizeStr || 'N/A'}<br>
-                                <b>Total Stock:</b> <span style="color:#fbbf24; font-weight:bold;">${totalCurrentStock} Pcs</span>
+                                <b>Total Stock:</b> <span style="color:#111; font-weight:bold;">${totalCurrentStock} Pcs</span>
                             </div>
                             <div class="action-btns">
                                 <button class="btn-sm btn-view" onclick="viewDress(${index})">View</button>
@@ -177,8 +183,9 @@
             renderViewThumbnails(images);
             document.getElementById('viewDetails').innerHTML = `
                 <b>Product ID:</b> ${d.id || 'N/A'}<br>
+                ${d.productCode ? `<b>Product Code:</b> ${d.productCode}<br>` : ''}
                 <b>Category:</b> ${d.category || 'General'}<br>
-                <b>Price:</b> ৳ ${Number(d.price).toLocaleString()}<br>
+                <b>Price:</b> Tk ${Number(d.price).toLocaleString()}.00<br>
                 <b>Size Breakdown:</b><br>
                 ${sizeBreakdownHtml}<br>
                 <b>Overall Total Stock:</b> ${total} Pcs
@@ -189,16 +196,15 @@
         function renderViewThumbnails(images) {
             let row = document.getElementById('viewThumbRow');
             if (images.length <= 1) {
-                // Nothing to pick between / nothing removable when only 1 photo exists
                 row.innerHTML = '';
                 return;
             }
             row.innerHTML = images.map((imgUrl, i) => `
-                <div style="position:relative; width:55px; height:65px;">
+                <div style="position:relative; width:50px; height:60px;">
                     <img src="${imgUrl}" onclick="document.getElementById('viewImg').src='${imgUrl}'"
-                         style="width:100%; height:100%; object-fit:cover; border-radius:6px; border:1px solid var(--card-border); cursor:pointer;">
+                         style="width:100%; height:100%; object-fit:cover; border-radius:4px; border:1px solid var(--card-border); cursor:pointer;">
                     <button onclick="removeDressImage(${currentViewIndex}, ${i})" title="Remove this photo"
-                            style="position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:#ef4444; color:#fff; border:none; font-size:10px; line-height:1; cursor:pointer; padding:0;">
+                            style="position:absolute; top:-6px; right:-6px; width:18px; height:18px; border-radius:50%; background:#dc2626; color:#fff; border:none; font-size:10px; line-height:1; cursor:pointer; padding:0;">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
@@ -219,13 +225,13 @@
 
             images.splice(imgIndex, 1);
             d.images = images;
-            d.image = images[0]; // keep main thumbnail in sync
+            d.image = images[0];
             dresses[dressIndex] = d;
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
 
             tg.showAlert("🗑️ Photo removed!");
-            viewDress(dressIndex); // refresh modal with updated gallery
-            loadInventory(); // refresh list thumbnail too
+            viewDress(dressIndex);
+            loadInventory();
         }
 
         function openEditModal(index) {
@@ -235,12 +241,13 @@
 
             document.getElementById('editIndex').value = index;
             document.getElementById('editName').value = d.name;
+            document.getElementById('editCode').value = d.productCode || '';
             document.getElementById('editCat').value = d.category || '';
             document.getElementById('editPrice').value = d.price;
+            document.getElementById('editNewImgFile').value = '';
+            document.getElementById('editNewImgUrl').value = '';
 
-            // Suggest existing categories so a retyped name doesn't create a
-            // near-duplicate category (e.g. "Gowns" vs "gown").
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Gowns', 'Party Wear', 'Casual Sets', 'Bridal'];
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
             document.getElementById('editCatOptions').innerHTML = categories.map(c => `<option value="${c}">`).join('');
 
             let sizeContainer = document.getElementById('editSizesContainer');
@@ -249,7 +256,7 @@
             Object.keys(sizesObj).forEach(sizeKey => {
                 sizeContainer.innerHTML += `
                     <div>
-                        <label style="font-size:9px; color:#94a3b8;">${sizeKey}</label>
+                        <label style="font-size:10px; color:#666;">${sizeKey}</label>
                         <input type="number" id="editSize_${sizeKey}" class="form-control edit-size-input" value="${sizesObj[sizeKey]}" data-size="${sizeKey}">
                     </div>
                 `;
@@ -262,23 +269,51 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function saveDressChanges() {
+        async function saveDressChanges() {
             let index = document.getElementById('editIndex').value;
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let dress = dresses[index];
 
-            dresses[index].name = document.getElementById('editName').value.trim();
-            dresses[index].category = document.getElementById('editCat').value.trim();
-            dresses[index].price = parseFloat(document.getElementById('editPrice').value) || 0;
+            dress.name = document.getElementById('editName').value.trim();
+            dress.productCode = document.getElementById('editCode').value.trim();
+            dress.category = document.getElementById('editCat').value.trim();
+            dress.price = parseFloat(document.getElementById('editPrice').value) || 0;
+
+            let newImgFile = document.getElementById('editNewImgFile').files[0];
+            let newImgUrlInput = document.getElementById('editNewImgUrl').value.trim();
+
+            if (newImgFile) {
+                let formData = new FormData();
+                formData.append("file", newImgFile);
+                formData.append("upload_preset", "ml_default");
+                formData.append("folder", "shop/Product add");
+
+                try {
+                    let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
+                    let data = await res.json();
+                    if (data.secure_url) {
+                        if (!dress.images) dress.images = [];
+                        dress.images.push(data.secure_url);
+                        dress.image = data.secure_url;
+                    }
+                } catch (err) {
+                    console.error("Image upload failed", err);
+                }
+            } else if (newImgUrlInput) {
+                if (!dress.images) dress.images = [];
+                dress.images.push(newImgUrlInput);
+                dress.image = newImgUrlInput;
+            }
 
             let updatedSizes = {};
             document.querySelectorAll('.edit-size-input').forEach(input => {
                 let sizeKey = input.getAttribute('data-size');
                 updatedSizes[sizeKey] = parseInt(input.value) || 0;
             });
-            dresses[index].sizes = updatedSizes;
+            dress.sizes = updatedSizes;
 
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
-            tg.showAlert("✅ Dress and size stocks updated successfully!");
+            tg.showAlert("✅ Dress details and new photo updated successfully!");
             closeModal('editModal');
             loadInventory();
         }
@@ -319,7 +354,6 @@
 
             if (confirm(`Remove ${indexesToDelete.length} selected dress(es) from inventory?`)) {
                 let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-                // Remove from highest index to lowest so earlier splices don't shift later indexes
                 indexesToDelete.sort((a, b) => b - a).forEach(idx => {
                     dresses.splice(idx, 1);
                 });
