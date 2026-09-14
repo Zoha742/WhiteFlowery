@@ -129,11 +129,14 @@
         </div>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        requireAdmin();          // শুধু অ্যাডমিন এই পেজ খুলতে পারবে
 
         let lastActiveTab = 'live';
+        let ALL_ORDERS = [];     // ক্লাউড থেকে লোড হওয়া সব অর্ডার
 
         function formatDateTime(ts) {
             if (!ts) return 'N/A';
@@ -141,29 +144,14 @@
             return d.toLocaleDateString() + ' , ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadAllOrders();
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadAllOrders();
         });
 
-        function getUniversalOrders() {
-            let globalOrders = JSON.parse(localStorage.getItem('globalUserOrders')) || [];
-            let localOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
-            
-            // Merge both to ensure all buyer orders appear universally
-            let map = new Map();
-            [...globalOrders, ...localOrders].forEach(o => {
-                if (o.orderId) map.set(o.orderId, o);
-            });
-            let merged = Array.from(map.values());
-            
-            // Sync back to both keys
-            localStorage.setItem('userOrders', JSON.stringify(merged));
-            localStorage.setItem('globalUserOrders', JSON.stringify(merged));
-            return merged;
-        }
-
-        function loadAllOrders() {
-            let orders = getUniversalOrders();
+        async function loadAllOrders() {
+            // সব টেলিগ্রাম আইডির অর্ডার একসাথে — ক্লাউড ডাটাবেজ থেকে
+            ALL_ORDERS = await getAllOrders();
+            let orders = ALL_ORDERS;
             let liveContainer = document.getElementById('liveOrdersContainer');
             let acceptedContainer = document.getElementById('acceptedOrdersContainer');
             let rejectedContainer = document.getElementById('rejectedOrdersContainer');
@@ -187,14 +175,14 @@
                 if (order.status === 'Accepted') {
                     exchangeToggleHtml = `
                         <div class="action-row">
-                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled('${order.orderId}')">
+                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled(${index})">
                                 <i class="fa-solid fa-rotate"></i> ${order.exchangeEnabled ? 'Exchange/Refund: ON' : 'Enable Exchange/Refund'}
                             </button>
                         </div>
                     `;
                 }
 
-                let itemHtml = buildOrderListItemHtml(order, order.orderId, itemsDesc, imgUrl, exchangeToggleHtml);
+                let itemHtml = buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml);
 
                 if(order.status === 'Accepted') {
                     hasAccepted = true;
@@ -209,7 +197,7 @@
 
                 if (order.serviceRequest) {
                     hasExchange = true;
-                    exchangeContainer.innerHTML += buildExchangeRequestItemHtml(order, order.orderId);
+                    exchangeContainer.innerHTML += buildExchangeRequestItemHtml(order, index);
                 }
             });
 
@@ -219,7 +207,7 @@
             if(!hasExchange) exchangeContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No exchange/refund requests yet.</div>`;
         }
 
-        function buildExchangeRequestItemHtml(order, orderId) {
+        function buildExchangeRequestItemHtml(order, index) {
             let sr = order.serviceRequest;
             let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
             let typeColor = sr.type === 'exchange' ? '#7c3aed' : '#d97706';
@@ -242,20 +230,20 @@
             if (sr.status === 'Requested') {
                 actionButtons = `
                     <div class="action-row">
-                        <button class="btn-sm btn-accept" onclick="updateServiceStatus('${orderId}', 'Processing')">Start Processing</button>
-                        <button class="btn-sm btn-cancel" onclick="updateServiceStatus('${orderId}', 'Rejected')">Reject</button>
+                        <button class="btn-sm btn-accept" onclick="updateServiceStatus(${index}, 'Processing')">Start Processing</button>
+                        <button class="btn-sm btn-cancel" onclick="updateServiceStatus(${index}, 'Rejected')">Reject</button>
                     </div>
                 `;
             } else if (sr.status === 'Processing') {
                 actionButtons = `
                     <div class="action-row">
-                        <button class="btn-sm btn-accept" onclick="updateServiceStatus('${orderId}', 'Delivered')">Mark Delivered</button>
+                        <button class="btn-sm btn-accept" onclick="updateServiceStatus(${index}, 'Delivered')">Mark Delivered</button>
                     </div>
                 `;
             }
 
             return `
-                <div class="list-item" data-userid="${order.userId || 'Guest'}">
+                <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
                     <div class="img-thumb-wrap">
                         <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
                         <span class="view-badge" onclick="viewModalImage('${imgUrl}')"><i class="fa-solid fa-eye"></i> View</span>
@@ -280,7 +268,7 @@
             `;
         }
 
-        function buildOrderListItemHtml(order, orderId, itemsDesc, imgUrl, exchangeToggleHtml) {
+        function buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml) {
             let serviceSummaryHtml = '';
             if (order.serviceRequest) {
                 let sr = order.serviceRequest;
@@ -302,7 +290,7 @@
             }
 
             return `
-                <div class="list-item" data-userid="${order.userId || 'Guest'}">
+                <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
                     <div class="img-thumb-wrap">
                         <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
                         <span class="view-badge" onclick="viewModalImage('${imgUrl}')"><i class="fa-solid fa-eye"></i> View</span>
@@ -316,12 +304,12 @@
                             <b>Customer:</b> ${order.userName || 'Customer'}<br>
                             <b>Items:</b> ${itemsDesc}<br>
                             <b>Total:</b> Tk ${Number(order.totalAmount || 0).toLocaleString()}.00
-                            <div class="order-date-line"><i class="fa-regular fa-clock"></i> ${formatDateTime(order.createdAt || order.date)}</div>
+                            <div class="order-date-line"><i class="fa-regular fa-clock"></i> ${formatDateTime(order.createdAt)}</div>
                         </div>
                         ${order.status === 'Pending' || !order.status ? `
                             <div class="action-row">
-                                <button class="btn-sm btn-accept" onclick="updateOrderStatus('${orderId}', 'Accepted')">Accept</button>
-                                <button class="btn-sm btn-cancel" onclick="updateOrderStatus('${orderId}', 'Rejected')">Reject</button>
+                                <button class="btn-sm btn-accept" onclick="updateOrderStatus(${index}, 'Accepted')">Accept</button>
+                                <button class="btn-sm btn-cancel" onclick="updateOrderStatus(${index}, 'Rejected')">Reject</button>
                             </div>
                         ` : ''}
                         ${exchangeToggleHtml}
@@ -331,42 +319,32 @@
             `;
         }
 
-        function updateOrderStatus(orderId, newStatus) {
-            let orders = getUniversalOrders();
-            let target = orders.find(o => o.orderId === orderId);
-            if(target) {
-                target.status = newStatus;
-                localStorage.setItem('userOrders', JSON.stringify(orders));
-                localStorage.setItem('globalUserOrders', JSON.stringify(orders));
-                loadAllOrders();
-                tg.showAlert(`✅ Order #${orderId} marked as ${newStatus}!`);
-            }
+        async function updateOrderStatus(index, newStatus) {
+            let order = ALL_ORDERS[index];
+            if (!order) return;
+            await updateOrder(order._key, { status: newStatus });
+            await loadAllOrders();
+            tg.showAlert(`✅ Order #${order.orderId} marked as ${newStatus}!`);
         }
 
-        function toggleExchangeEnabled(orderId) {
-            let orders = getUniversalOrders();
-            let target = orders.find(o => o.orderId === orderId);
-            if (target) {
-                target.exchangeEnabled = !target.exchangeEnabled;
-                localStorage.setItem('userOrders', JSON.stringify(orders));
-                localStorage.setItem('globalUserOrders', JSON.stringify(orders));
-                loadAllOrders();
-                tg.showAlert(target.exchangeEnabled
-                    ? `✅ Exchange/Refund enabled for Order #${orderId}!`
-                    : `⚠️ Exchange/Refund disabled for Order #${orderId}.`);
-            }
+        async function toggleExchangeEnabled(index) {
+            let order = ALL_ORDERS[index];
+            if (!order) return;
+            let newVal = !order.exchangeEnabled;
+            await updateOrder(order._key, { exchangeEnabled: newVal });
+            await loadAllOrders();
+            tg.showAlert(newVal
+                ? `✅ Exchange/Refund enabled for Order #${order.orderId}!`
+                : `⚠️ Exchange/Refund disabled for Order #${order.orderId}.`);
         }
 
-        function updateServiceStatus(orderId, newStatus) {
-            let orders = getUniversalOrders();
-            let target = orders.find(o => o.orderId === orderId);
-            if (target && target.serviceRequest) {
-                target.serviceRequest.status = newStatus;
-                localStorage.setItem('userOrders', JSON.stringify(orders));
-                localStorage.setItem('globalUserOrders', JSON.stringify(orders));
-                loadAllOrders();
-                tg.showAlert(`✅ Request marked as ${newStatus}!`);
-            }
+        async function updateServiceStatus(index, newStatus) {
+            let order = ALL_ORDERS[index];
+            if (!order || !order.serviceRequest) return;
+            let sr = { ...order.serviceRequest, status: newStatus };
+            await updateOrder(order._key, { serviceRequest: sr });
+            await loadAllOrders();
+            tg.showAlert(`✅ ${sr.type} request marked as ${newStatus}!`);
         }
 
         function switchOrderSub(subId) {
@@ -394,21 +372,23 @@
             document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
             document.getElementById('sub-search').style.display = 'block';
 
-            let orders = getUniversalOrders();
+            let orders = ALL_ORDERS;
             let container = document.getElementById('searchResultsContainer');
 
-            let matches = orders.filter(order => {
-                let uid = (order.userId || '').toString().toLowerCase();
-                let uname = (order.userName || '').toString().toLowerCase();
-                return uid.includes(query) || uname.includes(query);
-            });
+            let matches = orders
+                .map((o, idx) => ({ order: o, index: idx }))
+                .filter(({ order }) => {
+                    let uid = (order.userId || '').toString().toLowerCase();
+                    let uname = (order.userName || '').toString().toLowerCase();
+                    return uid.includes(query) || uname.includes(query);
+                });
 
             if (matches.length === 0) {
                 container.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No orders found for "${query}".</div>`;
                 return;
             }
 
-            container.innerHTML = matches.map((order) => {
+            container.innerHTML = matches.map(({ order, index }) => {
                 let itemsDesc = (order.items && order.items.length > 0)
                     ? order.items.map(i => `${i.name} (Size: ${i.size || 'N/A'}, Qty: ${i.qty})`).join(', ')
                     : 'N/A';
@@ -418,14 +398,14 @@
                 if (order.status === 'Accepted') {
                     exchangeToggleHtml = `
                         <div class="action-row">
-                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled('${order.orderId}')">
+                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled(${index})">
                                 <i class="fa-solid fa-rotate"></i> ${order.exchangeEnabled ? 'Exchange/Refund: ON' : 'Enable Exchange/Refund'}
                             </button>
                         </div>
                     `;
                 }
 
-                return buildOrderListItemHtml(order, order.orderId, itemsDesc, imgUrl, exchangeToggleHtml);
+                return buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml);
             }).join('');
         }
     </script>
