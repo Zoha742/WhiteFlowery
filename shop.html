@@ -10,8 +10,8 @@
     <style>
         :root {
             --bg-color: #080b12;
-            --card-bg: rgba(19, 28, 46, 0.75);
-            --card-border: rgba(124, 58, 237, 0.25);
+            --card-bg: rgba(19, 28, 46, 0.85);
+            --card-border: rgba(124, 58, 237, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
@@ -26,51 +26,48 @@
             margin: 0; padding: 0 0 95px 0;
             display: flex; justify-content: center;
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 12px; box-sizing: border-box; }
 
-        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; }
 
-        .search-box { position: relative; margin-bottom: 16px; }
+        .search-box { position: relative; margin-bottom: 12px; }
         .search-input { width: 100%; background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px 16px 12px 42px; border-radius: 14px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        .categories-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; scrollbar-width: none; }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: none; }
         .categories-scroll::-webkit-scrollbar { display: none; }
-        .cat-chip { background: var(--card-bg); border: 1px solid var(--card-border); padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); }
+        .cat-chip { background: var(--card-bg); border: 1px solid var(--card-border); padding: 7px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer; color: var(--text-muted); }
         .cat-chip.active, .cat-chip:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
-        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        /* Full Width / Large Card Grid Layout (1 Column per row for bigger display) */
+        .products-grid { display: flex; flex-direction: column; gap: 16px; }
+        .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
         
-        .product-img-box { width: 100%; height: 140px; background: #0b0f19; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
-        .product-img-box:hover img { transform: scale(1.1); }
+        /* Larger Image Box with Website Style */
+        .product-img-box { width: 100%; height: 340px; background: #0b0f19; border-radius: 14px; overflow: hidden; position: relative; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .product-img-box:hover img { transform: scale(1.05); }
 
-        .product-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+        .product-title { margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #fff; }
+        .product-price { margin: 0 0 8px 0; font-size: 15px; font-weight: bold; color: #fbbf24; }
 
-        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 10px; }
-        .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 6px; font-weight: bold; }
+        .meta-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 11px; }
+        .stock-badge { color: var(--stock-green); background: rgba(16, 185, 129, 0.12); padding: 3px 8px; border-radius: 6px; font-weight: bold; }
         
-        .size-box { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
-        .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .size-box { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+        .size-pill { background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .size-pill.selected { background: #7c3aed; color: #fff; border-color: #7c3aed; }
 
-        .color-box { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
-        .color-pill { display: flex; align-items: center; gap: 4px; background: #0b0f19; border: 1px solid var(--card-border); color: var(--text-muted); font-size: 9px; padding: 2px 8px 2px 4px; border-radius: 12px; cursor: pointer; font-weight: bold; }
-        .color-pill.selected { border-color: #7c3aed; background: rgba(124, 58, 237, 0.2); color: #fff; }
-        .color-pill .swatch { width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.4); flex-shrink: 0; }
-
-        .card-action-row { display: flex; gap: 4px; margin-bottom: 6px; }
-        .btn-mini { background: #1e293b; border: 1px solid var(--card-border); color: #c084fc; font-size: 9px; padding: 4px 6px; border-radius: 6px; cursor: pointer; flex: 1; text-align: center; font-weight: bold; }
+        .card-action-row { display: flex; gap: 6px; margin-bottom: 10px; }
+        .btn-mini { background: #1e293b; border: 1px solid var(--card-border); color: #c084fc; font-size: 11px; padding: 6px 10px; border-radius: 8px; cursor: pointer; flex: 1; text-align: center; font-weight: bold; }
         
-        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 8px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; }
+        .add-to-cart-btn { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; border: none; padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; width: 100%; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
 
         /* Modals & Zoom */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 16px; position: relative; text-align: center; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 99999; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); width: 92%; max-width: 420px; padding: 18px; border-radius: 18px; position: relative; text-align: center; }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -109,27 +106,27 @@
     <!-- Zoom Image Modal -->
     <div id="zoomModal" class="modal-overlay">
         <div class="modal-content" style="background:#0b0f19;">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
-            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:320px; object-fit:contain; border-radius:8px; margin-bottom:10px;">
-            <div id="zoomThumbnails" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
+            <span style="position:absolute; top:10px; right:15px; font-size:24px; cursor:pointer; color:#fff; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:380px; object-fit:contain; border-radius:10px; margin-bottom:12px;">
+            <div id="zoomThumbnails" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;"></div>
         </div>
     </div>
 
     <!-- Details Modal -->
     <div id="detailsModal" class="modal-overlay">
         <div class="modal-content" style="text-align: left;">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('detailsModal')">&times;</span>
-            <h4 id="modalTitle" style="color:#c084fc; margin-top:0;">Product Details</h4>
-            <p id="modalDescription" style="font-size:12px; color:var(--text-muted); line-height:1.6;"></p>
+            <span style="position:absolute; top:12px; right:15px; font-size:24px; cursor:pointer; color:#fff;" onclick="closeModal('detailsModal')">&times;</span>
+            <h4 id="modalTitle" style="color:#c084fc; margin-top:0; font-size:16px;">Product Details</h4>
+            <p id="modalDescription" style="font-size:13px; color:var(--text-muted); line-height:1.6;"></p>
         </div>
     </div>
 
     <!-- Video Modal -->
     <div id="videoModal" class="modal-overlay">
         <div class="modal-content">
-            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#fff;" onclick="closeModal('videoModal')">&times;</span>
-            <h4 style="color:#fff; margin-top:0;">Product Video</h4>
-            <video id="modalVideoPlayer" src="" controls style="width:100%; max-height:280px; border-radius:8px; border:1px solid var(--card-border);"></video>
+            <span style="position:absolute; top:12px; right:15px; font-size:24px; cursor:pointer; color:#fff;" onclick="closeModal('videoModal')">&times;</span>
+            <h4 style="color:#fff; margin-top:0; font-size:16px;">Product Video</h4>
+            <video id="modalVideoPlayer" src="" controls style="width:100%; max-height:300px; border-radius:10px; border:1px solid var(--card-border);"></video>
         </div>
     </div>
 
@@ -146,22 +143,22 @@
         tg.expand();
         let currentCategory = 'All';
         let currentFilteredDresses = [];
-        // cardIndex -> array of in-stock variants shown on that card: [{ color, images, sizes }]
-        let currentCardVariants = {};
 
         window.addEventListener('DOMContentLoaded', () => {
-            cleanOldDummyProducts();
+            forceCleanStorage();
             loadDynamicCategories();
             renderProducts();
         });
 
-        function cleanOldDummyProducts() {
+        function forceCleanStorage() {
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let cleanDresses = dresses.filter(d => {
-                let isDummy = (d.id === 'WF-1' || d.name === 'Royal Silk Gown' || (d.image && d.image.includes('unsplash.com')));
-                return !isDummy;
+            let validDresses = dresses.filter(d => {
+                let name = (d.name || "").toLowerCase();
+                let isUnsplash = d.image && d.image.includes('unsplash.com');
+                let isRoyalSilk = name.includes('royal silk') || d.id === 'WF-1';
+                return !isUnsplash && !isRoyalSilk && d.name;
             });
-            localStorage.setItem('shopDresses', JSON.stringify(cleanDresses));
+            localStorage.setItem('shopDresses', JSON.stringify(validDresses));
         }
 
         function loadDynamicCategories() {
@@ -174,86 +171,47 @@
             });
         }
 
-        // Normalize a dress into its list of color variants, whichever data
-        // shape it was saved with (new multi-color "variants" array, or the
-        // older flat single image-set + single size-list format), and drop
-        // any color whose sizes are all out of stock.
-        function getDressVariants(dress) {
-            let variants;
-            if (dress.variants && dress.variants.length > 0) {
-                variants = dress.variants;
-            } else {
-                variants = [{
-                    color: (dress.colors && dress.colors[0]) || '',
-                    images: (dress.images && dress.images.length > 0) ? dress.images : (dress.image ? [dress.image] : []),
-                    sizes: dress.sizes || {}
-                }];
-            }
-            return variants.filter(v => {
-                let sizes = v.sizes || {};
-                let total = Object.values(sizes).reduce((a, b) => a + Number(b), 0);
-                return total > 0;
-            });
-        }
-
-        function buildSizePillsHtml(sizesObj, cardIndex) {
-            let keys = Object.keys(sizesObj);
-            return keys.map((k, i) => {
-                let cls = i === 0 ? 'size-pill selected' : 'size-pill';
-                return `<span class="${cls}" onclick="selectSize(this, '${k}', ${sizesObj[k]}, ${cardIndex})">${k}</span>`;
-            }).join('');
-        }
-
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let searchVal = document.getElementById('searchInput').value.toLowerCase();
             
             grid.innerHTML = '';
-            currentCardVariants = {};
             
             currentFilteredDresses = dresses.filter(d => {
                 let matchesCat = (currentCategory === 'All' || d.category === currentCategory);
-                let matchesSearch = d.name.toLowerCase().includes(searchVal);
-                // Hide a product entirely once every one of its colors is out of stock
-                let hasStock = getDressVariants(d).length > 0;
-                return matchesCat && matchesSearch && hasStock;
+                let matchesSearch = (d.name || "").toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
             });
 
             if (currentFilteredDresses.length === 0) {
-                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 30px; font-size: 12px;">No dresses found.</div>`;
+                grid.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 40px; font-size: 13px;">No dresses found. Please add from admin panel.</div>`;
                 return;
             }
 
             currentFilteredDresses.forEach((dress, index) => {
-                let visibleVariants = getDressVariants(dress);
-                currentCardVariants[index] = visibleVariants;
-
-                let variant0 = visibleVariants[0];
-                let sizesObj = variant0.sizes || {};
+                let sizesObj = dress.sizes || {};
                 let sizeKeys = Object.keys(sizesObj);
                 let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
                 let initialStock = firstSize ? sizesObj[firstSize] : 0;
+                
+                let sizePillsHtml = '';
+                sizeKeys.forEach((sizeKey, sIdx) => {
+                    let cls = sIdx === 0 ? 'size-pill selected' : 'size-pill';
+                    sizePillsHtml += `<span class="${cls}" onclick="selectSize(this, '${sizeKey}', ${sizesObj[sizeKey]}, ${index})">${sizeKey}</span>`;
+                });
 
-                let sizePillsHtml = buildSizePillsHtml(sizesObj, index);
-
-                let colorPillsHtml = '';
-                if (visibleVariants.length > 1 || (visibleVariants.length === 1 && visibleVariants[0].color)) {
-                    colorPillsHtml = visibleVariants.map((v, vIdx) => {
-                        let cls = vIdx === 0 ? 'color-pill selected' : 'color-pill';
-                        return `<span class="${cls}" onclick="selectColor(this, ${index}, ${vIdx})"><span class="swatch" style="background:${v.color || '#666'};"></span>${v.color || 'Default'}</span>`;
-                    }).join('');
+                let mainImg = dress.image || '';
+                if (dress.images && dress.images.length > 0) {
+                    mainImg = dress.images[0];
                 }
-                let colorBoxHtml = colorPillsHtml ? `<div class="color-box" id="color-box-${index}">${colorPillsHtml}</div>` : '';
-
-                let mainImg = (variant0.images && variant0.images[0]) || '';
 
                 let videoBtn = dress.video ? `<button class="btn-mini" onclick="openVideoModal('${dress.video}')"><i class="fa-solid fa-play"></i> Video</button>` : `<button class="btn-mini" style="opacity:0.4; cursor:not-allowed;" title="No video">No Video</button>`;
 
                 grid.innerHTML += `
-                    <div class="product-card" id="card-${index}" data-selected-variant="0" data-selected-size="${firstSize}" data-selected-color="${variant0.color || ''}">
+                    <div class="product-card" id="card-${index}">
                         <div class="product-img-box" onclick="openZoomModal(${index})">
-                            <img id="card-img-${index}" src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
+                            <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
                         </div>
                         <div>
                             <h4 class="product-title">${dress.name}</h4>
@@ -261,16 +219,15 @@
                             <div class="meta-info">
                                 <span class="stock-badge" id="stock-text-${index}">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
                             </div>
-                            <div class="size-box" id="size-box-${index}">
-                                ${sizePillsHtml || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>'}
+                            <div class="size-box">
+                                ${sizePillsHtml || '<span style="font-size:10px; color:#ef4444;">Stock Out</span>'}
                             </div>
-                            ${colorBoxHtml}
                             <div class="card-action-row">
                                 <button class="btn-mini" onclick="openDetailsModal('${dress.name}', \`${dress.details || 'No details'}\`)"><i class="fa-solid fa-circle-info"></i> Details</button>
                                 ${videoBtn}
                             </div>
                         </div>
-                        <button class="add-to-cart-btn" onclick="addToCart(${index})">Add to Cart</button>
+                        <button class="add-to-cart-btn" onclick="addToCart('${dress.name}', ${dress.price})">Add to Cart</button>
                     </div>
                 `;
             });
@@ -281,46 +238,13 @@
             parent.querySelectorAll('.size-pill').forEach(p => p.classList.remove('selected'));
             pill.classList.add('selected');
             document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${sizeKey}): ${qty} Pcs`;
-            document.getElementById(`card-${cardIndex}`).dataset.selectedSize = sizeKey;
-        }
-
-        // Switching color swaps this card's photo AND rebuilds its size pills
-        // to that color's own stock (since each color can have different sizes/qty).
-        function selectColor(pill, cardIndex, variantIdx) {
-            let parent = pill.parentElement;
-            parent.querySelectorAll('.color-pill').forEach(p => p.classList.remove('selected'));
-            pill.classList.add('selected');
-
-            let variant = currentCardVariants[cardIndex][variantIdx];
-            let card = document.getElementById(`card-${cardIndex}`);
-            card.dataset.selectedVariant = variantIdx;
-            card.dataset.selectedColor = variant.color || '';
-
-            let imgEl = document.getElementById(`card-img-${cardIndex}`);
-            if (imgEl && variant.images && variant.images.length > 0) {
-                imgEl.src = variant.images[0];
-            }
-
-            let sizesObj = variant.sizes || {};
-            let sizeKeys = Object.keys(sizesObj);
-            let sizeBox = document.getElementById(`size-box-${cardIndex}`);
-            sizeBox.innerHTML = buildSizePillsHtml(sizesObj, cardIndex) || '<span style="font-size:9px; color:#ef4444;">Stock Out</span>';
-
-            let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
-            let firstStock = firstSize ? sizesObj[firstSize] : 0;
-            document.getElementById(`stock-text-${cardIndex}`).innerText = `Stock (${firstSize || 'N/A'}): ${firstStock} Pcs`;
-            card.dataset.selectedSize = firstSize;
         }
 
         function openZoomModal(index) {
             let dress = currentFilteredDresses[index];
             if (!dress) return;
 
-            let card = document.getElementById(`card-${index}`);
-            let variantIdx = card ? parseInt(card.dataset.selectedVariant || '0') : 0;
-            let variant = (currentCardVariants[index] && currentCardVariants[index][variantIdx]) || currentCardVariants[index][0];
-            let images = variant.images && variant.images.length > 0 ? variant.images : [dress.image];
-
+            let images = dress.images && dress.images.length > 0 ? dress.images : [dress.image];
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
@@ -330,7 +254,7 @@
             if (images.length > 1) {
                 images.forEach((imgUrl) => {
                     thumbContainer.innerHTML += `
-                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:45px; height:55px; object-fit:cover; border-radius:4px; border:1px solid #7c3aed; cursor:pointer;">
+                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:50px; height:65px; object-fit:cover; border-radius:6px; border:1px solid #7c3aed; cursor:pointer;">
                     `;
                 });
             }
@@ -365,44 +289,8 @@
             renderProducts();
         }
 
-        function addToCart(cardIndex) {
-            let dress = currentFilteredDresses[cardIndex];
-            if (!dress) return;
-
-            let card = document.getElementById(`card-${cardIndex}`);
-            let selectedSize = card ? card.dataset.selectedSize : '';
-            let selectedColor = card ? card.dataset.selectedColor : '';
-            let variantIdx = card ? parseInt(card.dataset.selectedVariant || '0') : 0;
-            let variant = (currentCardVariants[cardIndex] && currentCardVariants[cardIndex][variantIdx]) || {};
-            let image = (variant.images && variant.images[0]) || dress.image || '';
-
-            // Same product + size + color = same cart line (just bump quantity).
-            // Anything different (including a different dress) becomes its own line.
-            let itemKey = `${dress.id || dress.name}_${selectedSize}_${selectedColor}`;
-
-            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-            let existing = cart.find(it => it.key === itemKey);
-
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({
-                    key: itemKey,
-                    name: dress.name,
-                    price: Number(dress.price),
-                    size: selectedSize,
-                    color: selectedColor,
-                    image: image,
-                    qty: 1
-                });
-            }
-
-            localStorage.setItem('cartItems', JSON.stringify(cart));
-
-            let variantText = [selectedSize, selectedColor].filter(Boolean).join(' / ');
-            let label = variantText ? `${dress.name} (${variantText})` : dress.name;
-
-            tg.showAlert(`✅ Added "${label}" to cart! (৳ ${Number(dress.price).toLocaleString()})`);
+        function addToCart(itemName, price) {
+            tg.showAlert(`✅ Added "${itemName}" to cart! (৳ ${price.toLocaleString()})`);
         }
     </script>
 </body>
