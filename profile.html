@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhiteFlowery - Profile</title>
+    <title>WhiteFlowery - Colorful Animated Profile</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #ffffff;
-            --card-bg: #ffffff;
-            --card-border: #e5e7eb;
-            --text-main: #111111;
-            --text-muted: #666666;
-            --btn-dark: #111111;
+            --bg-color: #080b12;
+            --card-border: rgba(124, 58, 237, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --accent-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
         }
 
         body {
@@ -23,121 +23,144 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 100px 0;
             display: flex; justify-content: center;
+            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.2) 0%, transparent 60%);
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: rgba(19, 28, 46, 0.9); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); }
 
         /* Profile Hero with Real User Image & 6 Digit ID */
         .profile-hero {
-            background: #f9fafb;
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
+            background: linear-gradient(135deg, #131c2e 0%, #1e1b4b 100%);
+            border: 1px solid rgba(124, 58, 237, 0.4);
+            border-radius: 24px;
             padding: 24px 20px;
             text-align: center;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.3);
             position: relative;
             overflow: hidden;
+            animation: fadeInDown 0.6s ease-out;
         }
         .profile-avatar {
             width: 75px; height: 75px;
-            background: #e5e7eb;
+            background: var(--accent-gradient);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 30px; color: #111;
+            font-size: 30px; color: #fff;
             margin: 0 auto 12px auto;
-            border: 2px solid var(--card-border);
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
             overflow: hidden;
             object-fit: cover;
         }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { margin: 0 0 4px 0; font-size: 19px; font-weight: 800; color: #111; }
+        .profile-name { margin: 0 0 4px 0; font-size: 19px; font-weight: 800; color: #fff; }
         
+        /* Clickable Copy ID Tag */
         .profile-id-tag {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #f3f4f6;
-            border: 1px solid var(--card-border);
+            background: rgba(124, 58, 237, 0.25);
+            border: 1px solid rgba(124, 58, 237, 0.5);
             padding: 5px 14px; border-radius: 20px;
-            font-size: 11px; color: #111; font-weight: bold;
+            font-size: 11px; color: #d8b4fe; font-weight: bold;
             margin-top: 4px;
             cursor: pointer;
             transition: 0.2s;
         }
-        .profile-id-tag:active { background: #e5e7eb; transform: scale(0.97); }
+        .profile-id-tag:active { background: rgba(124, 58, 237, 0.4); transform: scale(0.97); }
 
         /* Admin Control Panel Banner */
         .admin-banner-card {
-            background: #f9fafb;
-            border: 1px solid var(--card-border);
-            border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.18) 0%, rgba(124, 58, 237, 0.18) 100%);
+            border: 1px solid rgba(236, 72, 153, 0.4);
+            border-radius: 18px; padding: 14px 16px; margin-bottom: 20px;
             display: flex; align-items: center; justify-content: space-between;
-            text-decoration: none; color: #111; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s;
+            animation: fadeInUp 0.6s ease-out;
         }
         .admin-banner-card:active { transform: scale(0.98); }
         .admin-info { display: flex; align-items: center; gap: 12px; }
         .admin-icon-box {
-            width: 40px; height: 40px; background: #111;
-            border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: #fff;
+            width: 40px; height: 40px; background: var(--accent-gradient);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff; box-shadow: 0 4px 12px rgba(236,72,153,0.3);
         }
-        .admin-text h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
-        .admin-text p { margin: 0; font-size: 10px; color: var(--text-muted); }
+        .admin-text h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .admin-text p { margin: 0; font-size: 10px; color: #fbcfe8; }
 
-        /* Cardview Grid */
+        /* Colorful & Animated Cardview Grid */
         .section-header { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 4px; }
         
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         
         .card-view {
-            background: #f9fafb;
-            border: 1px solid var(--card-border);
-            border-radius: 12px; padding: 16px;
+            background: linear-gradient(135deg, rgba(19, 28, 46, 0.85) 0%, rgba(30, 27, 75, 0.75) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 18px; padding: 16px;
             text-decoration: none; color: var(--text-main);
             display: flex; flex-direction: column; justify-content: space-between;
             min-height: 100px; position: relative; overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            animation: fadeIn 0.8s ease-out;
         }
-        .card-view:active {
-            transform: scale(0.98);
-            border-color: #111;
+        .card-view:hover, .card-view:active {
+            transform: translateY(-4px) scale(1.02);
+            border-color: #c084fc;
+            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
         }
         
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
         
         .card-icon {
-            width: 38px; height: 38px; border-radius: 8px;
+            width: 40px; height: 40px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 16px; color: #111; background: #e5e7eb;
-            border: 1px solid var(--card-border);
+            font-size: 18px; color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
         .corner-badge {
-            background: #059669;
-            color: #fff; font-size: 10px; font-weight: 800;
-            padding: 2px 6px; border-radius: 6px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff; font-size: 11px; font-weight: 800;
+            padding: 3px 8px; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
         }
 
-        .card-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #111; }
+        .card-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #fff; }
 
-        /* White Bottom Navigation Bar */
+        /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: #ffffff;
+            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
         }
         .nav-item {
-            text-align: center; color: #6b7280;
-            text-decoration: none; font-size: 11px; font-weight: 600; flex: 1;
+            text-align: center; color: var(--text-muted);
+            text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; transition: 0.2s;
         }
-        .nav-item.active { color: #111111; font-weight: 700; }
+        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -145,7 +168,7 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-crown" style="color: #111;"></i> WhiteFlowery Pro</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-crown"></i> WhiteFlowery Pro</h3>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-house"></i> Home</a>
         </div>
 
@@ -156,7 +179,7 @@
             </div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
             <div class="profile-id-tag" id="userIdDisplay" onclick="copyUserId()" title="Tap to copy ID">
-                <span id="idTextValue">ID: 884920</span> <i class="fa-regular fa-copy" style="font-size: 10px; color: #666;"></i>
+                <span id="idTextValue">ID: 884920</span> <i class="fa-regular fa-copy" style="font-size: 10px; color: #d8b4fe;"></i>
             </div>
         </div>
 
@@ -169,7 +192,7 @@
                     <p>Manage products, stock & support tickets</p>
                 </div>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #666; font-size: 12px;"></i>
+            <i class="fa-solid fa-chevron-right" style="color: #fbcfe8; font-size: 12px;"></i>
         </a>
 
         <!-- Dashboard Hub -->
@@ -179,7 +202,9 @@
             <!-- My Orders Card -->
             <a href="orders.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-box-archive"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);">
+                        <i class="fa-solid fa-box-archive"></i>
+                    </div>
                     <span class="corner-badge" id="deliveredCountBadge">0</span>
                 </div>
                 <h4 class="card-title">My Orders</h4>
@@ -188,7 +213,9 @@
             <!-- Cart Card -->
             <a href="cart.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
                 </div>
                 <h4 class="card-title">My Cart</h4>
             </a>
@@ -196,7 +223,9 @@
             <!-- Wishlist Card -->
             <a href="wishlist.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-heart" style="color: #ec4899;"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
                 </div>
                 <h4 class="card-title">Wishlist</h4>
             </a>
@@ -204,7 +233,9 @@
             <!-- Address Card -->
             <a href="address.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #34d399 0%, #059669 100%);">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
                 </div>
                 <h4 class="card-title">Delivery Address</h4>
             </a>
@@ -212,7 +243,9 @@
             <!-- Payment Methods Card -->
             <a href="payment.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
                 </div>
                 <h4 class="card-title">Payment Methods</h4>
             </a>
@@ -220,7 +253,9 @@
             <!-- Invoices Card -->
             <a href="invoice.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
                 </div>
                 <h4 class="card-title">My Invoices</h4>
             </a>
@@ -228,7 +263,9 @@
             <!-- Support Card -->
             <a href="support.html" class="card-view">
                 <div class="card-top">
-                    <div class="card-icon"><i class="fa-solid fa-headset"></i></div>
+                    <div class="card-icon" style="background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
                 </div>
                 <h4 class="card-title">Support</h4>
             </a>
@@ -271,7 +308,6 @@
             navigator.clipboard.writeText(rawUserId).then(() => {
                 tg.showAlert(`✅ ID copied to clipboard: ${rawUserId}`);
             }).catch(err => {
-                // Fallback for older browsers
                 let tempInput = document.createElement("input");
                 tempInput.value = rawUserId;
                 document.body.appendChild(tempInput);
