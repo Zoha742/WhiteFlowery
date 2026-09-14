@@ -9,13 +9,12 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: rgba(19, 28, 46, 0.85);
-            --card-border: rgba(124, 58, 237, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-pink: #ec4899;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
 
         body {
@@ -24,62 +23,71 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 100px 0;
             display: flex; justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
 
-        /* Wishlist Items List & Swipe Container */
+        /* Wishlist Items List */
         .wishlist-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
-        
-        .wish-item-wrapper {
-            position: relative; overflow: hidden; border-radius: 16px; background: #ef4444;
-        }
-        .delete-swipe-action {
-            position: absolute; right: 0; top: 0; bottom: 0; width: 80px;
-            background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: bold; gap: 4px; cursor: pointer;
-        }
 
         .wish-item {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 14px; position: relative; z-index: 2;
-            transition: transform 0.2s ease; backdrop-filter: blur(10px);
+            border-radius: 12px; padding: 14px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        
-        .wish-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .wish-item-info { display: flex; align-items: center; gap: 12px; }
-        .wish-item-img { width: 55px; height: 55px; background: #0b0f19; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .wish-item-img img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .wish-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
-        .wish-item-price { margin: 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
 
-        /* Footer Move to Cart Button */
+        .delete-icon-btn {
+            position: absolute; top: 10px; right: 10px; width: 26px; height: 26px;
+            background: #fee2e2; border: 1px solid #fecaca;
+            color: #dc2626; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; cursor: pointer; z-index: 3;
+        }
+        .delete-icon-btn:active { background: #dc2626; color: #fff; }
+        
+        .wish-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-right: 30px; }
+        .wish-item-info { display: flex; align-items: center; gap: 12px; }
+        .wish-item-img { width: 55px; height: 55px; background: #f9fafb; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--card-border); }
+        .wish-item-img img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .wish-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
+        .wish-item-price { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; color: #111; }
+
+        .wish-item-variant { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        
+        .wish-size-select {
+            background: #f9fafb; border: 1px solid var(--card-border); color: #111;
+            padding: 2px 6px; border-radius: 6px; font-size: 10px; outline: none; font-weight: bold;
+        }
+
+        .quantity-control { display: flex; align-items: center; gap: 8px; background: #f9fafb; border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 6px; flex-shrink: 0; }
+        .qty-btn { background: none; border: none; color: #111; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .qty-val { font-size: 12px; font-weight: bold; color: #111; }
+
         .wish-item-footer {
             display: flex; justify-content: space-between; align-items: center;
             border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 8px;
         }
         .move-cart-btn {
-            background: var(--primary-gradient); border: none;
-            color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 700;
-            cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+            background: var(--btn-dark); border: none;
+            color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
         }
-        .move-cart-btn:active { transform: scale(0.96); }
+        .move-cart-btn:active { opacity: 0.85; }
 
-        /* Bottom Navigation Bar */
+        .empty-wishlist { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .empty-wishlist i { font-size: 40px; margin-bottom: 12px; display: block; color: #ec4899; }
+
+        /* White Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            width: 100%; max-width: 480px; background: #ffffff;
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
@@ -92,54 +100,8 @@
             <a href="shop.html" class="back-btn"><i class="fa-solid fa-store"></i> Shop</a>
         </div>
 
-        <!-- Wishlist Items List with Swipe & Move to Cart -->
-        <div class="wishlist-list" id="wishlistContainer">
-            
-            <!-- Item 1 -->
-            <div class="wish-item-wrapper">
-                <div class="delete-swipe-action" onclick="removeItem(this)"><i class="fa-solid fa-trash"></i> Delete</div>
-                <div class="wish-item" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
-                    <div class="wish-item-top">
-                        <div class="wish-item-info">
-                            <div class="wish-item-img">
-                                <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp" alt="Gown">
-                            </div>
-                            <div>
-                                <h4 class="wish-item-title">Royal Silk Gown</h4>
-                                <p class="wish-item-price">৳ 8,500</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="wish-item-footer">
-                        <span style="font-size: 10px; color: var(--text-muted);"><i class="fa-solid fa-arrow-left-long"></i> Swipe left to delete</span>
-                        <button class="move-cart-btn" onclick="moveToCart('Royal Silk Gown')"><i class="fa-solid fa-cart-arrow-down"></i> Move to Cart</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Item 2 -->
-            <div class="wish-item-wrapper">
-                <div class="delete-swipe-action" onclick="removeItem(this)"><i class="fa-solid fa-trash"></i> Delete</div>
-                <div class="wish-item" ontouchstart="touchStart(event)" ontouchmove="touchMove(event)" ontouchend="touchEnd(event)">
-                    <div class="wish-item-top">
-                        <div class="wish-item-info">
-                            <div class="wish-item-img">
-                                <img src="https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/4_jwi1bs.webp" alt="Maxi">
-                            </div>
-                            <div>
-                                <h4 class="wish-item-title">White Floral Maxi</h4>
-                                <p class="wish-item-price">৳ 3,500</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="wish-item-footer">
-                        <span style="font-size: 10px; color: var(--text-muted);"><i class="fa-solid fa-arrow-left-long"></i> Swipe left to delete</span>
-                        <button class="move-cart-btn" onclick="moveToCart('White Floral Maxi')"><i class="fa-solid fa-cart-arrow-down"></i> Move to Cart</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        <!-- Wishlist Items List -->
+        <div class="wishlist-list" id="wishlistContainer"></div>
     </div>
 
     <!-- Bottom Navigation Bar -->
@@ -154,31 +116,134 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Move to Cart Action
-        function moveToCart(itemName) {
-            tg.showAlert(`✅ "${itemName}" moved to cart successfully!`);
-            window.location.href = "cart.html";
+        window.addEventListener('DOMContentLoaded', () => {
+            renderWishlist();
+        });
+
+        function getWishlist() {
+            return JSON.parse(localStorage.getItem('wishlistItems')) || [];
         }
 
-        // Remove Item
-        function removeItem(el) {
-            el.closest('.wish-item-wrapper').remove();
+        function saveWishlist(wishlist) {
+            localStorage.setItem('wishlistItems', JSON.stringify(wishlist));
+        }
+
+        function renderWishlist() {
+            let wishlist = getWishlist();
+            let container = document.getElementById('wishlistContainer');
+
+            if (wishlist.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-wishlist">
+                        <i class="fa-solid fa-heart"></i>
+                        Your wishlist is empty.<br>Save your favorite dresses here!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = wishlist.map((item, index) => {
+                let sizes = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+                let sizeOptions = sizes.map(s =>
+                    `<option value="${s}" ${s === item.size ? 'selected' : ''}>${s}</option>`
+                ).join('');
+
+                return `
+                    <div class="wish-item" data-index="${index}">
+                        <button class="delete-icon-btn" onclick="removeItem(${index})" title="Remove">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        <div class="wish-item-top">
+                            <div class="wish-item-info">
+                                <div class="wish-item-img">
+                                    <img src="${item.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'}" alt="${item.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
+                                </div>
+                                <div>
+                                    <h4 class="wish-item-title">${item.name}</h4>
+                                    <p class="wish-item-price">Tk ${Number(item.price).toLocaleString()}.00</p>
+                                    <div class="wish-item-variant">
+                                        <span style="font-size: 10px; color: var(--text-muted);">Size:</span>
+                                        <select class="wish-size-select" onchange="updateWishlistSize(${index}, this.value)">
+                                            ${sizeOptions}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="quantity-control">
+                                <button class="qty-btn" onclick="updateWishlistQty(${index}, -1)">-</button>
+                                <span class="qty-val">${item.qty || 1}</span>
+                                <button class="qty-btn" onclick="updateWishlistQty(${index}, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="wish-item-footer">
+                            <span style="font-size: 10px; color: var(--text-muted);">Qty: ${item.qty || 1}</span>
+                            <button class="move-cart-btn" onclick="moveToCart(${index})"><i class="fa-solid fa-cart-arrow-down"></i> Move to Cart</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateWishlistQty(index, change) {
+            let wishlist = getWishlist();
+            if (!wishlist[index]) return;
+
+            let currentQty = wishlist[index].qty || 1;
+            let newQty = currentQty + change;
+            if (newQty < 1) return;
+
+            wishlist[index].qty = newQty;
+            saveWishlist(wishlist);
+            renderWishlist();
+        }
+
+        function updateWishlistSize(index, newSize) {
+            let wishlist = getWishlist();
+            if (!wishlist[index]) return;
+
+            wishlist[index].size = newSize;
+            saveWishlist(wishlist);
+        }
+
+        function removeItem(index) {
+            let wishlist = getWishlist();
+            wishlist.splice(index, 1);
+            saveWishlist(wishlist);
+            renderWishlist();
             tg.showAlert("🗑️ Removed from wishlist!");
         }
 
-        // Swipe Gesture Logic for Mobile
-        let startX = 0;
-        function touchStart(e) { startX = e.touches[0].clientX; }
-        function touchMove(e) {
-            let diff = e.touches[0].clientX - startX;
-            let card = e.currentTarget;
-            if(diff < -30) {
-                card.style.transform = `translateX(-80px)`;
-            } else if(diff > 30) {
-                card.style.transform = `translateX(0px)`;
+        function moveToCart(index) {
+            let wishlist = getWishlist();
+            let item = wishlist[index];
+            if (!item) return;
+
+            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+            let itemKey = `${item.name}_${item.size || 'M'}`;
+            let existing = cart.find(it => it.key === itemKey);
+
+            if (existing) {
+                existing.qty += (item.qty || 1);
+            } else {
+                cart.push({
+                    key: itemKey,
+                    name: item.name,
+                    price: Number(item.price),
+                    size: item.size || 'M',
+                    image: item.image || '',
+                    qty: item.qty || 1
+                });
             }
+
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+
+            // Remove from wishlist after moving
+            wishlist.splice(index, 1);
+            saveWishlist(wishlist);
+            renderWishlist();
+
+            tg.showAlert(`✅ "${item.name}" moved to cart successfully!`);
         }
-        function touchEnd(e) {}
     </script>
 </body>
 </html>
