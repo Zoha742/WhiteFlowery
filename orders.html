@@ -72,6 +72,51 @@
 
         .cooldown-timer { font-size: 11px; color: #d97706; font-weight: 600; margin-top: 6px; display: block; }
 
+        /* Exchange / Refund service buttons + status */
+        .service-btn-row { display: flex; gap: 6px; margin-top: 10px; }
+        .service-btn {
+            flex: 1; border: none; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: #fff;
+        }
+        .exchange-btn { background: #7c3aed; }
+        .exchange-btn:active { background: #6d28d9; }
+        .refund-btn { background: #d97706; }
+        .refund-btn:active { background: #b45309; }
+
+        .service-status-box {
+            margin-top: 10px; background: #f9fafb; border: 1px solid var(--card-border); border-radius: 8px;
+            padding: 8px 10px; font-size: 11px; color: var(--text-muted);
+        }
+        .service-status-box b { color: #111; }
+        .service-status-pill {
+            display: inline-block; font-size: 9px; font-weight: bold; padding: 2px 7px; border-radius: 5px;
+            text-transform: uppercase; margin-left: 4px;
+        }
+
+        /* Modals (Reason popup + Exchange product picker) — hidden by default */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px; box-sizing: border-box; }
+        .modal-content { background: #fff; border: 1px solid var(--card-border); width: 100%; max-width: 400px; padding: 18px; border-radius: 14px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer; color: #111; }
+        .modal-title { margin: 0 0 4px 0; font-size: 15px; font-weight: 800; color: #111; }
+        .modal-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        .reason-textarea {
+            width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111;
+            padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; height: 80px; resize: none; margin-bottom: 12px;
+        }
+        .modal-submit-btn {
+            width: 100%; border: none; padding: 11px; border-radius: 8px; font-weight: 700; font-size: 13px;
+            color: #fff; cursor: pointer;
+        }
+
+        .exchange-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+        .exchange-pick-card {
+            border: 1px solid var(--card-border); border-radius: 10px; padding: 8px; cursor: pointer; background: #f9fafb;
+        }
+        .exchange-pick-card:active { background: #ede9fe; border-color: #7c3aed; }
+        .exchange-pick-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px; }
+        .exchange-pick-name { font-size: 11px; font-weight: bold; color: #111; }
+        .exchange-pick-price { font-size: 11px; color: #7c3aed; font-weight: bold; }
+
         /* White Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -99,6 +144,27 @@
         </div>
     </div>
 
+    <!-- Reason Popup (Exchange or Refund) - hidden by default -->
+    <div id="serviceReasonModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeServiceReasonModal()">&times;</span>
+            <h4 class="modal-title" id="serviceModalTitle">Request Exchange</h4>
+            <p class="modal-sub">Please tell us the reason so we can review it:</p>
+            <textarea id="serviceReasonInput" class="reason-textarea" placeholder="e.g. Wrong size received, fabric/color issue, etc."></textarea>
+            <button class="modal-submit-btn" id="serviceModalSubmitBtn" style="background:#7c3aed;" onclick="proceedServiceRequest()">Continue</button>
+        </div>
+    </div>
+
+    <!-- Exchange Replacement Product Picker - hidden by default -->
+    <div id="exchangePickerModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeExchangePicker()">&times;</span>
+            <h4 class="modal-title">Select Replacement Product</h4>
+            <p class="modal-sub">Pick the product you'd like to exchange for:</p>
+            <div class="exchange-grid" id="exchangeProductGrid"></div>
+        </div>
+    </div>
+
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
@@ -110,6 +176,11 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+
+        // Which order + which service (exchange/refund) the popup is currently working on
+        let activeServiceOrderIndex = null;
+        let activeServiceType = null;
+        let pendingExchangeReason = "";
 
         window.addEventListener('DOMContentLoaded', () => {
             loadUserOrders();
@@ -166,6 +237,8 @@
                     statusBadgeHtml = `<span class="status-badge status-cancelled"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
                 } else if (order.status === 'Accepted') {
                     statusBadgeHtml = `<span class="status-badge status-accepted"><i class="fa-solid fa-check-circle"></i> Accepted</span>`;
+                    // Exchange / Refund service — only offered once Admin has enabled it for this order
+                    actionHtml += buildServiceSectionHtml(order, index);
                 } else {
                     if (timeLeftMs > 0) {
                         let minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -208,6 +281,33 @@
             }
         }
 
+        // Builds the Exchange/Refund buttons OR the current request's status box for an accepted order
+        function buildServiceSectionHtml(order, index) {
+            if (!order.exchangeEnabled) return ''; // Admin hasn't enabled this service for this order yet
+
+            if (order.serviceRequest) {
+                let sr = order.serviceRequest;
+                let label = sr.type === 'exchange' ? 'Exchange' : 'Refund';
+                let pillColor = sr.status === 'Delivered' ? '#059669' : sr.status === 'Rejected' ? '#dc2626' : '#d97706';
+                let pillBg = sr.status === 'Delivered' ? '#ecfdf5' : sr.status === 'Rejected' ? '#fee2e2' : '#fef3c7';
+                let extra = (sr.type === 'exchange' && sr.newItem) ? `<br><b>Replacement:</b> ${sr.newItem.name}` : '';
+                return `
+                    <div class="service-status-box">
+                        <b>${label} Request</b>
+                        <span class="service-status-pill" style="color:${pillColor}; background:${pillBg};">${sr.status}</span>
+                        <br><b>Reason:</b> ${sr.reason}${extra}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="service-btn-row">
+                    <button class="service-btn exchange-btn" onclick="openServiceReasonModal(${index}, 'exchange')"><i class="fa-solid fa-rotate"></i> Exchange</button>
+                    <button class="service-btn refund-btn" onclick="openServiceReasonModal(${index}, 'refund')"><i class="fa-solid fa-hand-holding-dollar"></i> Refund</button>
+                </div>
+            `;
+        }
+
         function cancelOrder(index) {
             let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
             if (orders[index]) {
@@ -224,6 +324,97 @@
                     tg.showAlert("⚠️ 10-minute cancellation window has expired!");
                 }
             }
+        }
+
+        // ---------- Exchange / Refund reason popup ----------
+        function openServiceReasonModal(index, type) {
+            activeServiceOrderIndex = index;
+            activeServiceType = type;
+            document.getElementById('serviceReasonInput').value = '';
+            document.getElementById('serviceModalTitle').innerText = type === 'exchange' ? 'Request Exchange' : 'Request Refund';
+            document.getElementById('serviceModalSubmitBtn').style.background = type === 'exchange' ? '#7c3aed' : '#d97706';
+            document.getElementById('serviceModalSubmitBtn').innerText = type === 'exchange' ? 'Continue' : 'Submit Refund Request';
+            document.getElementById('serviceReasonModal').style.display = 'flex';
+        }
+
+        function closeServiceReasonModal() {
+            document.getElementById('serviceReasonModal').style.display = 'none';
+        }
+
+        function proceedServiceRequest() {
+            let reason = document.getElementById('serviceReasonInput').value.trim();
+            if (!reason) { tg.showAlert("⚠️ Please write a reason first!"); return; }
+
+            if (activeServiceType === 'exchange') {
+                // Reason captured — now ask them to pick a replacement product
+                pendingExchangeReason = reason;
+                closeServiceReasonModal();
+                openExchangePicker();
+            } else {
+                // Refund needs no product selection — submit immediately
+                saveServiceRequest({ type: 'refund', reason: reason, status: 'Requested', requestedAt: Date.now() });
+                closeServiceReasonModal();
+                tg.showAlert("✅ Refund request submitted! Our team will review it soon.");
+            }
+        }
+
+        // ---------- Exchange replacement product picker ----------
+        function openExchangePicker() {
+            let grid = document.getElementById('exchangeProductGrid');
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+
+            if (dresses.length === 0) {
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; font-size:11px; padding:20px;">No products available right now.</div>`;
+            } else {
+                grid.innerHTML = dresses.map((dress, dIdx) => {
+                    let mainImg = (dress.images && dress.images[0]) || dress.image || '';
+                    return `
+                        <div class="exchange-pick-card" onclick="selectExchangeProduct(${dIdx})">
+                            <img src="${mainImg}" alt="${dress.name}">
+                            <div class="exchange-pick-name">${dress.name}</div>
+                            <div class="exchange-pick-price">৳ ${Number(dress.price).toLocaleString()}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('exchangePickerModal').style.display = 'flex';
+        }
+
+        function closeExchangePicker() {
+            document.getElementById('exchangePickerModal').style.display = 'none';
+        }
+
+        function selectExchangeProduct(dressIndex) {
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let dress = dresses[dressIndex];
+            if (!dress) return;
+
+            let mainImg = (dress.images && dress.images[0]) || dress.image || '';
+
+            saveServiceRequest({
+                type: 'exchange',
+                reason: pendingExchangeReason,
+                status: 'Requested',
+                requestedAt: Date.now(),
+                newItem: { name: dress.name, price: dress.price, image: mainImg }
+            });
+
+            closeExchangePicker();
+            tg.showAlert(`✅ Exchange request submitted for "${dress.name}"! Our team will review it soon.`);
+        }
+
+        function saveServiceRequest(serviceRequest) {
+            if (activeServiceOrderIndex === null) return;
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            if (orders[activeServiceOrderIndex]) {
+                orders[activeServiceOrderIndex].serviceRequest = serviceRequest;
+                localStorage.setItem('userOrders', JSON.stringify(orders));
+                loadUserOrders();
+            }
+            activeServiceOrderIndex = null;
+            activeServiceType = null;
+            pendingExchangeReason = "";
         }
     </script>
 </body>
