@@ -111,17 +111,23 @@
         </div>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        // requireAdmin();       // ডেমোর জন্য সাময়িকভাবে বন্ধ — পরে আনকমেন্ট করে লক করুন
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadInventory();
+        let CURRENT_DRESSES = [];   // ক্লাউড থেকে লোড হওয়া সব প্রোডাক্ট (এই পেজের ইনভেন্টরি)
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadInventory();
         });
 
-        function loadInventory() {
+        async function loadInventory() {
             let container = document.getElementById('inventoryListContainer');
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>`;
+            CURRENT_DRESSES = await getDresses();
+            let dresses = CURRENT_DRESSES;
 
             document.getElementById('selectAllCheckbox').checked = false;
             updateBulkToolbar();
@@ -155,7 +161,7 @@
                             <div class="action-btns">
                                 <button class="btn-sm btn-view" onclick="viewDress(${index})">View</button>
                                 <button class="btn-sm btn-edit" onclick="openEditModal(${index})">Edit Stock</button>
-                                <button class="btn-sm btn-delete" onclick="deleteDress(${index})" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
+                                <button class="btn-sm btn-delete" onclick="deleteDressAt(${index})" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </div>
                     </div>
@@ -167,7 +173,7 @@
 
         function viewDress(index) {
             currentViewIndex = index;
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let dresses = CURRENT_DRESSES;
             let d = dresses[index];
             let sizesObj = d.sizes || {};
             let total = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
@@ -211,8 +217,8 @@
             `).join('');
         }
 
-        function removeDressImage(dressIndex, imgIndex) {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+        async function removeDressImage(dressIndex, imgIndex) {
+            let dresses = CURRENT_DRESSES;
             let d = dresses[dressIndex];
             let images = (d.images && d.images.length > 0) ? [...d.images] : (d.image ? [d.image] : []);
 
@@ -226,16 +232,15 @@
             images.splice(imgIndex, 1);
             d.images = images;
             d.image = images[0];
-            dresses[dressIndex] = d;
-            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            await updateDress(d._key, { images: d.images, image: d.image });
 
             tg.showAlert("🗑️ Photo removed!");
+            await loadInventory();
             viewDress(dressIndex);
-            loadInventory();
         }
 
-        function openEditModal(index) {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+        async function openEditModal(index) {
+            let dresses = CURRENT_DRESSES;
             let d = dresses[index];
             let sizesObj = d.sizes || { S: 0, M: 0, L: 0, XL: 0 };
 
@@ -247,7 +252,7 @@
             document.getElementById('editNewImgFile').value = '';
             document.getElementById('editNewImgUrl').value = '';
 
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
+            let categories = await getCategories();
             document.getElementById('editCatOptions').innerHTML = categories.map(c => `<option value="${c}">`).join('');
 
             let sizeContainer = document.getElementById('editSizesContainer');
@@ -271,8 +276,8 @@
 
         async function saveDressChanges() {
             let index = document.getElementById('editIndex').value;
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let dress = dresses[index];
+            let dresses = CURRENT_DRESSES;
+            let dress = { ...dresses[index] };
 
             dress.name = document.getElementById('editName').value.trim();
             dress.productCode = document.getElementById('editCode').value.trim();
@@ -312,10 +317,19 @@
             });
             dress.sizes = updatedSizes;
 
-            localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            let key = dresses[index]._key;
+            await updateDress(key, {
+                name: dress.name,
+                productCode: dress.productCode,
+                category: dress.category,
+                price: dress.price,
+                images: dress.images,
+                image: dress.image,
+                sizes: dress.sizes
+            });
             tg.showAlert("✅ Dress details and new photo updated successfully!");
             closeModal('editModal');
-            loadInventory();
+            await loadInventory();
         }
 
         function toggleSelectAll(checkbox) {
@@ -346,30 +360,28 @@
             }
         }
 
-        function deleteSelectedDresses() {
+        async function deleteSelectedDresses() {
             let checkedBoxes = document.querySelectorAll('.dress-select-checkbox:checked');
             if (checkedBoxes.length === 0) return;
 
             let indexesToDelete = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-index')));
 
             if (confirm(`Remove ${indexesToDelete.length} selected dress(es) from inventory?`)) {
-                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-                indexesToDelete.sort((a, b) => b - a).forEach(idx => {
-                    dresses.splice(idx, 1);
-                });
-                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                for (const idx of indexesToDelete) {
+                    let key = CURRENT_DRESSES[idx] && CURRENT_DRESSES[idx]._key;
+                    if (key) await deleteDress(key);
+                }
                 tg.showAlert(`🗑️ ${indexesToDelete.length} dress(es) removed successfully!`);
-                loadInventory();
+                await loadInventory();
             }
         }
 
-        function deleteDress(index) {
+        async function deleteDressAt(index) {
             if(confirm("Are you sure you want to remove this dress from inventory?")) {
-                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-                dresses.splice(index, 1);
-                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                let key = CURRENT_DRESSES[index] && CURRENT_DRESSES[index]._key;
+                if (key) await deleteDress(key);
                 tg.showAlert("🗑️ Dress removed successfully!");
-                loadInventory();
+                await loadInventory();
             }
         }
     </script>
