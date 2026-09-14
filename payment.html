@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <!-- Bank Dropdown Box (Appears only if Bank is selected) -->
+        <!-- Bank Dropdown Box -->
         <div id="bankDropdownContainer" class="bank-dropdown-box">
             <div class="form-group">
                 <label>Select Partner Bank & Branch</label>
@@ -163,7 +163,7 @@
             </div>
         </div>
 
-        <!-- Payment Proof Upload Box (Hidden if COD is selected) -->
+        <!-- Payment Proof Upload Box -->
         <div id="proofUploadSection" class="proof-upload-card" style="display: none;">
             <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #111;"><i class="fa-solid fa-receipt"></i> Upload Payment Proof</h4>
             <p style="margin: 0 0 10px 0; font-size: 10px; color: var(--text-muted);">Upload screenshot or receipt of your transaction.</p>
@@ -204,7 +204,6 @@
                 bankBox.style.display = 'none';
                 proofBox.style.display = 'block';
             } else {
-                // COD / Home Delivery
                 bankBox.style.display = 'none';
                 proofBox.style.display = 'none';
             }
@@ -230,6 +229,18 @@
                     tg.showAlert("⚠️ Please upload your payment screenshot proof!");
                     return;
                 }
+            }
+
+            let pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
+            if (pendingOrder) {
+                pendingOrder.paymentMethod = selectedType;
+                
+                let existingOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+                existingOrders.unshift(pendingOrder);
+                localStorage.setItem('userOrders', JSON.stringify(existingOrders));
+
+                localStorage.removeItem('cartItems');
+                localStorage.removeItem('pendingOrder');
             }
 
             tg.showAlert("✅ Order confirmed successfully! Thank you for shopping with WhiteFlowery.");
