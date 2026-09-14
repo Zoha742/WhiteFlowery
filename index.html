@@ -170,6 +170,17 @@
         tg.expand();
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Auto-Sync and clear old conflicting cache for index
+            let globalDresses = JSON.parse(localStorage.getItem('globalShopDresses')) || [];
+            let localDresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let mergedMap = new Map();
+            [...globalDresses, ...localDresses].forEach(d => {
+                if (d && d.name) mergedMap.set(d.name + d.price, d);
+            });
+            let freshDresses = Array.from(mergedMap.values());
+            localStorage.setItem('shopDresses', JSON.stringify(freshDresses));
+            localStorage.setItem('globalShopDresses', JSON.stringify(freshDresses));
+
             loadHomeSections();
         });
 
