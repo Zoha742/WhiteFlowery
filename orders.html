@@ -50,7 +50,13 @@
         .status-cancelled { background: #fee2e2; color: #dc2626; border: 1px solid #ef4444; }
 
         .order-item-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 8px; }
-        .order-item-img { width: 55px; height: 65px; object-fit: contain; border-radius: 6px; background: #f9fafb; border: 1px solid var(--card-border); flex-shrink: 0; }
+        .order-item-img { width: 55px; height: 65px; object-fit: contain; border-radius: 6px; background: #f9fafb; border: 1px solid var(--card-border); flex-shrink: 0; cursor: pointer; }
+
+        .mini-view-btn {
+            display: inline-flex; align-items: center; gap: 4px; background: #ede9fe; color: #7c3aed;
+            border: 1px solid #ddd6fe; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px; cursor: pointer; margin-left: 6px;
+        }
+        .order-date-line { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
         
         .dress-name { font-weight: bold; color: #111; margin-bottom: 2px; font-size: 13px; }
         .dress-specs { display: flex; gap: 10px; color: var(--text-muted); font-size: 11px; }
@@ -165,6 +171,14 @@
         </div>
     </div>
 
+    <!-- Image Zoom Modal (used for order items + exchange replacement photos) -->
+    <div id="imageZoomModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <span class="modal-close" onclick="closeImageZoom()">&times;</span>
+            <img id="zoomModalImg" src="" alt="Zoom" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px;">
+        </div>
+    </div>
+
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
@@ -186,6 +200,22 @@
             loadUserOrders();
             setInterval(loadUserOrders, 1000); // Update timers every second
         });
+
+        function formatDateTime(ts) {
+            if (!ts) return 'N/A';
+            let d = new Date(ts);
+            return d.toLocaleDateString() + ' , ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function openImageZoom(url) {
+            if (!url) return;
+            document.getElementById('zoomModalImg').src = url;
+            document.getElementById('imageZoomModal').style.display = 'flex';
+        }
+
+        function closeImageZoom() {
+            document.getElementById('imageZoomModal').style.display = 'none';
+        }
 
         function loadUserOrders() {
             let container = document.getElementById('ordersListContainer');
@@ -217,7 +247,7 @@
                         let img = item.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp';
                         itemsHtml += `
                             <div class="order-item-row">
-                                <img src="${img}" class="order-item-img" alt="${item.name}">
+                                <img src="${img}" class="order-item-img" alt="${item.name}" onclick="openImageZoom('${img}')">
                                 <div>
                                     <div class="dress-name">${item.name}</div>
                                     <div class="dress-specs">
@@ -259,7 +289,10 @@
                 container.innerHTML += `
                     <div class="order-card">
                         <div class="order-header">
-                            <span class="order-id">#${order.orderId || 'WF-9021'}</span>
+                            <div>
+                                <span class="order-id">#${order.orderId || 'WF-9021'}</span>
+                                <div class="order-date-line"><i class="fa-regular fa-clock"></i> ${formatDateTime(order.createdAt)}</div>
+                            </div>
                             ${statusBadgeHtml}
                         </div>
                         <div class="order-details">
@@ -290,7 +323,9 @@
                 let label = sr.type === 'exchange' ? 'Exchange' : 'Refund';
                 let pillColor = sr.status === 'Delivered' ? '#059669' : sr.status === 'Rejected' ? '#dc2626' : '#d97706';
                 let pillBg = sr.status === 'Delivered' ? '#ecfdf5' : sr.status === 'Rejected' ? '#fee2e2' : '#fef3c7';
-                let extra = (sr.type === 'exchange' && sr.newItem) ? `<br><b>Replacement:</b> ${sr.newItem.name}` : '';
+                let extra = (sr.type === 'exchange' && sr.newItem)
+                    ? `<br><b>Replacement:</b> ${sr.newItem.name}${sr.newItem.image ? `<button class="mini-view-btn" onclick="openImageZoom('${sr.newItem.image}')"><i class="fa-solid fa-eye"></i> View</button>` : ''}`
+                    : '';
                 return `
                     <div class="service-status-box">
                         <b>${label} Request</b>
