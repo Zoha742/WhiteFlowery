@@ -186,6 +186,7 @@
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -220,7 +221,7 @@
             reader.readAsDataURL(event.target.files[0]);
         }
 
-        function submitPaymentProof() {
+        async function submitPaymentProof() {
             let selectedType = document.querySelector('.pay-card.selected h4').innerText;
 
             if(selectedType.includes('bKash') || selectedType.includes('Nagad') || selectedType.includes('Bank')) {
@@ -234,10 +235,18 @@
             let pendingOrder = JSON.parse(localStorage.getItem('pendingOrder'));
             if (pendingOrder) {
                 pendingOrder.paymentMethod = selectedType;
-                
-                let existingOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
-                existingOrders.unshift(pendingOrder);
-                localStorage.setItem('userOrders', JSON.stringify(existingOrders));
+
+                let btn = document.querySelector('.submit-btn');
+                if (btn) { btn.disabled = true; btn.innerText = 'Placing order...'; }
+
+                // ক্লাউড ডাটাবেজে অর্ডার সেভ — এখন অ্যাডমিন সব আইডি থেকেই এটা দেখতে পাবে
+                let savedKey = await placeOrder(pendingOrder);
+
+                if (!savedKey) {
+                    tg.showAlert("❌ Order placement failed. Please check your internet and try again.");
+                    if (btn) { btn.disabled = false; btn.innerText = 'Confirm & Complete Order'; }
+                    return;
+                }
 
                 localStorage.removeItem('cartItems');
                 localStorage.removeItem('pendingOrder');
