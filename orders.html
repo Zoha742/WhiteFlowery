@@ -47,10 +47,14 @@
         .status-badge { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
         .status-accepted { background: #ecfdf5; color: #059669; border: 1px solid #10b981; }
         .status-pending { background: #fef3c7; color: #d97706; border: 1px solid #f59e0b; }
+        .status-cancelled { background: #fee2e2; color: #dc2626; border: 1px solid #ef4444; }
 
-        .dress-name { font-weight: bold; color: #111; margin-bottom: 4px; font-size: 14px; }
-        .dress-specs { display: flex; gap: 12px; color: var(--text-muted); font-size: 12px; margin-bottom: 8px; }
-        .spec-item { background: #f9fafb; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--card-border); }
+        .order-item-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 8px; }
+        .order-item-img { width: 55px; height: 65px; object-fit: contain; border-radius: 6px; background: #f9fafb; border: 1px solid var(--card-border); flex-shrink: 0; }
+        
+        .dress-name { font-weight: bold; color: #111; margin-bottom: 2px; font-size: 13px; }
+        .dress-specs { display: flex; gap: 10px; color: var(--text-muted); font-size: 11px; }
+        .spec-item { background: #f9fafb; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--card-border); }
 
         .order-footer {
             display: flex; justify-content: space-between; align-items: center;
@@ -58,6 +62,15 @@
         }
         .total-label { font-size: 11px; color: var(--text-muted); }
         .total-amount { font-size: 15px; font-weight: bold; color: #111; }
+
+        .cancel-btn {
+            background: #fee2e2; color: #dc2626; border: 1px solid #fecaca;
+            padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 8px;
+        }
+        .cancel-btn:active { background: #dc2626; color: #fff; }
+
+        .cooldown-timer { font-size: 11px; color: #d97706; font-weight: 600; margin-top: 6px; display: block; }
 
         /* White Bottom Navigation Bar */
         .bottom-nav {
@@ -100,6 +113,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             loadUserOrders();
+            setInterval(loadUserOrders, 1000); // Update timers every second
         });
 
         function loadUserOrders() {
@@ -113,27 +127,67 @@
                 return;
             }
 
-            orders.forEach(order => {
+            let currentTime = Date.now();
+            let updated = false;
+
+            orders.forEach((order, index) => {
+                if (!order.createdAt) {
+                    order.createdAt = currentTime;
+                    updated = true;
+                }
+
+                let elapsedMs = currentTime - order.createdAt;
+                let tenMinutesMs = 10 * 60 * 1000;
+                let timeLeftMs = tenMinutesMs - elapsedMs;
+
                 let itemsHtml = '';
                 if (order.items && order.items.length > 0) {
                     order.items.forEach(item => {
+                        let img = item.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp';
                         itemsHtml += `
-                            <div style="margin-bottom: 8px;">
-                                <div class="dress-name">${item.name}</div>
-                                <div class="dress-specs">
-                                    <span class="spec-item">Size: <b>${item.size || 'N/A'}</b></span>
-                                    <span class="spec-item">Qty: <b>${item.qty} Pcs</b></span>
+                            <div class="order-item-row">
+                                <img src="${img}" class="order-item-img" alt="${item.name}">
+                                <div>
+                                    <div class="dress-name">${item.name}</div>
+                                    <div class="dress-specs">
+                                        <span class="spec-item">Size: <b>${item.size || 'N/A'}</b></span>
+                                        <span class="spec-item">Qty: <b>${item.qty} Pcs</b></span>
+                                    </div>
                                 </div>
                             </div>
                         `;
                     });
                 }
 
+                let statusBadgeHtml = '';
+                let actionHtml = '';
+
+                if (order.status === 'Cancelled') {
+                    statusBadgeHtml = `<span class="status-badge status-cancelled"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+                } else if (order.status === 'Accepted') {
+                    statusBadgeHtml = `<span class="status-badge status-accepted"><i class="fa-solid fa-check-circle"></i> Accepted</span>`;
+                } else {
+                    if (timeLeftMs > 0) {
+                        let minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
+                        let seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
+                        let timerStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                        statusBadgeHtml = `<span class="status-badge status-pending"><i class="fa-solid fa-clock"></i> Pending (Review)</span>`;
+                        actionHtml = `
+                            <span class="cooldown-timer"><i class="fa-solid hourglass-start"></i> Cancellation available for: <b>${timerStr}</b></span>
+                            <button class="cancel-btn" onclick="cancelOrder(${index})"><i class="fa-solid fa-xmark"></i> Cancel Order</button>
+                        `;
+                    } else {
+                        // 10 minutes passed, order goes to Admin live orders
+                        statusBadgeHtml = `<span class="status-badge status-pending"><i class="fa-solid fa-paper-plane"></i> Sent to Admin</span>`;
+                    }
+                }
+
                 container.innerHTML += `
                     <div class="order-card">
                         <div class="order-header">
                             <span class="order-id">#${order.orderId || 'WF-9021'}</span>
-                            <span class="status-badge status-pending"><i class="fa-solid fa-clock"></i> ${order.status || 'Pending'}</span>
+                            ${statusBadgeHtml}
                         </div>
                         <div class="order-details">
                             ${itemsHtml}
@@ -144,9 +198,32 @@
                             </div>
                             <div class="total-amount">Tk ${Number(order.totalAmount || 0).toLocaleString()}.00</div>
                         </div>
+                        ${actionHtml}
                     </div>
                 `;
             });
+
+            if (updated) {
+                localStorage.setItem('userOrders', JSON.stringify(orders));
+            }
+        }
+
+        function cancelOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            if (orders[index]) {
+                let currentTime = Date.now();
+                let elapsedMs = currentTime - (orders[index].createdAt || currentTime);
+                let tenMinutesMs = 10 * 60 * 1000;
+
+                if (elapsedMs <= tenMinutesMs) {
+                    orders[index].status = 'Cancelled';
+                    localStorage.setItem('userOrders', JSON.stringify(orders));
+                    loadUserOrders();
+                    tg.showAlert("✅ Order cancelled successfully within the 10-minute window!");
+                } else {
+                    tg.showAlert("⚠️ 10-minute cancellation window has expired!");
+                }
+            }
         }
     </script>
 </body>
