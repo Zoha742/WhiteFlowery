@@ -217,11 +217,12 @@
                 categories[index] = newCatName;
                 localStorage.setItem('shopCategories', JSON.stringify(categories));
 
-                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || JSON.parse(localStorage.getItem('globalShopDresses')) || [];
                 dresses.forEach(d => {
                     if(d.category === oldCat) d.category = newCatName;
                 });
                 localStorage.setItem('shopDresses', JSON.stringify(dresses));
+                localStorage.setItem('globalShopDresses', JSON.stringify(dresses));
 
                 loadCategoriesDropdown();
                 document.getElementById('renameCatInput').value = '';
@@ -335,13 +336,14 @@
                 isNewArrival: isNewArrival
             };
 
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            // Global Storage Sync for all Telegram Accounts
+            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || JSON.parse(localStorage.getItem('globalShopDresses')) || [];
             dresses.unshift(newDress);
             localStorage.setItem('shopDresses', JSON.stringify(dresses));
+            localStorage.setItem('globalShopDresses', JSON.stringify(dresses));
 
             tg.showAlert(`✅ Dress "${name}" published successfully!`);
             
-            // Reset Form fields
             document.getElementById('newName').value = '';
             document.getElementById('newProductCode').value = '';
             document.getElementById('newSubCat').value = '';
