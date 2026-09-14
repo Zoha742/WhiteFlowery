@@ -9,12 +9,10 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-border: rgba(124, 58, 237, 0.3);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            --bg-color: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
         }
 
         body {
@@ -23,75 +21,75 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 100px 0;
             display: flex; justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.2) 0%, transparent 60%);
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: rgba(19, 28, 46, 0.9); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(10px); }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 14px; border-radius: 12px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
 
-        /* Profile Hero with Real User Image & 6 Digit ID */
+        /* Profile Hero with Dynamic Style & Copy ID Tag */
         .profile-hero {
-            background: linear-gradient(135deg, #131c2e 0%, #1e1b4b 100%);
-            border: 1px solid rgba(124, 58, 237, 0.4);
+            background: linear-gradient(135deg, #f5f3ff 0%, #fdf2f8 100%);
+            border: 1px solid #ddd6fe;
             border-radius: 24px;
             padding: 24px 20px;
             text-align: center;
             margin-bottom: 20px;
-            box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1);
             position: relative;
             overflow: hidden;
             animation: fadeInDown 0.6s ease-out;
         }
         .profile-avatar {
             width: 75px; height: 75px;
-            background: var(--accent-gradient);
+            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 30px; color: #fff;
             margin: 0 auto 12px auto;
-            border: 3px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+            border: 3px solid #fff;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
             overflow: hidden;
             object-fit: cover;
         }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { margin: 0 0 4px 0; font-size: 19px; font-weight: 800; color: #fff; }
+        .profile-name { margin: 0 0 4px 0; font-size: 19px; font-weight: 800; color: #111; }
         
         /* Clickable Copy ID Tag */
         .profile-id-tag {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: rgba(124, 58, 237, 0.25);
-            border: 1px solid rgba(124, 58, 237, 0.5);
+            background: #ede9fe;
+            border: 1px solid #c4b5fd;
             padding: 5px 14px; border-radius: 20px;
-            font-size: 11px; color: #d8b4fe; font-weight: bold;
+            font-size: 11px; color: #6d28d9; font-weight: bold;
             margin-top: 4px;
             cursor: pointer;
             transition: 0.2s;
         }
-        .profile-id-tag:active { background: rgba(124, 58, 237, 0.4); transform: scale(0.97); }
+        .profile-id-tag:active { background: #ddd6fe; transform: scale(0.97); }
 
         /* Admin Control Panel Banner */
         .admin-banner-card {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.18) 0%, rgba(124, 58, 237, 0.18) 100%);
-            border: 1px solid rgba(236, 72, 153, 0.4);
+            background: linear-gradient(135deg, #fdf2f8 0%, #f5f3ff 100%);
+            border: 1px solid #fbcfe8;
             border-radius: 18px; padding: 14px 16px; margin-bottom: 20px;
             display: flex; align-items: center; justify-content: space-between;
-            text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none; color: #111; transition: transform 0.2s, box-shadow 0.2s;
             animation: fadeInUp 0.6s ease-out;
+            box-shadow: 0 4px 12px rgba(236,72,153,0.08);
         }
         .admin-banner-card:active { transform: scale(0.98); }
         .admin-info { display: flex; align-items: center; gap: 12px; }
         .admin-icon-box {
-            width: 40px; height: 40px; background: var(--accent-gradient);
+            width: 40px; height: 40px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
             font-size: 18px; color: #fff; box-shadow: 0 4px 12px rgba(236,72,153,0.3);
         }
-        .admin-text h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
-        .admin-text p { margin: 0; font-size: 10px; color: #fbcfe8; }
+        .admin-text h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
+        .admin-text p { margin: 0; font-size: 10px; color: #6b7280; }
 
         /* Colorful & Animated Cardview Grid */
         .section-header { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 4px; }
@@ -99,21 +97,20 @@
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         
         .card-view {
-            background: linear-gradient(135deg, rgba(19, 28, 46, 0.85) 0%, rgba(30, 27, 75, 0.75) 100%);
-            border: 1px solid rgba(124, 58, 237, 0.3);
+            background: #ffffff;
+            border: 1px solid var(--card-border);
             border-radius: 18px; padding: 16px;
             text-decoration: none; color: var(--text-main);
             display: flex; flex-direction: column; justify-content: space-between;
             min-height: 100px; position: relative; overflow: hidden;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
             animation: fadeIn 0.8s ease-out;
         }
         .card-view:hover, .card-view:active {
             transform: translateY(-4px) scale(1.02);
-            border-color: #c084fc;
-            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
+            border-color: #7c3aed;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.15);
         }
         
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
@@ -122,31 +119,31 @@
             width: 40px; height: 40px; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 18px; color: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         .corner-badge {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff; font-size: 11px; font-weight: 800;
             padding: 3px 8px; border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
-        .card-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .card-title { margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #111; }
 
         /* Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            width: 100%; max-width: 480px; background: rgba(255, 255, 255, 0.95);
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(15px); box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
         }
         .nav-item {
             text-align: center; color: var(--text-muted);
             text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; transition: 0.2s;
         }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item.active { color: #7c3aed; transform: translateY(-2px); font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
 
         @keyframes fadeInDown {
@@ -179,7 +176,7 @@
             </div>
             <h2 class="profile-name" id="userNameDisplay">Loading...</h2>
             <div class="profile-id-tag" id="userIdDisplay" onclick="copyUserId()" title="Tap to copy ID">
-                <span id="idTextValue">ID: 884920</span> <i class="fa-regular fa-copy" style="font-size: 10px; color: #d8b4fe;"></i>
+                <span id="idTextValue">ID: 884920</span> <i class="fa-regular fa-copy" style="font-size: 10px; color: #6d28d9;"></i>
             </div>
         </div>
 
@@ -192,7 +189,7 @@
                     <p>Manage products, stock & support tickets</p>
                 </div>
             </div>
-            <i class="fa-solid fa-chevron-right" style="color: #fbcfe8; font-size: 12px;"></i>
+            <i class="fa-solid fa-chevron-right" style="color: #ec4899; font-size: 12px;"></i>
         </a>
 
         <!-- Dashboard Hub -->
