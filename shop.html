@@ -27,25 +27,23 @@
         .container { width: 100%; max-width: 480px; padding: 12px; box-sizing: border-box; }
 
         /* Top Filter & Sort Bar */
-        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
-        .filter-btn-box, .sort-select-box {
+        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+        .filter-select-box, .sort-select-box {
             flex: 1; background: #ffffff; border: 1px solid #d1d5db; padding: 10px 12px;
             border-radius: 6px; font-size: 13px; font-weight: 600; color: #374151;
             display: flex; align-items: center; justify-content: space-between; cursor: pointer;
             outline: none; box-sizing: border-box;
         }
-        .sort-select-box select { background: transparent; border: none; font-size: 13px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
+        .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 13px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
 
         /* Products Grid */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .product-card { background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 10px; }
         
-        /* Big Portrait Image Box - Full View without crop */
         .product-img-box { width: 100%; height: 260px; background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 6px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .product-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
-        /* Add to Cart Button */
         .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 11px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.3px; }
         .add-to-cart-btn:active { opacity: 0.85; }
 
@@ -79,9 +77,15 @@
     <div class="container">
         <!-- Top Filter & Sort Bar -->
         <div class="top-filter-bar">
-            <div class="filter-btn-box" onclick="toggleFilterModal()">
-                <span><i class="fa-solid fa-sliders"></i> Filter By</span>
-                <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+            <div class="filter-select-box">
+                <select id="categoryFilterDropdown" onchange="renderProducts()">
+                    <option value="All">All Category</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Party Wear">Party Wear</option>
+                    <option value="Casual Sets">Casual Sets</option>
+                    <option value="Gowns">Gowns</option>
+                </select>
             </div>
             <div class="sort-select-box">
                 <select id="sortDropdown" onchange="renderProducts()">
@@ -111,9 +115,7 @@
     <div id="quickViewModal" class="modal-overlay">
         <div class="modal-content">
             <span style="position:absolute; top:15px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('quickViewModal')">&times;</span>
-            <div id="modalBodyContent">
-                <!-- Dynamically filled on click -->
-            </div>
+            <div id="modalBodyContent"></div>
         </div>
     </div>
 
@@ -132,6 +134,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             forceCleanStorage();
+            loadCategoriesFilter();
             renderProducts();
         });
 
@@ -146,11 +149,31 @@
             localStorage.setItem('shopDresses', JSON.stringify(validDresses));
         }
 
+        function loadCategoriesFilter() {
+            let dropdown = document.getElementById('categoryFilterDropdown');
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'Party Wear', 'Casual Sets', 'Gowns'];
+            
+            let currentSelected = dropdown.value;
+            dropdown.innerHTML = `<option value="All">All Category</option>`;
+            
+            categories.forEach(cat => {
+                dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+            dropdown.value = currentSelected;
+        }
+
         function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
 
+            // Category Filter
+            if (selectedCategory !== 'All') {
+                dresses = dresses.filter(d => d.category === selectedCategory);
+            }
+
+            // Sorting logic
             if (sortType === 'price-low') {
                 dresses.sort((a, b) => a.price - b.price);
             } else if (sortType === 'price-high') {
@@ -165,7 +188,7 @@
             grid.innerHTML = '';
 
             if (currentFilteredDresses.length === 0) {
-                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: #666; padding: 40px; font-size: 13px;">No dresses found. Please add from admin panel.</div>`;
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: #666; padding: 40px; font-size: 13px;">No dresses found in this category.</div>`;
                 return;
             }
 
@@ -236,7 +259,6 @@
                 });
             }
 
-            // Video Option added inside Details Popup
             let videoSection = dress.video ? `
                 <div style="margin-top:12px;">
                     <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">PRODUCT VIDEO:</label>
@@ -311,10 +333,6 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        function toggleFilterModal() {
-            tg.showAlert("💡 Filter options can be customized based on categories!");
         }
     </script>
 </body>
