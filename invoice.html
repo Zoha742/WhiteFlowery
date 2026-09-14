@@ -43,7 +43,7 @@
         }
         .invoice-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; }
         .invoice-id { font-size: 13px; font-weight: bold; color: #c084fc; }
-        .invoice-status { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .invoice-status { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 6px; }
 
         .invoice-details { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
         .invoice-details span b { color: #fff; }
@@ -69,7 +69,7 @@
             z-index: 99999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
         .invoice-modal-box {
-            background: #fff; color: #1a1a1a; width: 100%; max-width: 380px;
+            background: #fff; color: #1a1a1a; width: 100%; max-width: 400px;
             max-height: 85vh; overflow-y: auto; border-radius: 16px; padding: 22px;
             position: relative;
         }
@@ -80,19 +80,23 @@
             cursor: pointer; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
-        /* Printable invoice template shared between the modal and direct download */
-        .invoice-paper-header { text-align: center; margin-bottom: 16px; }
+        /* Printable invoice template shared between the modal and direct download.
+           Rows use a fixed-width label + a flexible, wrapping value column so long
+           values (long item names, IDs, etc.) never overflow past the page edge. */
+        .invoice-paper-header { text-align: center; margin-bottom: 14px; }
         .invoice-paper-header h2 { margin: 0; color: #7c3aed; font-size: 21px; font-weight: 800; }
         .invoice-paper-header p { margin: 3px 0 0 0; font-size: 11px; color: #777; }
-        .invoice-paper-rows { border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; padding: 12px 0; margin-bottom: 16px; font-size: 12.5px; }
-        .invoice-paper-row { display: flex; justify-content: space-between; padding: 4px 0; }
-        .invoice-paper-row span:first-child { color: #666; }
-        .invoice-paper-row span:last-child { font-weight: 700; color: #111; }
-        .invoice-paper-total { display: flex; justify-content: space-between; align-items: center; font-size: 17px; font-weight: 800; color: #111; margin-bottom: 14px; }
+        .invoice-paper-rows { border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; padding: 10px 0; margin-bottom: 16px; }
+        .invoice-paper-row { display: flex; padding: 5px 0; font-size: 12px; gap: 10px; }
+        .invoice-paper-row .p-label { color: #666; width: 118px; flex-shrink: 0; }
+        .invoice-paper-row .p-value { flex: 1; min-width: 0; font-weight: 700; color: #111; text-align: right; word-break: break-word; overflow-wrap: anywhere; }
+        .invoice-paper-total { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; color: #111; margin-bottom: 14px; }
+        .invoice-paper-total span:last-child { word-break: break-word; text-align: right; }
         .invoice-paper-footer { text-align: center; font-size: 10px; color: #999; }
 
-        /* Hidden off-screen template used to generate a PDF without opening the modal */
-        #hiddenInvoiceTemplate { position: fixed; left: -9999px; top: 0; width: 340px; background: #fff; padding: 22px; box-sizing: border-box; }
+        /* Hidden off-screen template used to generate a PDF without opening the modal.
+           Sized generously (and explicitly captured at its full scroll size) so nothing clips. */
+        #hiddenInvoiceTemplate { position: fixed; left: -9999px; top: 0; width: 360px; background: #fff; padding: 22px; box-sizing: border-box; }
 
         /* Bottom Navigation Bar */
         .bottom-nav {
@@ -160,6 +164,29 @@
         let allInvoices = [];
         let currentViewIndex = null;
 
+        // ---------- Document-type helpers ----------
+        // inv.type may be 'purchase' (default), 'exchange', or 'cashback'.
+        // All of these extra fields (type, channel, userName, userId, time) are
+        // OPTIONAL and backward-compatible: older invoice records that don't
+        // have them will just skip those rows instead of breaking.
+        function getInvoiceType(inv) {
+            return inv.type || 'purchase';
+        }
+
+        function getStatusInfo(inv) {
+            let type = getInvoiceType(inv);
+            if (type === 'exchange') return { text: 'Exchange Processed', color: '#3b82f6', bg: 'rgba(59,130,246,0.15)', border: 'rgba(59,130,246,0.3)' };
+            if (type === 'cashback') return { text: 'Cashback Issued', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)' };
+            return { text: 'Paid & Confirmed', color: '#10b981', bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)' };
+        }
+
+        function getDocTitle(inv) {
+            let type = getInvoiceType(inv);
+            if (type === 'exchange') return 'Exchange Receipt';
+            if (type === 'cashback') return 'Cashback / Refund Receipt';
+            return 'Official Invoice / Receipt';
+        }
+
         // Load Invoices saved from Admin Panel automatically
         window.addEventListener('DOMContentLoaded', () => {
             let container = document.getElementById('invoiceContainer');
@@ -168,19 +195,21 @@
             if (allInvoices.length > 0) {
                 container.innerHTML = '';
                 allInvoices.forEach((inv, idx) => {
+                    let status = getStatusInfo(inv);
                     container.innerHTML += `
                         <div class="invoice-card">
                             <div class="invoice-header">
                                 <span class="invoice-id">#${inv.orderId}</span>
-                                <span class="invoice-status">Paid & Confirmed</span>
+                                <span class="invoice-status" style="color:${status.color}; background:${status.bg}; border:1px solid ${status.border};">${status.text}</span>
                             </div>
                             <div class="invoice-details">
                                 <span><b>Item:</b> ${inv.itemName}</span>
-                                <span><b>Date:</b> ${inv.date}</span>
+                                <span><b>Date:</b> ${inv.date}${inv.time ? ' , ' + inv.time : ''}</span>
                                 <span><b>Payment:</b> ${inv.method}</span>
+                                ${inv.channel ? `<span><b>Ordered Via:</b> ${inv.channel}</span>` : ''}
                             </div>
                             <div class="invoice-footer">
-                                <span class="invoice-total">৳ ${inv.amount.toLocaleString()}</span>
+                                <span class="invoice-total">৳ ${Number(inv.amount).toLocaleString()}</span>
                                 <div class="invoice-btn-group">
                                     <button class="view-btn" onclick="viewInvoice(${idx})"><i class="fa-solid fa-eye"></i> View</button>
                                     <button class="download-btn" onclick="downloadInvoicePdfByIndex(${idx})"><i class="fa-solid fa-file-pdf"></i> PDF</button>
@@ -195,21 +224,48 @@
         // Builds the clean, printable invoice markup shared by the View modal
         // and the direct-download hidden template (so both always look identical).
         function buildInvoicePaperHtml(inv) {
+            let type = getInvoiceType(inv);
+            let status = getStatusInfo(inv);
+
+            let rows = [];
+            rows.push(['Order ID', `#${inv.orderId}`]);
+            rows.push(['Date & Time', `${inv.date}${inv.time ? ' , ' + inv.time : ''}`]);
+            if (inv.userName) rows.push(['Customer Name', inv.userName]);
+            if (inv.userId) rows.push(['Customer ID', inv.userId]);
+            if (inv.channel) rows.push(['Ordered Via', inv.channel]);
+
+            if (type === 'exchange') {
+                rows.push(['Old Item', inv.itemName || 'N/A']);
+                if (inv.newItemName) rows.push(['New Item', inv.newItemName]);
+                if (inv.note) rows.push(['Note', inv.note]);
+            } else if (type === 'cashback') {
+                rows.push(['Related Item', inv.itemName || 'N/A']);
+                if (inv.note) rows.push(['Reason', inv.note]);
+            } else {
+                rows.push(['Item', inv.itemName || 'N/A']);
+            }
+
+            rows.push(['Payment Method', inv.method || 'N/A']);
+            rows.push(['Status', status.text, status.color]);
+
+            let rowsHtml = rows.map(r => {
+                let colorStyle = r[2] ? `color:${r[2]};` : '';
+                return `<div class="invoice-paper-row"><span class="p-label">${r[0]}</span><span class="p-value" style="${colorStyle}">${r[1]}</span></div>`;
+            }).join('');
+
+            let amountLabel = type === 'cashback' ? 'Cashback Amount' : (type === 'exchange' ? 'Price Adjustment' : 'Total Amount');
+
             return `
                 <div class="invoice-paper-header">
                     <h2>WhiteFlowery</h2>
-                    <p>Official Invoice / Receipt</p>
+                    <p>${getDocTitle(inv)}</p>
                 </div>
                 <div class="invoice-paper-rows">
-                    <div class="invoice-paper-row"><span>Order ID</span><span>#${inv.orderId}</span></div>
-                    <div class="invoice-paper-row"><span>Date</span><span>${inv.date}</span></div>
-                    <div class="invoice-paper-row"><span>Item</span><span>${inv.itemName}</span></div>
-                    <div class="invoice-paper-row"><span>Payment Method</span><span>${inv.method}</span></div>
-                    <div class="invoice-paper-row"><span>Status</span><span style="color:#10b981;">Paid & Confirmed</span></div>
+                    ${rowsHtml}
                 </div>
                 <div class="invoice-paper-total">
-                    <span>Total Amount</span>
-                    <span>৳ ${Number(inv.amount).toLocaleString()}</span>
+                    <span>${amountLabel}</span>
+                    <span>৳ ${Number(inv.amount || 0).toLocaleString()}</span>
                 </div>
                 <div class="invoice-paper-footer">Thank you for shopping with WhiteFlowery!</div>
             `;
@@ -228,7 +284,8 @@
 
         // Renders the invoice into an off-screen template, snapshots it as an
         // image (so Bengali text/৳ renders correctly), then drops that image
-        // into a PDF. Works whether or not the View modal is open.
+        // into a PDF. Captures at the template's actual full scroll size so
+        // nothing that overflows the visible box gets clipped.
         async function downloadInvoicePdfByIndex(idx) {
             if (idx === null || idx === undefined || !allInvoices[idx]) return;
             let inv = allInvoices[idx];
@@ -237,7 +294,17 @@
             hiddenBox.innerHTML = buildInvoicePaperHtml(inv);
 
             try {
-                let canvas = await html2canvas(hiddenBox, { scale: 2, backgroundColor: '#ffffff' });
+                let fullWidth = hiddenBox.scrollWidth;
+                let fullHeight = hiddenBox.scrollHeight;
+
+                let canvas = await html2canvas(hiddenBox, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    width: fullWidth,
+                    height: fullHeight,
+                    windowWidth: fullWidth,
+                    windowHeight: fullHeight
+                });
                 let imgData = canvas.toDataURL('image/png');
 
                 const { jsPDF } = window.jspdf;
