@@ -187,6 +187,7 @@
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -196,9 +197,13 @@
         let activeServiceType = null;
         let pendingExchangeReason = "";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadUserOrders();
-            setInterval(loadUserOrders, 1000); // Update timers every second
+        let CURRENT_ORDERS = [];   // এই বায়ারের অর্ডার, ক্লাউড থেকে লোড হওয়া
+        let EXCHANGE_DRESSES = []; // এক্সচেঞ্জ পিকারে দেখানো প্রোডাক্ট লিস্ট
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadUserOrders();          // ক্লাউড থেকে প্রথমবার লোড
+            setInterval(renderOrders, 1000);       // প্রতি সেকেন্ডে শুধু টাইমার রিফ্রেশ (নেটওয়ার্ক কল ছাড়া)
+            setInterval(loadUserOrders, 8000);     // প্রতি ৮ সেকেন্ডে ক্লাউড থেকে নতুন স্ট্যাটাস চেক
         });
 
         function formatDateTime(ts) {
@@ -217,9 +222,15 @@
             document.getElementById('imageZoomModal').style.display = 'none';
         }
 
-        function loadUserOrders() {
+        async function loadUserOrders() {
+            // এই টেলিগ্রাম আইডির অর্ডার শুধু — ক্লাউড ডাটাবেজ থেকে
+            CURRENT_ORDERS = await getMyOrders(currentUserId());
+            renderOrders();
+        }
+
+        function renderOrders() {
             let container = document.getElementById('ordersListContainer');
-            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            let orders = CURRENT_ORDERS;
 
             container.innerHTML = '';
 
@@ -309,8 +320,9 @@
                 `;
             });
 
+            // updated createdAt টাইমস্ট্যাম্প ক্লাউডে সিঙ্ক করা (কালেভদ্রে ঘটে)
             if (updated) {
-                localStorage.setItem('userOrders', JSON.stringify(orders));
+                orders.forEach(o => { if (o._key) updateOrder(o._key, { createdAt: o.createdAt }); });
             }
         }
 
@@ -343,17 +355,16 @@
             `;
         }
 
-        function cancelOrder(index) {
-            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
-            if (orders[index]) {
+        async function cancelOrder(index) {
+            let order = CURRENT_ORDERS[index];
+            if (order) {
                 let currentTime = Date.now();
-                let elapsedMs = currentTime - (orders[index].createdAt || currentTime);
+                let elapsedMs = currentTime - (order.createdAt || currentTime);
                 let tenMinutesMs = 10 * 60 * 1000;
 
                 if (elapsedMs <= tenMinutesMs) {
-                    orders[index].status = 'Cancelled';
-                    localStorage.setItem('userOrders', JSON.stringify(orders));
-                    loadUserOrders();
+                    await updateOrder(order._key, { status: 'Cancelled' });
+                    await loadUserOrders();
                     tg.showAlert("✅ Order cancelled successfully within the 10-minute window!");
                 } else {
                     tg.showAlert("⚠️ 10-minute cancellation window has expired!");
@@ -394,9 +405,11 @@
         }
 
         // ---------- Exchange replacement product picker ----------
-        function openExchangePicker() {
+        async function openExchangePicker() {
             let grid = document.getElementById('exchangeProductGrid');
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; font-size:11px; padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>`;
+            let dresses = await getDresses();
+            EXCHANGE_DRESSES = dresses;
 
             if (dresses.length === 0) {
                 grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; font-size:11px; padding:20px;">No products available right now.</div>`;
@@ -421,7 +434,7 @@
         }
 
         function selectExchangeProduct(dressIndex) {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+            let dresses = EXCHANGE_DRESSES;
             let dress = dresses[dressIndex];
             if (!dress) return;
 
@@ -439,13 +452,12 @@
             tg.showAlert(`✅ Exchange request submitted for "${dress.name}"! Our team will review it soon.`);
         }
 
-        function saveServiceRequest(serviceRequest) {
+        async function saveServiceRequest(serviceRequest) {
             if (activeServiceOrderIndex === null) return;
-            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
-            if (orders[activeServiceOrderIndex]) {
-                orders[activeServiceOrderIndex].serviceRequest = serviceRequest;
-                localStorage.setItem('userOrders', JSON.stringify(orders));
-                loadUserOrders();
+            let order = CURRENT_ORDERS[activeServiceOrderIndex];
+            if (order) {
+                await updateOrder(order._key, { serviceRequest: serviceRequest });
+                await loadUserOrders();
             }
             activeServiceOrderIndex = null;
             activeServiceType = null;
