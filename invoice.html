@@ -6,7 +6,9 @@
     <title>WhiteFlowery - My Invoices</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         :root {
             --bg-color: #080b12;
@@ -46,18 +48,51 @@
         .invoice-details { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
         .invoice-details span b { color: #fff; }
 
-        .invoice-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; }
+        .invoice-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 10px; gap: 8px; }
         .invoice-total { font-size: 14px; font-weight: bold; color: #fbbf24; }
-        
-        .download-btn {
-            background: var(--primary-gradient); border: none; color: #fff;
+
+        .invoice-btn-group { display: flex; gap: 6px; }
+        .view-btn, .download-btn {
+            border: none; color: #fff;
             padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
             cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
         }
-        .download-btn:active { transform: scale(0.96); }
+        .view-btn { background: #1e293b; border: 1px solid var(--card-border); color: #c084fc; }
+        .download-btn { background: var(--primary-gradient); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4); }
+        .view-btn:active, .download-btn:active { transform: scale(0.96); }
 
         .no-invoice { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 13px; line-height: 1.6; }
+
+        /* Invoice View Modal (rendered in a light, print-friendly style) */
+        .invoice-modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            z-index: 99999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+        }
+        .invoice-modal-box {
+            background: #fff; color: #1a1a1a; width: 100%; max-width: 380px;
+            max-height: 85vh; overflow-y: auto; border-radius: 16px; padding: 22px;
+            position: relative;
+        }
+        .invoice-modal-close { position: absolute; top: 10px; right: 14px; font-size: 22px; cursor: pointer; color: #444; }
+        .invoice-modal-download-btn {
+            background: var(--primary-gradient); border: none; color: #fff; width: 100%;
+            padding: 10px; border-radius: 10px; font-weight: 700; font-size: 13px;
+            cursor: pointer; margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+
+        /* Printable invoice template shared between the modal and direct download */
+        .invoice-paper-header { text-align: center; margin-bottom: 16px; }
+        .invoice-paper-header h2 { margin: 0; color: #7c3aed; font-size: 21px; font-weight: 800; }
+        .invoice-paper-header p { margin: 3px 0 0 0; font-size: 11px; color: #777; }
+        .invoice-paper-rows { border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; padding: 12px 0; margin-bottom: 16px; font-size: 12.5px; }
+        .invoice-paper-row { display: flex; justify-content: space-between; padding: 4px 0; }
+        .invoice-paper-row span:first-child { color: #666; }
+        .invoice-paper-row span:last-child { font-weight: 700; color: #111; }
+        .invoice-paper-total { display: flex; justify-content: space-between; align-items: center; font-size: 17px; font-weight: 800; color: #111; margin-bottom: 14px; }
+        .invoice-paper-footer { text-align: center; font-size: 10px; color: #999; }
+
+        /* Hidden off-screen template used to generate a PDF without opening the modal */
+        #hiddenInvoiceTemplate { position: fixed; left: -9999px; top: 0; width: 340px; background: #fff; padding: 22px; box-sizing: border-box; }
 
         /* Bottom Navigation Bar */
         .bottom-nav {
@@ -96,6 +131,20 @@
         </div>
     </div>
 
+    <!-- View Invoice Modal -->
+    <div id="invoiceViewModal" class="invoice-modal-overlay">
+        <div class="invoice-modal-box">
+            <span class="invoice-modal-close" onclick="closeInvoiceView()">&times;</span>
+            <div id="invoicePrintArea"></div>
+            <button class="invoice-modal-download-btn" onclick="downloadInvoicePdfByIndex(currentViewIndex)">
+                <i class="fa-solid fa-file-pdf"></i> Download as PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden template used to render + snapshot a PDF without opening the modal -->
+    <div id="hiddenInvoiceTemplate"></div>
+
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
@@ -108,14 +157,17 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
+        let allInvoices = [];
+        let currentViewIndex = null;
+
         // Load Invoices saved from Admin Panel automatically
         window.addEventListener('DOMContentLoaded', () => {
             let container = document.getElementById('invoiceContainer');
-            let savedInvoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
+            allInvoices = JSON.parse(localStorage.getItem('userInvoices')) || [];
 
-            if(savedInvoices.length > 0) {
+            if (allInvoices.length > 0) {
                 container.innerHTML = '';
-                savedInvoices.forEach(inv => {
+                allInvoices.forEach((inv, idx) => {
                     container.innerHTML += `
                         <div class="invoice-card">
                             <div class="invoice-header">
@@ -129,9 +181,10 @@
                             </div>
                             <div class="invoice-footer">
                                 <span class="invoice-total">৳ ${inv.amount.toLocaleString()}</span>
-                                <button class="download-btn" onclick="downloadInvoice('${inv.orderId}', '${inv.itemName}', ${inv.amount})">
-                                    <i class="fa-solid fa-download"></i> Download
-                                </button>
+                                <div class="invoice-btn-group">
+                                    <button class="view-btn" onclick="viewInvoice(${idx})"><i class="fa-solid fa-eye"></i> View</button>
+                                    <button class="download-btn" onclick="downloadInvoicePdfByIndex(${idx})"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -139,27 +192,66 @@
             }
         });
 
-        // Download Invoice Simulation / File Generation
-        function downloadInvoice(orderId, itemName, amount) {
-            let receiptText = `WHITEFLOWERY OFFICIAL INVOICE\\n` +
-                              `--------------------------------\\n` +
-                              `Order ID: #${orderId}\\n` +
-                              `Item: ${itemName}\\n` +
-                              `Total Amount: ৳ ${amount}\\n` +
-                              `Status: Paid & Verified\\n` +
-                              `--------------------------------\\n` +
-                              `Thank you for shopping with us!`;
+        // Builds the clean, printable invoice markup shared by the View modal
+        // and the direct-download hidden template (so both always look identical).
+        function buildInvoicePaperHtml(inv) {
+            return `
+                <div class="invoice-paper-header">
+                    <h2>WhiteFlowery</h2>
+                    <p>Official Invoice / Receipt</p>
+                </div>
+                <div class="invoice-paper-rows">
+                    <div class="invoice-paper-row"><span>Order ID</span><span>#${inv.orderId}</span></div>
+                    <div class="invoice-paper-row"><span>Date</span><span>${inv.date}</span></div>
+                    <div class="invoice-paper-row"><span>Item</span><span>${inv.itemName}</span></div>
+                    <div class="invoice-paper-row"><span>Payment Method</span><span>${inv.method}</span></div>
+                    <div class="invoice-paper-row"><span>Status</span><span style="color:#10b981;">Paid & Confirmed</span></div>
+                </div>
+                <div class="invoice-paper-total">
+                    <span>Total Amount</span>
+                    <span>৳ ${Number(inv.amount).toLocaleString()}</span>
+                </div>
+                <div class="invoice-paper-footer">Thank you for shopping with WhiteFlowery!</div>
+            `;
+        }
 
-            let blob = new Blob([receiptText.replace(/\\n/g, '\\r\\n')], { type: 'text/plain;charset=utf-8' });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = `Invoice_${orderId}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            tg.showAlert(`📥 Invoice #${orderId} downloaded successfully!`);
+        function viewInvoice(idx) {
+            currentViewIndex = idx;
+            let inv = allInvoices[idx];
+            document.getElementById('invoicePrintArea').innerHTML = buildInvoicePaperHtml(inv);
+            document.getElementById('invoiceViewModal').style.display = 'flex';
+        }
+
+        function closeInvoiceView() {
+            document.getElementById('invoiceViewModal').style.display = 'none';
+        }
+
+        // Renders the invoice into an off-screen template, snapshots it as an
+        // image (so Bengali text/৳ renders correctly), then drops that image
+        // into a PDF. Works whether or not the View modal is open.
+        async function downloadInvoicePdfByIndex(idx) {
+            if (idx === null || idx === undefined || !allInvoices[idx]) return;
+            let inv = allInvoices[idx];
+
+            let hiddenBox = document.getElementById('hiddenInvoiceTemplate');
+            hiddenBox.innerHTML = buildInvoicePaperHtml(inv);
+
+            try {
+                let canvas = await html2canvas(hiddenBox, { scale: 2, backgroundColor: '#ffffff' });
+                let imgData = canvas.toDataURL('image/png');
+
+                const { jsPDF } = window.jspdf;
+                let pdfWidth = canvas.width / 2;
+                let pdfHeight = canvas.height / 2;
+                let pdf = new jsPDF({ unit: 'px', format: [pdfWidth, pdfHeight] });
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`Invoice_${inv.orderId}.pdf`);
+
+                tg.showAlert(`📥 Invoice #${inv.orderId} downloaded as PDF!`);
+            } catch (err) {
+                console.error("PDF generation failed:", err);
+                tg.showAlert("⚠️ Could not generate PDF. Please try again.");
+            }
         }
     </script>
 </body>
