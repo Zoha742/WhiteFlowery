@@ -51,6 +51,19 @@
         .service-detail-box { background: #fff; border: 1px dashed var(--card-border); border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
         .service-detail-box b { color: #111; }
         .service-type-pill { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 4px; }
+
+        .img-thumb-wrap { position: relative; flex-shrink: 0; }
+        .view-badge {
+            position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            background: #7c3aed; color: #fff; font-size: 8px; font-weight: bold; padding: 1px 6px;
+            border-radius: 5px; display: flex; align-items: center; gap: 2px; white-space: nowrap; cursor: pointer;
+        }
+        .order-date-line { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .replacement-thumb { width: 44px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); vertical-align: middle; margin-right: 6px; cursor: pointer; }
+        .replacement-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+
+        .customer-lookup-card { border: 1px solid #ddd6fe; background: #f5f3ff; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+        .customer-lookup-header { font-size: 12px; font-weight: 800; color: #7c3aed; margin-bottom: 6px; }
     </style>
 </head>
 <body>
@@ -68,6 +81,15 @@
             <button class="btn-sm btn-accept" onclick="switchOrderSub('accepted')">Accepted History</button>
             <button class="btn-sm btn-cancel" onclick="switchOrderSub('rejected')">Rejected History</button>
             <button class="btn-sm" style="background:#7c3aed;" onclick="switchOrderSub('exchange')">Exchange & Refund</button>
+        </div>
+
+        <!-- Customer Lookup (shown while search box has text) -->
+        <div id="sub-search" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#7c3aed;"><i class="fa-solid fa-user-magnifying-glass"></i> Customer Lookup</h4>
+            <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">All orders & exchange/refund requests for this User ID / Name.</p>
+            <div class="list-box" id="searchResultsContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">Type a User ID or Name above.</div>
+            </div>
         </div>
 
         <!-- Live Orders -->
@@ -116,6 +138,14 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
+        let lastActiveTab = 'live';
+
+        function formatDateTime(ts) {
+            if (!ts) return 'N/A';
+            let d = new Date(ts);
+            return d.toLocaleDateString() + ' , ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             loadAllOrders();
         });
@@ -153,29 +183,7 @@
                     `;
                 }
 
-                let itemHtml = `
-                    <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
-                        <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
-                        <div class="order-info">
-                            <div class="item-header">
-                                <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
-                                <span class="item-badge" style="${order.status === 'Accepted' ? 'color:#059669; background:#ecfdf5;' : order.status === 'Rejected' ? 'color:#dc2626; background:#fee2e2;' : ''}">${order.status || 'Pending'}</span>
-                            </div>
-                            <div class="item-body">
-                                <b>Customer:</b> ${order.userName || 'Customer'}<br>
-                                <b>Items:</b> ${itemsDesc}<br>
-                                <b>Total:</b> Tk ${Number(order.totalAmount || 0).toLocaleString()}.00
-                            </div>
-                            ${order.status === 'Pending' || !order.status ? `
-                                <div class="action-row">
-                                    <button class="btn-sm btn-accept" onclick="updateOrderStatus(${index}, 'Accepted')">Accept</button>
-                                    <button class="btn-sm btn-cancel" onclick="updateOrderStatus(${index}, 'Rejected')">Reject</button>
-                                </div>
-                            ` : ''}
-                            ${exchangeToggleHtml}
-                        </div>
-                    </div>
-                `;
+                let itemHtml = buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml);
 
                 if(order.status === 'Accepted') {
                     hasAccepted = true;
@@ -210,7 +218,17 @@
             let statusColor = sr.status === 'Delivered' ? '#059669' : sr.status === 'Rejected' ? '#dc2626' : sr.status === 'Processing' ? '#2563eb' : '#d97706';
             let statusBg = sr.status === 'Delivered' ? '#ecfdf5' : sr.status === 'Rejected' ? '#fee2e2' : sr.status === 'Processing' ? '#dbeafe' : '#fef3c7';
 
-            let newItemLine = (sr.type === 'exchange' && sr.newItem) ? `<br><b>Replacement Item:</b> ${sr.newItem.name} (৳ ${Number(sr.newItem.price).toLocaleString()})` : '';
+            // Show the replacement product's own photo + a View button (this was previously text-only)
+            let replacementHtml = (sr.type === 'exchange' && sr.newItem)
+                ? `<div class="replacement-row">
+                       <img src="${sr.newItem.image || 'https://via.placeholder.com/100'}" class="replacement-thumb" onclick="viewModalImage(this.src)">
+                       <div>
+                           <div><b>Replacement:</b> ${sr.newItem.name}</div>
+                           <div>৳ ${Number(sr.newItem.price).toLocaleString()}</div>
+                       </div>
+                       <span class="view-badge" style="position:static; transform:none;" onclick="viewModalImage('${sr.newItem.image || ''}')"><i class="fa-solid fa-eye"></i> View</span>
+                   </div>`
+                : '';
 
             let actionButtons = '';
             if (sr.status === 'Requested') {
@@ -231,18 +249,23 @@
 
             return `
                 <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
-                    <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                    <div class="img-thumb-wrap">
+                        <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                        <span class="view-badge" onclick="viewModalImage('${imgUrl}')"><i class="fa-solid fa-eye"></i> View</span>
+                    </div>
                     <div class="order-info">
                         <div class="item-header">
                             <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
                             <span class="item-badge" style="color:${statusColor}; background:${statusBg};">${sr.status}</span>
                         </div>
                         <div class="item-body">
-                            <b>Customer:</b> ${order.userName || 'Customer'}
+                            <b>Customer:</b> ${order.userName || 'Customer'} ${order.userId ? `(ID: ${order.userId})` : ''}
                             <span class="service-type-pill" style="color:${typeColor}; background:${typeBg};">${sr.type}</span>
+                            <div class="order-date-line"><i class="fa-regular fa-clock"></i> Requested: ${formatDateTime(sr.requestedAt)}</div>
                         </div>
                         <div class="service-detail-box">
-                            <b>Reason:</b> ${sr.reason}${newItemLine}
+                            <b>Reason:</b> ${sr.reason}
+                            ${replacementHtml}
                         </div>
                         ${actionButtons}
                     </div>
@@ -250,7 +273,56 @@
             `;
         }
 
-        function updateOrderStatus(index, newStatus) {
+        function buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml) {
+            let serviceSummaryHtml = '';
+            if (order.serviceRequest) {
+                let sr = order.serviceRequest;
+                let typeColor = sr.type === 'exchange' ? '#7c3aed' : '#d97706';
+                let typeBg = sr.type === 'exchange' ? '#ede9fe' : '#fef3c7';
+                let replacementHtml = (sr.type === 'exchange' && sr.newItem)
+                    ? `<div class="replacement-row">
+                           <img src="${sr.newItem.image || 'https://via.placeholder.com/100'}" class="replacement-thumb" onclick="viewModalImage(this.src)">
+                           <span>${sr.newItem.name} (৳ ${Number(sr.newItem.price).toLocaleString()})</span>
+                       </div>`
+                    : '';
+                serviceSummaryHtml = `
+                    <div class="service-detail-box">
+                        <span class="service-type-pill" style="color:${typeColor}; background:${typeBg};">${sr.type}</span>
+                        <b>Status:</b> ${sr.status} &nbsp;|&nbsp; <b>Reason:</b> ${sr.reason}
+                        ${replacementHtml}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
+                    <div class="img-thumb-wrap">
+                        <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                        <span class="view-badge" onclick="viewModalImage('${imgUrl}')"><i class="fa-solid fa-eye"></i> View</span>
+                    </div>
+                    <div class="order-info">
+                        <div class="item-header">
+                            <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
+                            <span class="item-badge" style="${order.status === 'Accepted' ? 'color:#059669; background:#ecfdf5;' : order.status === 'Rejected' ? 'color:#dc2626; background:#fee2e2;' : ''}">${order.status || 'Pending'}</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Customer:</b> ${order.userName || 'Customer'} ${order.userId ? `(ID: ${order.userId})` : ''}<br>
+                            <b>Items:</b> ${itemsDesc}<br>
+                            <b>Total:</b> Tk ${Number(order.totalAmount || 0).toLocaleString()}.00
+                            <div class="order-date-line"><i class="fa-regular fa-clock"></i> ${formatDateTime(order.createdAt)}</div>
+                        </div>
+                        ${order.status === 'Pending' || !order.status ? `
+                            <div class="action-row">
+                                <button class="btn-sm btn-accept" onclick="updateOrderStatus(${index}, 'Accepted')">Accept</button>
+                                <button class="btn-sm btn-cancel" onclick="updateOrderStatus(${index}, 'Rejected')">Reject</button>
+                            </div>
+                        ` : ''}
+                        ${exchangeToggleHtml}
+                        ${serviceSummaryHtml}
+                    </div>
+                </div>
+            `;
+        }
             let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
             if(orders[index]) {
                 orders[index].status = newStatus;
@@ -283,20 +355,68 @@
         }
 
         function switchOrderSub(subId) {
+            lastActiveTab = subId;
             document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
             document.getElementById(`sub-${subId}`).style.display = 'block';
         }
         function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
         function viewModalImage(imgUrl) {
+            if (!imgUrl) return;
             document.getElementById('modalImgSrc').src = imgUrl;
             document.getElementById('imageModal').style.display = 'flex';
         }
+
+        // Typing a User ID or Name now pulls together EVERY order (any status)
+        // and every exchange/refund request for that customer into one list,
+        // instead of just hiding/showing items inside whichever tab happened
+        // to be open (which made it look like "no results" if the match was
+        // sitting in a different tab).
         function filterOrdersByUserId() {
             let query = document.getElementById('searchUserId').value.trim().toLowerCase();
-            document.querySelectorAll('.list-item').forEach(item => {
-                let uid = item.getAttribute('data-userid') || "";
-                item.style.display = uid.toLowerCase().includes(query) ? "flex" : "none";
-            });
+
+            if (!query) {
+                switchOrderSub(lastActiveTab || 'live');
+                return;
+            }
+
+            document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
+            document.getElementById('sub-search').style.display = 'block';
+
+            let orders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            let container = document.getElementById('searchResultsContainer');
+
+            let matches = orders
+                .map((o, idx) => ({ order: o, index: idx }))
+                .filter(({ order }) => {
+                    let uid = (order.userId || '').toString().toLowerCase();
+                    let uname = (order.userName || '').toString().toLowerCase();
+                    return uid.includes(query) || uname.includes(query);
+                });
+
+            if (matches.length === 0) {
+                container.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No orders found for "${query}".</div>`;
+                return;
+            }
+
+            container.innerHTML = matches.map(({ order, index }) => {
+                let itemsDesc = (order.items && order.items.length > 0)
+                    ? order.items.map(i => `${i.name} (Size: ${i.size || 'N/A'}, Qty: ${i.qty})`).join(', ')
+                    : 'N/A';
+                let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+
+                let exchangeToggleHtml = '';
+                if (order.status === 'Accepted') {
+                    exchangeToggleHtml = `
+                        <div class="action-row">
+                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled(${index})">
+                                <i class="fa-solid fa-rotate"></i> ${order.exchangeEnabled ? 'Exchange/Refund: ON' : 'Enable Exchange/Refund'}
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml);
+            }).join('');
         }
     </script>
 </body>
