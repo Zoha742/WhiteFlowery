@@ -11,10 +11,11 @@
    3. উপরে যে URL দেখাবে সেটা কপি করে নিচের DB_URL এ বসান।
         উদাহরণ: https://whiteflowery-1234-default-rtdb.firebaseio.com
         (শেষে / বা .json দেবেন না)
-   4. নিচের ADMIN_IDS এ আপনার নিজের Telegram user id বসান।
-        আপনার id জানতে টেলিগ্রামে @userinfobot এ /start দিন।
-   5. চারটা HTML + এই db.js একসাথে একই ফোল্ডারে হোস্ট করুন
+   4. সব HTML ফাইল + এই db.js একসাথে একই ফোল্ডারে হোস্ট করুন
       (GitHub Pages / Netlify — দুটোই ফ্রি)।
+
+   এই অ্যাপ এখন সম্পূর্ণ ফ্রি/খোলা — কোনো Telegram user id বসাতে
+   হবে না, যে কেউ প্রোডাক্ট অ্যাড ও অর্ডার ম্যানেজ করতে পারবে।
 
    ⚠️ Test mode ৩০ দিন পর বন্ধ হয়ে যায়। তার আগে Rules ট্যাবে গিয়ে
       নিচের মতো দিন (সবাই পড়তে পারবে, লিখতে পারবে — পরে বট দিয়ে
@@ -24,10 +25,15 @@
       }
    ============================================================ */
 
-const DB_URL = "https://YOUR-PROJECT-default-rtdb.firebaseio.com";
+const DB_URL = "https://shop-6f00f-default-rtdb.firebaseio.com";
 
-/* আপনার Telegram user id (একাধিক অ্যাডমিন হলে কমা দিয়ে লিখুন) */
-const ADMIN_IDS = [123456789];
+/* আপনার Telegram user id (ঐচ্ছিক)।
+   এই অ্যাপ এখন সবার জন্য ফ্রি/খোলা রাখা হয়েছে, তাই ADMIN_IDS
+   খালি রাখা আছে এবং requireAdmin() কিছুই আটকায় না।
+   ভবিষ্যতে যদি dressadd/ordermanage শুধু নিজের জন্য লক করতে চান,
+   এখানে নিজের আইডি বসিয়ে নিচের requireAdmin() ফাংশনের
+   ভেতরের "return;" লাইনটা মুছে দিলেই লক আবার চালু হয়ে যাবে। */
+const ADMIN_IDS = [];
 
 const DEFAULT_CATEGORIES = ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
 
@@ -141,6 +147,33 @@ async function placeOrder(order) {
 async function updateOrder(key, patch) { return dbUpdate("orders", key, patch); }
 async function deleteOrder(key)        { return dbDelete("orders", key); }
 
+/* ---------------- Notifications (broadcast) ---------------- */
+
+async function getNotifications() {
+  const list = await dbGetList("notifications");
+  return list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+async function saveNotification(notif) {
+  notif.createdAt = Date.now();
+  return await dbPush("notifications", notif);
+}
+
+/* ---------------- Support tickets ---------------- */
+
+async function getSupportTickets() {
+  const list = await dbGetList("supportTickets");
+  return list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+async function saveSupportTicket(ticket) {
+  ticket.createdAt = Date.now();
+  ticket.userId = currentUserId();
+  ticket.userName = currentUserName();
+  ticket.status = ticket.status || "Open";
+  return await dbPush("supportTickets", ticket);
+}
+
 /* ---------------- Telegram user ---------------- */
 
 function currentUserId() {
@@ -160,10 +193,13 @@ function currentUserName() {
 }
 
 /* ---------------- Admin guard ----------------
-   dressadd.html ও ordermanage.html এর শুরুতে কল করা আছে।
-   ADMIN_IDS এ নিজের id না বসানো পর্যন্ত পেজ খুলবে না।             */
+   এই অ্যাপ এখন সবার জন্য ফ্রি/খোলা — requireAdmin() কল হলেও
+   কিছু আটকায় না। পরে লক করতে চাইলে নিচের "return;" লাইনটা মুছে দিন
+   এবং ADMIN_IDS এ নিজের Telegram id বসান।                        */
 
 function requireAdmin() {
+  return; // ডেমো/ফ্রি মোড — কোনো লক নেই
+  // eslint-disable-next-line no-unreachable
   if (!ADMIN_IDS.map(String).includes(String(currentUserId()))) {
     document.body.innerHTML =
       '<div style="padding:60px 20px;text-align:center;font-family:sans-serif;color:#111">' +
