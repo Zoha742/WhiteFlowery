@@ -45,15 +45,25 @@
         .product-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
+        /* Wishlist Heart Icon Button */
+        .wishlist-btn {
+            position: absolute; top: 8px; right: 8px; width: 30px; height: 30px;
+            background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #666; font-size: 14px; cursor: pointer; z-index: 5; transition: 0.2s;
+        }
+        .wishlist-btn:hover, .wishlist-btn.active { color: #ec4899; background: #fff; }
+
         .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 11px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.3px; }
         .add-to-cart-btn:active { opacity: 0.85; }
 
+        .product-code { font-size: 10px; color: #7c3aed; text-align: center; font-weight: 700; margin-bottom: 2px; }
         .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 500; color: #1f2937; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: var(--price-color); text-align: center; }
 
         .quick-view-link { font-size: 11px; color: #7c3aed; text-align: center; cursor: pointer; font-weight: 600; text-decoration: underline; margin-bottom: 4px; }
 
-        /* Modals & Popups (Full White Theme) */
+        /* Modals & Popups */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99999; justify-content: center; align-items: flex-end; }
         .modal-content { background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; position: relative; text-align: left; color: #111; animation: slideUp 0.3s ease; }
         
@@ -133,21 +143,9 @@
         let currentFilteredDresses = [];
 
         window.addEventListener('DOMContentLoaded', () => {
-            forceCleanStorage();
             loadCategoriesFilter();
             renderProducts();
         });
-
-        function forceCleanStorage() {
-            let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
-            let validDresses = dresses.filter(d => {
-                let name = (d.name || "").toLowerCase();
-                let isUnsplash = d.image && d.image.includes('unsplash.com');
-                let isRoyalSilk = name.includes('royal silk') || d.id === 'WF-1';
-                return !isUnsplash && !isRoyalSilk && d.name;
-            });
-            localStorage.setItem('shopDresses', JSON.stringify(validDresses));
-        }
 
         function loadCategoriesFilter() {
             let dropdown = document.getElementById('categoryFilterDropdown');
@@ -167,13 +165,12 @@
             let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
             let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
+            let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
 
-            // Category Filter
             if (selectedCategory !== 'All') {
                 dresses = dresses.filter(d => d.category === selectedCategory);
             }
 
-            // Sorting logic
             if (sortType === 'price-low') {
                 dresses.sort((a, b) => a.price - b.price);
             } else if (sortType === 'price-high') {
@@ -181,7 +178,7 @@
             } else if (sortType === 'old') {
                 // keep original order
             } else {
-                dresses.reverse(); // new to old
+                dresses.reverse();
             }
 
             currentFilteredDresses = dresses;
@@ -198,15 +195,20 @@
                     mainImg = dress.images[0];
                 }
 
+                let isWished = wishlist.some(w => w.name === dress.name);
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
                         <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
+                            <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
+                                <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
+                            </button>
                             <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
                         <div>
+                            ${dress.productCode ? `<div class="product-code">Code: ${dress.productCode}</div>` : ''}
                             <h4 class="product-title">${dress.name}</h4>
                             <p class="product-price">Tk ${Number(dress.price).toLocaleString()}.00</p>
                             <div class="quick-view-link" onclick="openQuickView(${index})">View Size & Details</div>
@@ -214,6 +216,33 @@
                     </div>
                 `;
             });
+        }
+
+        function toggleWishlist(index, btn) {
+            let dress = currentFilteredDresses[index];
+            if (!dress) return;
+
+            let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
+            let existingIdx = wishlist.findIndex(w => w.name === dress.name);
+
+            if (existingIdx !== -1) {
+                wishlist.splice(existingIdx, 1);
+                btn.classList.remove('active');
+                btn.innerHTML = `<i class="fa-regular fa-heart"></i>`;
+                tg.showAlert("🗑️ Removed from wishlist!");
+            } else {
+                wishlist.push({
+                    name: dress.name,
+                    price: dress.price,
+                    image: dress.image || (dress.images ? dress.images[0] : ''),
+                    size: 'M',
+                    qty: 1
+                });
+                btn.classList.add('active');
+                btn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+                tg.showAlert("❤️ Added to wishlist!");
+            }
+            localStorage.setItem('wishlistItems', JSON.stringify(wishlist));
         }
 
         function openZoomModal(encodedImages) {
@@ -271,6 +300,7 @@
                 <div style="display:flex; gap:12px; margin-bottom:14px;">
                     <img id="modalMainImg" src="${mainImg}" style="width:90px; height:110px; object-fit:contain; border-radius:8px; background:#f9fafb; border:1px solid #f3f4f6;">
                     <div>
+                        ${dress.productCode ? `<span style="font-size:10px; color:#7c3aed; font-weight:bold;">Code: ${dress.productCode}</span>` : ''}
                         <h4 style="margin:0 0 4px 0; font-size:15px; color:#111;">${dress.name}</h4>
                         <p style="margin:0 0 6px 0; font-size:15px; font-weight:bold; color:#111;">Tk ${Number(dress.price).toLocaleString()}.00</p>
                         <span id="modalStockText" style="font-size:11px; color:#059669; font-weight:bold; background:#ecfdf5; padding:2px 6px; border-radius:4px;">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
