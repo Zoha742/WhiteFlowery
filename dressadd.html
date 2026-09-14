@@ -73,6 +73,12 @@
                 <input type="text" id="newName" class="form-control" placeholder="e.g. Winter Velvet Frock">
             </div>
 
+            <!-- Product Code Input -->
+            <div class="form-group">
+                <label>Product Code (e.g. WF-101)</label>
+                <input type="text" id="newProductCode" class="form-control" placeholder="WF-101">
+            </div>
+
             <!-- Home Section Display Settings -->
             <div class="checkbox-row">
                 <label><input type="checkbox" id="isTrending"> 🔥 Trending Dress</label>
@@ -211,7 +217,6 @@
                 categories[index] = newCatName;
                 localStorage.setItem('shopCategories', JSON.stringify(categories));
 
-                // Also update category names in existing dresses
                 let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
                 dresses.forEach(d => {
                     if(d.category === oldCat) d.category = newCatName;
@@ -277,6 +282,7 @@
 
         async function publishDress() {
             let name = document.getElementById('newName').value.trim();
+            let productCode = document.getElementById('newProductCode').value.trim();
             let cat = document.getElementById('newCat').value;
             let subCat = document.getElementById('newSubCat').value.trim();
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
@@ -314,6 +320,7 @@
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
+                productCode: productCode || 'WF-CODE',
                 name: name,
                 category: cat,
                 subCategory: subCat,
@@ -336,6 +343,7 @@
             
             // Reset Form fields
             document.getElementById('newName').value = '';
+            document.getElementById('newProductCode').value = '';
             document.getElementById('newSubCat').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
