@@ -8,40 +8,40 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; background: #fff; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #ec4899, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
 
-        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 16px; margin-bottom: 16px; }
-        .card-title { font-size: 13px; font-weight: 700; color: #fff; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 13px; font-weight: 700; color: #111; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
 
         .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
-        .form-control { width: 100%; background: #0b0f19; border: 1px solid var(--card-border); color: #fff; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+        .form-control { width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
         textarea.form-control { resize: none; height: 70px; }
         
-        .checkbox-row { display: flex; gap: 15px; background: #0b0f19; border: 1px solid var(--card-border); padding: 10px; border-radius: 8px; margin-bottom: 12px; align-items: center; }
-        .checkbox-row label { font-size: 11px; color: #fff; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
+        .checkbox-row { display: flex; gap: 15px; background: #f9fafb; border: 1px solid var(--card-border); padding: 10px; border-radius: 8px; margin-bottom: 12px; align-items: center; }
+        .checkbox-row label { font-size: 11px; color: #111; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: 600; }
 
         .size-row-input { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
-        .add-size-btn { background: #3b82f6; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
+        .add-size-btn { background: #111; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
 
-        .size-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; background: #0b0f19; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
-        .size-table th, .size-table td { padding: 8px; font-size: 11px; text-align: center; border-bottom: 1px solid var(--card-border); }
-        .size-table th { background: rgba(124, 58, 237, 0.2); color: #c084fc; }
+        .size-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; background: #f9fafb; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
+        .size-table th, .size-table td { padding: 8px; font-size: 11px; text-align: center; border-bottom: 1px solid var(--card-border); color: #111; }
+        .size-table th { background: #e5e7eb; color: #111; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
-        .submit-btn { background: var(--primary-gradient); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; box-shadow: 0 4px 15px rgba(124,58,237,0.3); }
-        .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
+        .submit-btn { background: var(--btn-dark); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
+        .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
     </style>
 </head>
 <body>
@@ -52,8 +52,21 @@
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
+        <!-- Category Rename & Management Card -->
         <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Category & Product Setup</h4>
+            <h4 class="card-title"><i class="fa-solid fa-folder-pen"></i> Manage Categories</h4>
+            <div class="form-group">
+                <label>Rename Selected Category</label>
+                <div style="display:flex; gap:6px;">
+                    <select id="renameCatSelect" class="form-control" style="flex:1;"></select>
+                    <input type="text" id="renameCatInput" class="form-control" placeholder="New Name..." style="flex:1;">
+                    <button type="button" class="add-size-btn" onclick="renameCategory()" style="background:#059669; height:38px;">Rename</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Category Setup</h4>
             
             <div class="form-group">
                 <label>Dress Name</label>
@@ -66,18 +79,23 @@
                 <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
             </div>
 
-            <!-- Dynamic Category Management -->
+            <!-- Main Category & Subcategory Setup -->
             <div class="form-group">
-                <label>Select Category (Winter, Summer, etc.)</label>
-                <div style="display: flex; gap: 6px;">
+                <label>Category (Winter, Summer, All-Time, etc.)</label>
+                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                     <select id="newCat" class="form-control" style="flex: 2;"></select>
-                    <input type="text" id="customCatInput" class="form-control" placeholder="Add New Cat..." style="flex: 1;">
+                    <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
                     <button type="button" class="add-size-btn" onclick="addNewCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Price (৳)</label>
+                <label>Sub-Category (Optional)</label>
+                <input type="text" id="newSubCat" class="form-control" placeholder="e.g. Long Dress, Two-Piece...">
+            </div>
+
+            <div class="form-group">
+                <label>Price (Tk)</label>
                 <input type="number" id="newPrice" class="form-control" placeholder="4500">
             </div>
 
@@ -118,19 +136,19 @@
             <!-- Images & Video Upload -->
             <div class="form-group">
                 <label>Product Photo 1 (Required - Cloudinary)</label>
-                <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #94a3b8;">
+                <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111;">
             </div>
             <div class="form-group">
                 <label>Product Photo 2 (Optional)</label>
-                <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #94a3b8;">
+                <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #111;">
             </div>
             <div class="form-group">
                 <label>Product Photo 3 (Optional)</label>
-                <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #94a3b8;">
+                <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #111;">
             </div>
             <div class="form-group">
                 <label>Product Video (Optional)</label>
-                <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #94a3b8;">
+                <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;">
             </div>
 
             <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
@@ -138,7 +156,7 @@
     </div>
 
     <div id="uploadOverlay" class="uploading-overlay">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #c084fc;"></i>
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #fff;"></i>
         <span>Uploading images & publishing dress...</span>
     </div>
 
@@ -153,12 +171,14 @@
 
         function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
-            // Default categories including Winter & Summer
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'Party Wear', 'Casual Sets', 'Gowns'];
+            let renameSelect = document.getElementById('renameCatSelect');
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
             
             catSelect.innerHTML = '';
+            renameSelect.innerHTML = '';
             categories.forEach(cat => {
                 catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                renameSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
         }
 
@@ -167,7 +187,7 @@
             let newCat = customInput.value.trim();
             if(!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
 
-            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'Party Wear', 'Casual Sets', 'Gowns'];
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
             if(!categories.includes(newCat)) {
                 categories.push(newCat);
                 localStorage.setItem('shopCategories', JSON.stringify(categories));
@@ -177,6 +197,30 @@
                 tg.showAlert(`✅ Category "${newCat}" created successfully!`);
             } else {
                 tg.showAlert("⚠️ Category already exists!");
+            }
+        }
+
+        function renameCategory() {
+            let oldCat = document.getElementById('renameCatSelect').value;
+            let newCatName = document.getElementById('renameCatInput').value.trim();
+            if(!newCatName) { tg.showAlert("⚠️ Enter new name for category!"); return; }
+
+            let categories = JSON.parse(localStorage.getItem('shopCategories')) || ['Winter', 'Summer', 'All-Time', 'Party Wear', 'Casual Sets'];
+            let index = categories.indexOf(oldCat);
+            if(index !== -1) {
+                categories[index] = newCatName;
+                localStorage.setItem('shopCategories', JSON.stringify(categories));
+
+                // Also update category names in existing dresses
+                let dresses = JSON.parse(localStorage.getItem('shopDresses')) || [];
+                dresses.forEach(d => {
+                    if(d.category === oldCat) d.category = newCatName;
+                });
+                localStorage.setItem('shopDresses', JSON.stringify(dresses));
+
+                loadCategoriesDropdown();
+                document.getElementById('renameCatInput').value = '';
+                tg.showAlert(`✅ Category renamed from "${oldCat}" to "${newCatName}"!`);
             }
         }
 
@@ -205,7 +249,7 @@
                 tbody.innerHTML += `
                     <tr>
                         <td><b>${size}</b></td>
-                        <td style="color:#fbbf24; font-weight:bold;">${addedSizesList[size]} Pcs</td>
+                        <td style="color:#059669; font-weight:bold;">${addedSizesList[size]} Pcs</td>
                         <td><button class="del-size" onclick="removeSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
                     </tr>
                 `;
@@ -234,6 +278,7 @@
         async function publishDress() {
             let name = document.getElementById('newName').value.trim();
             let cat = document.getElementById('newCat').value;
+            let subCat = document.getElementById('newSubCat').value.trim();
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
             let details = document.getElementById('newDetails').value.trim();
             let isTrending = document.getElementById('isTrending').checked;
@@ -271,6 +316,7 @@
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
                 name: name,
                 category: cat,
+                subCategory: subCat,
                 price: price,
                 details: details || "No details provided.",
                 images: images,
@@ -290,6 +336,7 @@
             
             // Reset Form fields
             document.getElementById('newName').value = '';
+            document.getElementById('newSubCat').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
             document.getElementById('imgFile1').value = '';
