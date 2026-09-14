@@ -153,6 +153,7 @@
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -295,10 +296,12 @@
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             let totalAmount = subtotal + 100;
 
+            // আগে ভুল Telegram API (tg.initUnsafeUser) ব্যবহার হচ্ছিল, তাই সব বায়ারের
+            // অর্ডারে একই ফলব্যাক userId/name বসে যেত। এখন সঠিকভাবে আসল টেলিগ্রাম আইডি নেওয়া হয়।
             let pendingOrder = {
                 orderId: 'WF-' + Math.floor(1000 + Math.random() * 9000),
-                userId: tg.initUnsafeUser && tg.initUnsafeUser.id ? tg.initUnsafeUser.id : '884920',
-                userName: tg.initUnsafeUser && tg.initUnsafeUser.first_name ? tg.initUnsafeUser.first_name : 'Zoha',
+                userId: currentUserId(),
+                userName: currentUserName(),
                 items: cart,
                 totalAmount: totalAmount,
                 status: 'Pending',
