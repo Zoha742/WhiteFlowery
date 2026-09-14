@@ -9,12 +9,12 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: #131c2e;
-            --card-border: #2a1b4e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
 
         body {
@@ -24,66 +24,68 @@
             margin: 0; padding: 0 0 90px 0;
             display: flex; justify-content: center;
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 8px; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 10px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
 
         .payment-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
         .pay-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; transition: 0.2s;
+            border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .pay-card.selected { border-color: #ec4899; background: rgba(236, 72, 153, 0.08); }
+        .pay-card.selected { border-color: #111; background: #f9fafb; }
         .pay-left { display: flex; align-items: center; gap: 12px; }
-        .pay-icon { width: 38px; height: 38px; background: rgba(124, 58, 237, 0.15); color: #c084fc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-        .pay-info h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
+        .pay-icon { width: 38px; height: 38px; background: #f3f4f6; color: #111; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 1px solid var(--card-border); }
+        .pay-info h4 { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
         .pay-info p { margin: 0; font-size: 10px; color: var(--text-muted); }
         .radio-check { width: 16px; height: 16px; border: 2px solid var(--card-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .pay-card.selected .radio-check { border-color: #ec4899; background: #ec4899; }
+        .pay-card.selected .radio-check { border-color: #111; background: #111; }
         .pay-card.selected .radio-check::after { content: ''; width: 6px; height: 6px; background: #fff; border-radius: 50%; }
 
         /* Bank Dropdown Box */
         .bank-dropdown-box {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 14px; padding: 14px; margin-bottom: 16px; display: none;
+            background: #f9fafb; border: 1px solid var(--card-border);
+            border-radius: 12px; padding: 14px; margin-bottom: 16px; display: none;
         }
         .form-group { margin-bottom: 8px; }
         .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
         .form-control {
-            width: 100%; background: #0b0f19; border: 1px solid var(--card-border);
-            color: #fff; padding: 10px; border-radius: 10px; box-sizing: border-box;
-            font-size: 12px; outline: none;
+            width: 100%; background: #ffffff; border: 1px solid var(--card-border);
+            color: #111; padding: 10px; border-radius: 8px; box-sizing: border-box;
+            font-size: 12px; outline: none; font-weight: 600;
         }
 
         /* Payment Proof Upload Box */
         .proof-upload-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 14px; padding: 14px; margin-bottom: 20px;
+            border-radius: 12px; padding: 14px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .upload-preview {
-            width: 100%; height: 90px; background: #0b0f19; border: 2px dashed var(--card-border);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 90px; background: #f9fafb; border: 2px dashed var(--card-border);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
             color: var(--text-muted); font-size: 11px; margin-top: 5px; overflow: hidden; position: relative; cursor: pointer;
         }
         .upload-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
 
         .submit-btn {
-            background: var(--primary-gradient); color: #fff; border: none;
-            padding: 14px; border-radius: 14px; font-weight: 700; width: 100%;
-            cursor: pointer; font-size: 14px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+            background: var(--btn-dark); color: #fff; border: none;
+            padding: 14px; border-radius: 10px; font-weight: 700; width: 100%;
+            cursor: pointer; font-size: 14px;
         }
+        .submit-btn:active { transform: scale(0.98); }
 
+        /* White Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: var(--card-bg);
+            width: 100%; max-width: 480px; background: #ffffff;
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
@@ -92,20 +94,31 @@
     <div class="container">
         <!-- Header -->
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-wallet"></i> Payment & Proof</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-wallet"></i> Payment & Delivery</h3>
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
         </div>
 
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Select payment method and upload screenshot proof:</p>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Select your preferred payment method or home delivery:</p>
 
         <!-- Payment Options List -->
         <div class="payment-list">
-            <div class="pay-card selected" onclick="selectPayment('bkash', this)">
+            <div class="pay-card selected" onclick="selectPayment('cod', this)">
                 <div class="pay-left">
-                    <div class="pay-icon" style="color: #e2136e; background: rgba(226, 19, 110, 0.15);"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <div class="pay-icon" style="color: #059669; background: #ecfdf5;"><i class="fa-solid fa-truck-fast"></i></div>
+                    <div class="pay-info">
+                        <h4>Home Delivery (COD)</h4>
+                        <p>Pay cash upon home delivery</p>
+                    </div>
+                </div>
+                <div class="radio-check"></div>
+            </div>
+
+            <div class="pay-card" onclick="selectPayment('bkash', this)">
+                <div class="pay-left">
+                    <div class="pay-icon" style="color: #e2136e; background: #fdf2f8;"><i class="fa-solid fa-mobile-screen-button"></i></div>
                     <div class="pay-info">
                         <h4>bKash Personal</h4>
-                        <p>Send money & submit trxID</p>
+                        <p>Send money & submit proof</p>
                     </div>
                 </div>
                 <div class="radio-check"></div>
@@ -113,7 +126,7 @@
 
             <div class="pay-card" onclick="selectPayment('nagad', this)">
                 <div class="pay-left">
-                    <div class="pay-icon" style="color: #f37021; background: rgba(243, 112, 33, 0.15);"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="pay-icon" style="color: #f37021; background: #fff7ed;"><i class="fa-solid fa-wallet"></i></div>
                     <div class="pay-info">
                         <h4>Nagad Wallet</h4>
                         <p>Fast mobile transaction</p>
@@ -124,10 +137,10 @@
 
             <div class="pay-card" onclick="selectPayment('bank', this)">
                 <div class="pay-left">
-                    <div class="pay-icon" style="color: #38bdf8; background: rgba(56, 189, 248, 0.15);"><i class="fa-solid fa-building-columns"></i></div>
+                    <div class="pay-icon" style="color: #2563eb; background: #eff6ff;"><i class="fa-solid fa-building-columns"></i></div>
                     <div class="pay-info">
                         <h4>Online Bank Transfer</h4>
-                        <p>Select from listed banks</p>
+                        <p>Select from listed partner banks</p>
                     </div>
                 </div>
                 <div class="radio-check"></div>
@@ -137,21 +150,22 @@
         <!-- Bank Dropdown Box (Appears only if Bank is selected) -->
         <div id="bankDropdownContainer" class="bank-dropdown-box">
             <div class="form-group">
-                <label>Select Partner Bank</label>
+                <label>Select Partner Bank & Branch</label>
                 <select id="bankName" class="form-control">
                     <option value="" disabled selected>-- Choose Bank --</option>
-                    <option value="Dutch-Bangla Bank (DBBL)">Dutch-Bangla Bank (DBBL / Rocket)</option>
+                    <option value="Dutch-Bangla Bank (DBBL / Rocket)">Dutch-Bangla Bank (DBBL / Rocket)</option>
                     <option value="BRAC Bank PLC">BRAC Bank PLC</option>
                     <option value="Eastern Bank PLC (EBL)">Eastern Bank PLC (EBL)</option>
                     <option value="Islami Bank Bangladesh PLC">Islami Bank Bangladesh PLC</option>
                     <option value="City Bank PLC">City Bank PLC</option>
+                    <option value="Mutual Trust Bank PLC (MTB)">Mutual Trust Bank PLC (MTB)</option>
                 </select>
             </div>
         </div>
 
-        <!-- Payment Proof Upload Box -->
-        <div class="proof-upload-card">
-            <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #fff;"><i class="fa-solid fa-receipt"></i> Upload Payment Proof</h4>
+        <!-- Payment Proof Upload Box (Hidden if COD is selected) -->
+        <div id="proofUploadSection" class="proof-upload-card" style="display: none;">
+            <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #111;"><i class="fa-solid fa-receipt"></i> Upload Payment Proof</h4>
             <p style="margin: 0 0 10px 0; font-size: 10px; color: var(--text-muted);">Upload screenshot or receipt of your transaction.</p>
             
             <input type="file" id="proofFile" class="form-control" accept="image/*" style="display: none;" onchange="previewProof(event)">
@@ -161,7 +175,7 @@
             </div>
         </div>
 
-        <button class="submit-btn" onclick="submitPaymentProof()">Confirm & Submit Payment</button>
+        <button class="submit-btn" onclick="submitPaymentProof()">Confirm & Complete Order</button>
     </div>
 
     <!-- Bottom Navigation Bar -->
@@ -181,10 +195,18 @@
             card.classList.add('selected');
 
             let bankBox = document.getElementById('bankDropdownContainer');
+            let proofBox = document.getElementById('proofUploadSection');
+
             if(type === 'bank') {
                 bankBox.style.display = 'block';
-            } else {
+                proofBox.style.display = 'block';
+            } else if(type === 'bkash' || type === 'nagad') {
                 bankBox.style.display = 'none';
+                proofBox.style.display = 'block';
+            } else {
+                // COD / Home Delivery
+                bankBox.style.display = 'none';
+                proofBox.style.display = 'none';
             }
         }
 
@@ -200,14 +222,18 @@
         }
 
         function submitPaymentProof() {
-            let fileInput = document.getElementById('proofFile').files[0];
-            if(!fileInput) {
-                tg.showAlert("⚠️ Please upload your payment screenshot proof!");
-                return;
+            let selectedType = document.querySelector('.pay-card.selected h4').innerText;
+
+            if(selectedType.includes('bKash') || selectedType.includes('Nagad') || selectedType.includes('Bank')) {
+                let fileInput = document.getElementById('proofFile').files[0];
+                if(!fileInput) {
+                    tg.showAlert("⚠️ Please upload your payment screenshot proof!");
+                    return;
+                }
             }
 
-            tg.showAlert("✅ Payment proof submitted successfully! Admin will verify soon.");
-            window.location.href = "profile.html";
+            tg.showAlert("✅ Order confirmed successfully! Thank you for shopping with WhiteFlowery.");
+            window.location.href = "orders.html";
         }
     </script>
 </body>
