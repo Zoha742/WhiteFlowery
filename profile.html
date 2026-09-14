@@ -187,6 +187,7 @@
         <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
+    <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
@@ -221,7 +222,16 @@
             });
         }
 
-        document.getElementById('deliveredCountBadge').innerText = localStorage.getItem('deliveredOrdersCount') || 0;
+        // অ্যাক্সেপ্টেড অর্ডারের সংখ্যা এখন ক্লাউড থেকে গোনা হয় (আগে localStorage এ সবসময় 0 থাকত)
+        (async () => {
+            try {
+                let myOrders = await getMyOrders(currentUserId());
+                let count = myOrders.filter(o => o.status === 'Accepted').length;
+                document.getElementById('deliveredCountBadge').innerText = count;
+            } catch (e) {
+                document.getElementById('deliveredCountBadge').innerText = 0;
+            }
+        })();
     </script>
 </body>
 </html>
