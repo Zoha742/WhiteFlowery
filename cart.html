@@ -9,13 +9,12 @@
     
     <style>
         :root {
-            --bg-color: #080b12;
-            --card-bg: rgba(19, 28, 46, 0.85);
-            --card-border: rgba(124, 58, 237, 0.25);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
-            --accent-pink: #ec4899;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
         }
 
         body {
@@ -24,101 +23,96 @@
             color: var(--text-main);
             margin: 0; padding: 0 0 100px 0;
             display: flex; justify-content: center;
-            background-image: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18) 0%, transparent 60%);
         }
-        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
 
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .brand-title { margin: 0; font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
 
         /* Cart Items List */
         .cart-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
 
         .cart-item {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 14px; position: relative;
-            backdrop-filter: blur(10px);
+            border-radius: 12px; padding: 14px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        /* Corner delete icon (replaces the old swipe-to-delete gesture) */
         .delete-icon-btn {
             position: absolute; top: 10px; right: 10px; width: 26px; height: 26px;
-            background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #ef4444; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            background: #fee2e2; border: 1px solid #fecaca;
+            color: #dc2626; border-radius: 6px; display: flex; align-items: center; justify-content: center;
             font-size: 12px; cursor: pointer; z-index: 3;
         }
-        .delete-icon-btn:active { background: #ef4444; color: #fff; }
+        .delete-icon-btn:active { background: #dc2626; color: #fff; }
         
         .cart-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-right: 30px; }
         .cart-item-info { display: flex; align-items: center; gap: 12px; }
-        .cart-item-img { width: 55px; height: 55px; background: #0b0f19; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+        .cart-item-img { width: 55px; height: 55px; background: #f9fafb; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--card-border); }
+        .cart-item-img img { width: 100%; height: 100%; object-fit: contain; }
         
-        .cart-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #fff; }
-        .cart-item-price { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; color: #fbbf24; }
+        .cart-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
+        .cart-item-price { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; color: #111; }
 
         .cart-item-variant { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         
         .cart-size-select {
-            background: #0b0f19; border: 1px solid var(--card-border); color: #fff;
+            background: #f9fafb; border: 1px solid var(--card-border); color: #111;
             padding: 2px 6px; border-radius: 6px; font-size: 10px; outline: none; font-weight: bold;
         }
 
-        .quantity-control { display: flex; align-items: center; gap: 8px; background: #0b0f19; border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 8px; flex-shrink: 0; }
-        .qty-btn { background: none; border: none; color: #c084fc; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .qty-val { font-size: 12px; font-weight: bold; color: #fff; }
+        .quantity-control { display: flex; align-items: center; gap: 8px; background: #f9fafb; border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 6px; flex-shrink: 0; }
+        .qty-btn { background: none; border: none; color: #111; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .qty-val { font-size: 12px; font-weight: bold; color: #111; }
 
-        /* Duplicate Button Under Each Dress */
         .cart-item-footer {
             display: flex; justify-content: space-between; align-items: center;
             border-top: 1px solid var(--card-border); padding-top: 8px; margin-top: 8px;
         }
         .duplicate-btn {
-            background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.4);
-            color: #d8b4fe; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600;
-            cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
+            background: #f3f4f6; border: 1px solid var(--card-border);
+            color: #111; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
         }
-        .duplicate-btn:active { background: #7c3aed; color: #fff; }
+        .duplicate-btn:active { background: #111; color: #fff; }
 
         .empty-cart { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-        .empty-cart i { font-size: 40px; margin-bottom: 12px; display: block; color: #7c3aed; }
+        .empty-cart i { font-size: 40px; margin-bottom: 12px; display: block; color: #111; }
 
         /* Summary Card */
         .summary-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 18px; padding: 16px; margin-bottom: 16px; backdrop-filter: blur(10px);
+            border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .summary-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
-        .summary-row.total { font-size: 15px; font-weight: bold; color: #fff; border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 10px; }
-        .summary-row.total span:last-child { color: #fbbf24; }
+        .summary-row.total { font-size: 15px; font-weight: bold; color: #111; border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 10px; }
+        .summary-row.total span:last-child { color: #111; }
 
         /* Change Address Option at the Bottom */
         .change-address-box {
-            background: rgba(124, 58, 237, 0.1); border: 1px dashed rgba(124, 58, 237, 0.4);
-            border-radius: 14px; padding: 12px 16px; margin-bottom: 16px;
+            background: #f9fafb; border: 1px dashed var(--card-border);
+            border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .change-address-box span { font-size: 12px; color: #d8b4fe; font-weight: 600; }
-        .change-addr-btn { background: none; border: none; color: #ec4899; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: underline; }
+        .change-address-box span { font-size: 12px; color: #111; font-weight: 600; }
+        .change-addr-btn { background: none; border: none; color: #7c3aed; font-size: 12px; font-weight: bold; cursor: pointer; text-decoration: underline; }
 
         .checkout-btn {
-            background: var(--primary-gradient); color: #fff; border: none;
-            padding: 14px; border-radius: 14px; font-weight: 700; width: 100%;
-            cursor: pointer; font-size: 14px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+            background: var(--btn-dark); color: #fff; border: none;
+            padding: 14px; border-radius: 10px; font-weight: 700; width: 100%;
+            cursor: pointer; font-size: 14px;
         }
         .checkout-btn:active { transform: scale(0.98); }
 
-        /* Bottom Navigation Bar */
+        /* White Bottom Navigation Bar */
         .bottom-nav {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 480px; background: rgba(19, 28, 46, 0.95);
+            width: 100%; max-width: 480px; background: #ffffff;
             border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
             padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
-            backdrop-filter: blur(15px); box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.6);
         }
-        .nav-item { text-align: center; color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
-        .nav-item.active { color: #c084fc; transform: translateY(-2px); }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
     </style>
 </head>
@@ -136,14 +130,14 @@
 
         <!-- Order Summary -->
         <div class="summary-card">
-            <div class="summary-row"><span>Subtotal</span><span id="subTotal">৳ 0</span></div>
-            <div class="summary-row"><span>Delivery Fee</span><span>৳ 100</span></div>
-            <div class="summary-row total"><span>Total Amount</span><span id="grandTotal">৳ 0</span></div>
+            <div class="summary-row"><span>Subtotal</span><span id="subTotal">Tk 0</span></div>
+            <div class="summary-row"><span>Delivery Fee</span><span>Tk 100</span></div>
+            <div class="summary-row total"><span>Total Amount</span><span id="grandTotal">Tk 0</span></div>
         </div>
 
         <!-- Change Address Option at the Bottom -->
         <div class="change-address-box">
-            <span><i class="fa-solid fa-location-dot" style="color: #c084fc;"></i> Delivery Address: <b id="addressStatus">Set</b></span>
+            <span><i class="fa-solid fa-location-dot" style="color: #7c3aed;"></i> Delivery Address: <b id="addressStatus">Set</b></span>
             <button class="change-addr-btn" onclick="location.href='address.html'">Change Address</button>
         </div>
 
@@ -192,7 +186,7 @@
 
             container.innerHTML = cart.map(item => {
                 let lineTotal = item.price * item.qty;
-                let sizes = ['S', 'M', 'L', 'XL'];
+                let sizes = ['S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
                 let sizeOptions = sizes.map(s =>
                     `<option value="${s}" ${s === item.size ? 'selected' : ''}>${s}</option>`
                 ).join('');
@@ -209,13 +203,12 @@
                                 </div>
                                 <div>
                                     <h4 class="cart-item-title">${item.name}</h4>
-                                    <p class="cart-item-price" data-base="${item.price}">৳ ${lineTotal.toLocaleString()}</p>
+                                    <p class="cart-item-price">Tk ${lineTotal.toLocaleString()}.00</p>
                                     <div class="cart-item-variant">
                                         <span style="font-size: 10px; color: var(--text-muted);">Size:</span>
                                         <select class="cart-size-select" onchange="updateSize('${item.key}', this.value)">
                                             ${sizeOptions}
                                         </select>
-                                        ${item.color ? `<span style="font-size: 10px; color: var(--text-muted);">${item.color}</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -239,8 +232,8 @@
         function calculateTotal() {
             let cart = getCart();
             let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            document.getElementById('subTotal').innerText = `৳ ${total.toLocaleString()}`;
-            document.getElementById('grandTotal').innerText = `৳ ${(total + (cart.length ? 100 : 0)).toLocaleString()}`;
+            document.getElementById('subTotal').innerText = `Tk ${total.toLocaleString()}.00`;
+            document.getElementById('grandTotal').innerText = `Tk ${(total + (cart.length ? 100 : 0)).toLocaleString()}.00`;
         }
 
         function updateQty(key, change) {
@@ -265,7 +258,6 @@
             saveCart(cart);
         }
 
-        // Duplicate Item Logic
         function duplicateItem(key) {
             let cart = getCart();
             let item = cart.find(it => it.key === key);
@@ -278,7 +270,6 @@
             tg.showAlert("✅ Dress duplicated successfully!");
         }
 
-        // Remove Item (corner delete icon)
         function removeItem(key) {
             let cart = getCart().filter(it => it.key !== key);
             saveCart(cart);
@@ -293,7 +284,6 @@
                 return;
             }
 
-            // Check if address exists in localStorage
             let savedAddress = localStorage.getItem('userFullAddress') || localStorage.getItem('userAddress');
 
             if(!savedAddress) {
@@ -302,8 +292,27 @@
                 return;
             }
 
-            tg.showAlert("🎉 Order placed successfully! Proceeding to payment.");
-            window.location.href = "payment.html";
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let totalAmount = subtotal + 100;
+
+            let newOrder = {
+                orderId: 'WF-' + Math.floor(1000 + Math.random() * 9000),
+                userId: tg.initUnsafeUser && tg.initUnsafeUser.id ? tg.initUnsafeUser.id : '884920',
+                userName: tg.initUnsafeUser && tg.initUnsafeUser.first_name ? tg.initUnsafeUser.first_name : 'Zoha',
+                items: cart,
+                totalAmount: totalAmount,
+                status: 'Pending',
+                date: new Date().toLocaleDateString()
+            };
+
+            let existingOrders = JSON.parse(localStorage.getItem('userOrders')) || [];
+            existingOrders.unshift(newOrder);
+            localStorage.setItem('userOrders', JSON.stringify(existingOrders));
+
+            localStorage.removeItem('cartItems');
+
+            tg.showAlert("🎉 Order placed successfully! Check your orders list.");
+            window.location.href = "orders.html";
         }
     </script>
 </body>
