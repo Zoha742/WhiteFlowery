@@ -40,6 +40,13 @@
         .size-table th { background: #e5e7eb; color: #111; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
+        /* কালার ভ্যারিয়েন্ট স্লট (প্রতি কালারের নাম + ছবি) */
+        .color-slot { border: 1px dashed var(--card-border); border-radius: 10px; padding: 10px; margin-bottom: 10px; background: #fafafa; }
+        .color-slot-header { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 8px; }
+        .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
+        .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
+        .delete-preview-btn { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+
         .submit-btn { background: var(--btn-dark); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
     </style>
@@ -139,19 +146,41 @@
                 </tbody>
             </table>
 
-            <!-- Images & Video Upload -->
+            <!-- Color Variants: প্রতিটা কালারের জন্য নাম + ছবি (৩টা পর্যন্ত) -->
             <div class="form-group">
-                <label>Product Photo 1 (Required - Cloudinary)</label>
-                <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111;">
+                <label><i class="fa-solid fa-palette"></i> Color Variants (up to 3)</label>
+
+                <div class="color-slot">
+                    <div class="color-slot-header">Color 1 <span style="color:#ef4444;">*Required</span></div>
+                    <input type="text" id="colorName1" class="form-control" placeholder="Color name e.g. Red" style="margin-bottom:8px;">
+                    <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111;" onchange="previewImage(1)">
+                    <div class="img-preview-wrap" id="previewWrap1">
+                        <img id="previewImg1" src="" alt="Preview">
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(1)" title="ভুল ছবি সিলেক্ট হলে ডিলিট করুন"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+
+                <div class="color-slot">
+                    <div class="color-slot-header">Color 2 (Optional)</div>
+                    <input type="text" id="colorName2" class="form-control" placeholder="Color name e.g. Blue" style="margin-bottom:8px;">
+                    <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #111;" onchange="previewImage(2)">
+                    <div class="img-preview-wrap" id="previewWrap2">
+                        <img id="previewImg2" src="" alt="Preview">
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(2)" title="ভুল ছবি সিলেক্ট হলে ডিলিট করুন"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+
+                <div class="color-slot">
+                    <div class="color-slot-header">Color 3 (Optional)</div>
+                    <input type="text" id="colorName3" class="form-control" placeholder="Color name e.g. Green" style="margin-bottom:8px;">
+                    <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #111;" onchange="previewImage(3)">
+                    <div class="img-preview-wrap" id="previewWrap3">
+                        <img id="previewImg3" src="" alt="Preview">
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(3)" title="ভুল ছবি সিলেক্ট হলে ডিলিট করুন"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Product Photo 2 (Optional)</label>
-                <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #111;">
-            </div>
-            <div class="form-group">
-                <label>Product Photo 3 (Optional)</label>
-                <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #111;">
-            </div>
+
             <div class="form-group">
                 <label>Product Video (Optional)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;">
@@ -263,6 +292,28 @@
             });
         }
 
+        // নির্দিষ্ট কালার স্লটের ছবি সিলেক্ট হলে প্রিভিউ দেখানো
+        function previewImage(n) {
+            let fileInput = document.getElementById('imgFile' + n);
+            let wrap = document.getElementById('previewWrap' + n);
+            let img = document.getElementById('previewImg' + n);
+            let file = fileInput.files[0];
+            if (file) {
+                img.src = URL.createObjectURL(file);
+                wrap.style.display = 'block';
+            } else {
+                wrap.style.display = 'none';
+                img.src = '';
+            }
+        }
+
+        // ভুল করে ছবি আপলোড/সিলেক্ট হয়ে গেলে সেই স্লট ক্লিয়ার করার জন্য
+        function clearImageSlot(n) {
+            document.getElementById('imgFile' + n).value = '';
+            document.getElementById('previewWrap' + n).style.display = 'none';
+            document.getElementById('previewImg' + n).src = '';
+        }
+
         // Tracks why the last upload failed, so publishDress() can show a real reason
         let lastUploadError = "";
 
@@ -313,6 +364,9 @@
             let file1 = document.getElementById('imgFile1').files[0];
             let file2 = document.getElementById('imgFile2').files[0];
             let file3 = document.getElementById('imgFile3').files[0];
+            let colorName1 = document.getElementById('colorName1').value.trim() || 'Color 1';
+            let colorName2 = document.getElementById('colorName2').value.trim();
+            let colorName3 = document.getElementById('colorName3').value.trim();
             let videoInput = document.getElementById('productVideoFile');
             let sizeKeys = Object.keys(addedSizesList);
 
@@ -323,6 +377,8 @@
             document.getElementById('uploadOverlay').style.display = 'flex';
 
             let images = [];
+            let colorVariants = [];
+
             let url1 = await uploadToCloudinary(file1);
             if (!url1) {
                 // Never publish a product with no image — that's what produced records
@@ -332,8 +388,22 @@
                 return;
             }
             images.push(url1);
-            if(file2) { let url2 = await uploadToCloudinary(file2); if(url2) images.push(url2); }
-            if(file3) { let url3 = await uploadToCloudinary(file3); if(url3) images.push(url3); }
+            colorVariants.push({ colorName: colorName1, image: url1 });
+
+            if(file2) {
+                let url2 = await uploadToCloudinary(file2);
+                if(url2) {
+                    images.push(url2);
+                    colorVariants.push({ colorName: colorName2 || 'Color 2', image: url2 });
+                }
+            }
+            if(file3) {
+                let url3 = await uploadToCloudinary(file3);
+                if(url3) {
+                    images.push(url3);
+                    colorVariants.push({ colorName: colorName3 || 'Color 3', image: url3 });
+                }
+            }
 
             let videoUrl = "";
             if(videoInput.files.length > 0) {
@@ -357,6 +427,7 @@
                 details: details || "No details provided.",
                 images: images,
                 image: images[0],
+                colors: colorVariants,
                 video: videoUrl,
                 sizes: addedSizesList,
                 totalStock: totalStock,
@@ -379,9 +450,12 @@
             document.getElementById('newSubCat').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newDetails').value = '';
-            document.getElementById('imgFile1').value = '';
-            document.getElementById('imgFile2').value = '';
-            document.getElementById('imgFile3').value = '';
+            document.getElementById('colorName1').value = '';
+            document.getElementById('colorName2').value = '';
+            document.getElementById('colorName3').value = '';
+            clearImageSlot(1);
+            clearImageSlot(2);
+            clearImageSlot(3);
             document.getElementById('productVideoFile').value = '';
             document.getElementById('isTrending').checked = false;
             document.getElementById('isNewArrival').checked = false;
