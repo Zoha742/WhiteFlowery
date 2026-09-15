@@ -263,22 +263,40 @@
             });
         }
 
-        async function uploadToCloudinary(file) {
+        // Tracks why the last upload failed, so publishDress() can show a real reason
+        let lastUploadError = "";
+
+        async function uploadToCloudinary(file, resourceType) {
+            let type = resourceType || "image";
             let formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", "ml_default");
-            formData.append("folder", "shop/Product add");
+            // NOTE: folder name must not contain spaces — "shop/Product add" was
+            // getting rejected by Cloudinary, which is why no image URL was ever saved.
+            formData.append("folder", "shop/product_add");
+            // Unique id per upload so Cloudinary can never hand back an older asset's URL
+            formData.append("public_id", `wf_${type}_${Date.now()}_${Math.floor(Math.random() * 1000000)}`);
 
             try {
-                let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
+                let res = await fetch(`https://api.cloudinary.com/v1_1/dyqegwdme/${type}/upload`, { method: "POST", body: formData });
                 let data = await res.json();
-                return data.secure_url || "";
+
+                // Cloudinary answers with an error payload (bad/signed preset, wrong
+                // cloud name, bad folder) WITHOUT fetch() ever throwing. The old code
+                // did `data.secure_url || ""` and silently saved an empty string, so
+                // Firebase dropped the field entirely and every product fell back to
+                // the same placeholder photo. Treat a missing secure_url as a failure.
+                if (!res.ok || !data.secure_url) {
+                    lastUploadError = (data && data.error && data.error.message) ? data.error.message : "Cloudinary rejected the upload";
+                    console.error("Cloudinary upload rejected:", data);
+                    return "";
+                }
+                lastUploadError = "";
+                return data.secure_url;
             } catch (err) {
-                return new Promise((resolve) => {
-                    let reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(file);
-                });
+                lastUploadError = err.message || "Network error while uploading";
+                console.error("Cloudinary upload error:", err);
+                return "";
             }
         }
 
@@ -306,13 +324,24 @@
 
             let images = [];
             let url1 = await uploadToCloudinary(file1);
-            if(url1) images.push(url1);
+            if (!url1) {
+                // Never publish a product with no image — that's what produced records
+                // with no image field, which then showed the old placeholder photo.
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert(`❌ Photo upload failed: ${lastUploadError}\n\nCloudinary-te "ml_default" preset ta Unsigned kora ache kina check korun (Settings → Upload → Upload presets).`);
+                return;
+            }
+            images.push(url1);
             if(file2) { let url2 = await uploadToCloudinary(file2); if(url2) images.push(url2); }
             if(file3) { let url3 = await uploadToCloudinary(file3); if(url3) images.push(url3); }
 
             let videoUrl = "";
             if(videoInput.files.length > 0) {
-                videoUrl = await uploadToCloudinary(videoInput.files[0]);
+                // Videos must go to Cloudinary's video endpoint, not the image one
+                videoUrl = await uploadToCloudinary(videoInput.files[0], "video");
+                if (!videoUrl) {
+                    tg.showAlert(`⚠️ Video upload failed (${lastUploadError}). Dress ta video chara publish hocche.`);
+                }
             }
 
             let totalStock = 0;
