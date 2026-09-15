@@ -59,6 +59,11 @@
 
         <div class="admin-card">
             <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
+            <div style="position:relative; margin-bottom:10px;">
+                <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:12px;"></i>
+                <input type="text" id="codeSearchInput" class="form-control" placeholder="Search by Product Code..."
+                       style="padding-left:30px;" oninput="filterInventory()">
+            </div>
             <div id="bulkToolbar" style="display:flex; align-items:center; justify-content:space-between; background:#f9fafb; border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; margin-bottom:10px; font-size:11px;">
                 <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color: var(--text-muted); font-weight:600;">
                     <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="accent-color:#111;"> Select All
@@ -127,9 +132,35 @@
             let container = document.getElementById('inventoryListContainer');
             container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>`;
             CURRENT_DRESSES = await getDresses();
-            let dresses = CURRENT_DRESSES;
 
             document.getElementById('selectAllCheckbox').checked = false;
+            document.getElementById('codeSearchInput').value = '';
+
+            renderList(CURRENT_DRESSES.map((_, i) => i));
+        }
+
+        function filterInventory() {
+            let query = document.getElementById('codeSearchInput').value.trim().toLowerCase();
+
+            if (!query) {
+                renderList(CURRENT_DRESSES.map((_, i) => i));
+                return;
+            }
+
+            let matchingIndexes = CURRENT_DRESSES.reduce((acc, dress, index) => {
+                let code = (dress.productCode || '').toLowerCase();
+                let name = (dress.name || '').toLowerCase();
+                if (code.includes(query) || name.includes(query)) acc.push(index);
+                return acc;
+            }, []);
+
+            renderList(matchingIndexes, query);
+        }
+
+        function renderList(indexes, activeQuery) {
+            let container = document.getElementById('inventoryListContainer');
+            let dresses = CURRENT_DRESSES;
+
             updateBulkToolbar();
 
             if (dresses.length === 0) {
@@ -137,13 +168,18 @@
                 return;
             }
 
-            container.innerHTML = '';
-            dresses.forEach((dress, index) => {
+            if (indexes.length === 0) {
+                container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);">No dress matched code "${activeQuery}".</div>`;
+                return;
+            }
+
+            container.innerHTML = indexes.map(index => {
+                let dress = dresses[index];
                 let sizesObj = dress.sizes || { S: 0, M: 0, L: 0, XL: 0 };
                 let totalCurrentStock = Object.values(sizesObj).reduce((a, b) => a + Number(b), 0);
                 let sizeStr = Object.entries(sizesObj).map(([k, v]) => `${k}:${v}`).join(' | ');
 
-                container.innerHTML += `
+                return `
                     <div class="list-item">
                         <input type="checkbox" class="dress-select-checkbox" data-index="${index}" onchange="onSelectionChange()" style="width:16px; height:16px; accent-color:#111; cursor:pointer; flex-shrink:0;">
                         <img src="${dress.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'}" class="dress-thumb">
@@ -166,7 +202,7 @@
                         </div>
                     </div>
                 `;
-            });
+            }).join('');
         }
 
         let currentViewIndex = null;
