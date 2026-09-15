@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Stock Manager</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 70px; background: #fff; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
+
+        .stock-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stock-card.out-of-stock { border-color: #ef4444; background: #fef2f2; }
+        
+        .stock-img { width: 60px; height: 75px; object-fit: cover; border-radius: 8px; background: #f3f4f6; border: 1px solid var(--card-border); }
+        .stock-info { flex: 1; }
+        .stock-title { font-size: 13px; font-weight: 700; margin: 0 0 4px 0; color: #111; }
+        .stock-code { font-size: 10px; color: #7c3aed; font-weight: bold; margin-bottom: 4px; }
+        
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 4px; }
+        .badge.danger { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .badge.success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+
+        .size-qty-box { font-size: 11px; color: #4b5563; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-boxes-stacked"></i> Stock Status</h3>
+            <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
+        </div>
+
+        <div id="stockListContainer">
+            <div style="text-align:center; color:#666; padding:40px; font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading stock...</div>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await renderStockList();
+        });
+
+        async function renderStockList() {
+            let container = document.getElementById('stockListContainer');
+            let dresses = await getDresses();
+
+            if (!dresses || dresses.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#666; padding:40px; font-size:13px;">No dresses found in database.</div>`;
+                return;
+            }
+
+            // স্টক শেষ বা কম ড্রেসগুলোকে উপরে নিয়ে আসার জন্য সর্টিং (টোটাল স্টক বা সাইজ স্টক হিসাব করে)
+            dresses.sort((a, b) => {
+                let stockA = calculateTotalStock(a.sizes);
+                let stockB = calculateTotalStock(b.sizes);
+                return stockA - stockB; // কম স্টক বা ০ স্টক আগে দেখাবে
+            });
+
+            container.innerHTML = '';
+
+            dresses.forEach(dress => {
+                let mainImg = (dress.images && dress.images[0]) || dress.image || '';
+                let sizesObj = dress.sizes || {};
+                let totalStock = calculateTotalStock(sizesObj);
+                let isOut = totalStock <= 0;
+
+                let sizesHtml = '';
+                for (let [sizeKey, qty] of Object.entries(sizesObj)) {
+                    let colorBadge = qty <= 0 ? 'color: red; font-weight: bold;' : 'color: #059669;';
+                    sizesHtml += `<span style="margin-right:8px; ${colorBadge}">${sizeKey}: ${qty} pcs</span>`;
+                }
+
+                container.innerHTML += `
+                    <div class="stock-card ${isOut ? 'out-of-stock' : ''}">
+                        <img src="${mainImg || 'https://via.placeholder.com/60x75'}" class="stock-img" alt="${dress.name}">
+                        <div class="stock-info">
+                            ${dress.productCode ? `<div class="stock-code">Code: ${dress.productCode}</div>` : ''}
+                            <h4 class="stock-title">${dress.name}</h4>
+                            <div class="size-qty-box">${sizesHtml || 'No sizes'}</div>
+                            <div>
+                                ${isOut ? '<span class="badge danger"><i class="fa-solid fa-triangle-exclamation"></i> Stock Out (0)</span>' : `<span class="badge success">Total Stock: ${totalStock} Pcs</span>`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function calculateTotalStock(sizes) {
+            if (!sizes) return 0;
+            let total = 0;
+            for (let qty of Object.values(sizes)) {
+                total += Number(qty) || 0;
+            }
+            return total;
+        }
+    </script>
+</body>
+</html>
