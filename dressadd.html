@@ -40,9 +40,10 @@
         .size-table th { background: #e5e7eb; color: #111; }
         .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
-        /* কালার ভ্যারিয়েন্ট স্লট (প্রতি কালারের নাম + ছবি) */
-        .color-slot { border: 1px dashed var(--card-border); border-radius: 10px; padding: 10px; margin-bottom: 10px; background: #fafafa; }
-        .color-slot-header { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 8px; }
+        /* কালার ভ্যারিয়েন্ট স্লট (প্রতি কালারের নাম + ছবি + আলাদা সাইজ ও স্টক) */
+        .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
+        .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
         .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
         .delete-preview-btn { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
@@ -59,19 +60,6 @@
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
-        <!-- Category Rename & Management Card -->
-        <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-folder-pen"></i> Manage Categories</h4>
-            <div class="form-group">
-                <label>Rename Selected Category</label>
-                <div style="display:flex; gap:6px;">
-                    <select id="renameCatSelect" class="form-control" style="flex:1;"></select>
-                    <input type="text" id="renameCatInput" class="form-control" placeholder="New Name..." style="flex:1;">
-                    <button type="button" class="add-size-btn" onclick="renameCategory()" style="background:#059669; height:38px;">Rename</button>
-                </div>
-            </div>
-        </div>
-
         <div class="admin-card">
             <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Category Setup</h4>
             
@@ -80,21 +68,18 @@
                 <input type="text" id="newName" class="form-control" placeholder="e.g. Winter Velvet Frock">
             </div>
 
-            <!-- Product Code Input -->
             <div class="form-group">
                 <label>Product Code (e.g. WF-101)</label>
                 <input type="text" id="newProductCode" class="form-control" placeholder="WF-101">
             </div>
 
-            <!-- Home Section Display Settings -->
             <div class="checkbox-row">
                 <label><input type="checkbox" id="isTrending"> 🔥 Trending Dress</label>
                 <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
             </div>
 
-            <!-- Main Category & Subcategory Setup -->
             <div class="form-group">
-                <label>Category (Winter, Summer, All-Time, etc.)</label>
+                <label>Category</label>
                 <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                     <select id="newCat" class="form-control" style="flex: 2;"></select>
                     <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
@@ -117,7 +102,7 @@
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
             </div>
 
-            <!-- Size Setup -->
+            <!-- Global Size Setup (General Stock) -->
             <div class="size-row-input">
                 <div style="flex: 1;">
                     <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
@@ -146,37 +131,76 @@
                 </tbody>
             </table>
 
-            <!-- Color Variants: প্রতিটা কালারের জন্য নাম + ছবি (৩টা পর্যন্ত) -->
+            <!-- Color Variants: ৩টি কালার স্লট, প্রতিটিতে নিজস্ব সাইজ ও স্টক যুক্ত করার অপশন -->
             <div class="form-group">
-                <label><i class="fa-solid fa-palette"></i> Color Variants (up to 3)</label>
+                <label><i class="fa-solid fa-palette"></i> Color Variants & Sizes (Up to 3)</label>
 
+                <!-- Color Slot 1 -->
                 <div class="color-slot">
                     <div class="color-slot-header">Color 1 <span style="color:#ef4444;">*Required</span></div>
                     <input type="text" id="colorName1" class="form-control" placeholder="Color name e.g. Red" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111;" onchange="previewImage(1)">
+                    <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(1)">
                     <div class="img-preview-wrap" id="previewWrap1">
                         <img id="previewImg1" src="" alt="Preview">
-                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(1)" title="ভুল ছবি সিলেক্ট হলে ডিলিট করুন"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(1)"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <!-- Color 1 Specific Sizes -->
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <label style="font-size:10px; font-weight:bold; color:#555;">Color 1 Sizes & Qty:</label>
+                        <div style="display:flex; gap:4px; margin-bottom:6px;">
+                            <select id="colorSizeKey1" class="form-control" style="flex:1; padding:6px; font-size:11px;">
+                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
+                            </select>
+                            <input type="number" id="colorSizeQty1" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
+                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(1)">Add</button>
+                        </div>
+                        <div id="colorSizeList1" style="font-size:11px; color:#059669; font-weight:bold;"></div>
                     </div>
                 </div>
 
+                <!-- Color Slot 2 -->
                 <div class="color-slot">
                     <div class="color-slot-header">Color 2 (Optional)</div>
                     <input type="text" id="colorName2" class="form-control" placeholder="Color name e.g. Blue" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #111;" onchange="previewImage(2)">
+                    <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(2)">
                     <div class="img-preview-wrap" id="previewWrap2">
                         <img id="previewImg2" src="" alt="Preview">
-                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(2)" title="ভুল ছবি সিলেক্ট হলে ডিলিট করুন"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(2)"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <!-- Color 2 Specific Sizes -->
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <label style="font-size:10px; font-weight:bold; color:#555;">Color 2 Sizes & Qty:</label>
+                        <div style="display:flex; gap:4px; margin-bottom:6px;">
+                            <select id="colorSizeKey2" class="form-control" style="flex:1; padding:6px; font-size:11px;">
+                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
+                            </select>
+                            <input type="number" id="colorSizeQty2" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
+                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(2)">Add</button>
+                        </div>
+                        <div id="colorSizeList2" style="font-size:11px; color:#059669; font-weight:bold;"></div>
                     </div>
                 </div>
 
+                <!-- Color Slot 3 -->
                 <div class="color-slot">
                     <div class="color-slot-header">Color 3 (Optional)</div>
                     <input type="text" id="colorName3" class="form-control" placeholder="Color name e.g. Green" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #111;" onchange="previewImage(3)">
+                    <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(3)">
                     <div class="img-preview-wrap" id="previewWrap3">
                         <img id="previewImg3" src="" alt="Preview">
-                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(3)" title="ভুল ছবি সিলেক্ট হলে ডিলিট করুন"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(3)"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <!-- Color 3 Specific Sizes -->
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <label style="font-size:10px; font-weight:bold; color:#555;">Color 3 Sizes & Qty:</label>
+                        <div style="display:flex; gap:4px; margin-bottom:6px;">
+                            <select id="colorSizeKey3" class="form-control" style="flex:1; padding:6px; font-size:11px;">
+                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
+                            </select>
+                            <input type="number" id="colorSizeQty3" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
+                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(3)">Add</button>
+                        </div>
+                        <div id="colorSizeList3" style="font-size:11px; color:#059669; font-weight:bold;"></div>
                     </div>
                 </div>
             </div>
@@ -199,8 +223,8 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        // requireAdmin();       // ডেমোর জন্য সাময়িকভাবে বন্ধ — সবাই এই পেজ খুলতে পারবে। পরে আনকমেন্ট করে আবার লক করুন।
         let addedSizesList = {};
+        let colorSizesData = { 1: {}, 2: {}, 3: {} };
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
@@ -208,14 +232,10 @@
 
         async function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
-            let renameSelect = document.getElementById('renameCatSelect');
             let categories = await getCategories();
-            
             catSelect.innerHTML = '';
-            renameSelect.innerHTML = '';
             categories.forEach(cat => {
                 catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                renameSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
         }
 
@@ -223,7 +243,6 @@
             let customInput = document.getElementById('customCatInput');
             let newCat = customInput.value.trim();
             if(!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
-
             let categories = await getCategories();
             if(!categories.includes(newCat)) {
                 categories.push(newCat);
@@ -234,29 +253,6 @@
                 tg.showAlert(`✅ Category "${newCat}" created successfully!`);
             } else {
                 tg.showAlert("⚠️ Category already exists!");
-            }
-        }
-
-        async function renameCategory() {
-            let oldCat = document.getElementById('renameCatSelect').value;
-            let newCatName = document.getElementById('renameCatInput').value.trim();
-            if(!newCatName) { tg.showAlert("⚠️ Enter new name for category!"); return; }
-
-            let categories = await getCategories();
-            let index = categories.indexOf(oldCat);
-            if(index !== -1) {
-                categories[index] = newCatName;
-                await saveCategories(categories);
-
-                // ক্লাউডে থাকা প্রোডাক্টগুলোর ক্যাটাগরিও বদলে দেওয়া হচ্ছে
-                let dresses = await getDresses();
-                for (const d of dresses) {
-                    if (d.category === oldCat) await updateDress(d._key, { category: newCatName });
-                }
-
-                await loadCategoriesDropdown();
-                document.getElementById('renameCatInput').value = '';
-                tg.showAlert(`✅ Category renamed from "${oldCat}" to "${newCatName}"!`);
             }
         }
 
@@ -292,7 +288,21 @@
             });
         }
 
-        // নির্দিষ্ট কালার স্লটের ছবি সিলেক্ট হলে প্রিভিউ দেখানো
+        function addColorSize(slotNum) {
+            let sKey = document.getElementById(`colorSizeKey${slotNum}`).value;
+            let sQty = parseInt(document.getElementById(`colorSizeQty${slotNum}`).value) || 0;
+            if(sQty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
+
+            colorSizesData[slotNum][sKey] = sQty;
+            
+            let listContainer = document.getElementById(`colorSizeList${slotNum}`);
+            let text = "";
+            for(let [k, v] of Object.entries(colorSizesData[slotNum])) {
+                text += `[${k}: ${v} pcs] `;
+            }
+            listContainer.innerText = text;
+        }
+
         function previewImage(n) {
             let fileInput = document.getElementById('imgFile' + n);
             let wrap = document.getElementById('previewWrap' + n);
@@ -307,46 +317,33 @@
             }
         }
 
-        // ভুল করে ছবি আপলোড/সিলেক্ট হয়ে গেলে সেই স্লট ক্লিয়ার করার জন্য
         function clearImageSlot(n) {
             document.getElementById('imgFile' + n).value = '';
             document.getElementById('previewWrap' + n).style.display = 'none';
             document.getElementById('previewImg' + n).src = '';
+            colorSizesData[n] = {};
+            document.getElementById(`colorSizeList${n}`).innerText = '';
         }
 
-        // Tracks why the last upload failed, so publishDress() can show a real reason
         let lastUploadError = "";
-
         async function uploadToCloudinary(file, resourceType) {
             let type = resourceType || "image";
             let formData = new FormData();
             formData.append("file", file);
             formData.append("upload_preset", "whiteflowery_unsigned");
-            // NOTE: folder name must not contain spaces — "shop/Product add" was
-            // getting rejected by Cloudinary, which is why no image URL was ever saved.
             formData.append("folder", "shop/product_add");
-            // Unique id per upload so Cloudinary can never hand back an older asset's URL
             formData.append("public_id", `wf_${type}_${Date.now()}_${Math.floor(Math.random() * 1000000)}`);
 
             try {
                 let res = await fetch(`https://api.cloudinary.com/v1_1/dyqegwdme/${type}/upload`, { method: "POST", body: formData });
                 let data = await res.json();
-
-                // Cloudinary answers with an error payload (bad/signed preset, wrong
-                // cloud name, bad folder) WITHOUT fetch() ever throwing. The old code
-                // did `data.secure_url || ""` and silently saved an empty string, so
-                // Firebase dropped the field entirely and every product fell back to
-                // the same placeholder photo. Treat a missing secure_url as a failure.
                 if (!res.ok || !data.secure_url) {
-                    lastUploadError = (data && data.error && data.error.message) ? data.error.message : "Cloudinary rejected the upload";
-                    console.error("Cloudinary upload rejected:", data);
+                    lastUploadError = (data && data.error && data.error.message) ? data.error.message : "Cloudinary rejected upload";
                     return "";
                 }
-                lastUploadError = "";
                 return data.secure_url;
             } catch (err) {
-                lastUploadError = err.message || "Network error while uploading";
-                console.error("Cloudinary upload error:", err);
+                lastUploadError = err.message;
                 return "";
             }
         }
@@ -368,54 +365,76 @@
             let colorName2 = document.getElementById('colorName2').value.trim();
             let colorName3 = document.getElementById('colorName3').value.trim();
             let videoInput = document.getElementById('productVideoFile');
-            let sizeKeys = Object.keys(addedSizesList);
 
             if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            if (sizeKeys.length === 0) { tg.showAlert("⚠️ Please add at least one size & quantity!"); return; }
-            if (!file1) { tg.showAlert("⚠️ Product Photo 1 is required!"); return; }
+            if (!file1) { tg.showAlert("⚠️ Color 1 Photo is required!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
 
             let images = [];
             let colorVariants = [];
+            let combinedSizes = { ...addedSizesList };
 
             let url1 = await uploadToCloudinary(file1);
             if (!url1) {
-                // Never publish a product with no image — that's what produced records
-                // with no image field, which then showed the old placeholder photo.
                 document.getElementById('uploadOverlay').style.display = 'none';
-                tg.showAlert(`❌ Photo upload failed: ${lastUploadError}\n\nCloudinary-te "ml_default" preset ta Unsigned kora ache kina check korun (Settings → Upload → Upload presets).`);
+                tg.showAlert(`❌ Photo 1 upload failed: ${lastUploadError}`);
                 return;
             }
             images.push(url1);
-            colorVariants.push({ colorName: colorName1, image: url1 });
+            colorVariants.push({ 
+                colorName: colorName1, 
+                image: url1, 
+                sizes: colorSizesData[1] 
+            });
+            // Merge color 1 sizes into global sizes if added
+            for(let [k, v] of Object.entries(colorSizesData[1])) {
+                combinedSizes[k] = (combinedSizes[k] || 0) + v;
+            }
 
             if(file2) {
                 let url2 = await uploadToCloudinary(file2);
                 if(url2) {
                     images.push(url2);
-                    colorVariants.push({ colorName: colorName2 || 'Color 2', image: url2 });
+                    colorVariants.push({ 
+                        colorName: colorName2 || 'Color 2', 
+                        image: url2, 
+                        sizes: colorSizesData[2] 
+                    });
+                    for(let [k, v] of Object.entries(colorSizesData[2])) {
+                        combinedSizes[k] = (combinedSizes[k] || 0) + v;
+                    }
                 }
             }
+
             if(file3) {
                 let url3 = await uploadToCloudinary(file3);
                 if(url3) {
                     images.push(url3);
-                    colorVariants.push({ colorName: colorName3 || 'Color 3', image: url3 });
+                    colorVariants.push({ 
+                        colorName: colorName3 || 'Color 3', 
+                        image: url3, 
+                        sizes: colorSizesData[3] 
+                    });
+                    for(let [k, v] of Object.entries(colorSizesData[3])) {
+                        combinedSizes[k] = (combinedSizes[k] || 0) + v;
+                    }
                 }
+            }
+
+            if (Object.keys(combinedSizes).length === 0) {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert("⚠️ Please add at least one size & quantity (either general or inside color variants)!");
+                return;
             }
 
             let videoUrl = "";
             if(videoInput.files.length > 0) {
-                // Videos must go to Cloudinary's video endpoint, not the image one
                 videoUrl = await uploadToCloudinary(videoInput.files[0], "video");
-                if (!videoUrl) {
-                    tg.showAlert(`⚠️ Video upload failed (${lastUploadError}). Dress ta video chara publish hocche.`);
-                }
             }
 
             let totalStock = 0;
-            sizeKeys.forEach(s => totalStock += addedSizesList[s]);
+            Object.values(combinedSizes).forEach(q => totalStock += Number(q) || 0);
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
@@ -429,38 +448,21 @@
                 image: images[0],
                 colors: colorVariants,
                 video: videoUrl,
-                sizes: addedSizesList,
+                sizes: combinedSizes,
                 totalStock: totalStock,
                 isTrending: isTrending,
                 isNewArrival: isNewArrival
             };
 
-            // ক্লাউড ডাটাবেজে সেভ — এখন সব অ্যাকাউন্ট থেকেই দেখা যাবে
             let savedKey = await saveDress(newDress);
             document.getElementById('uploadOverlay').style.display = 'none';
             if (!savedKey) {
-                tg.showAlert("❌ Could not save to cloud. db.js এ DB_URL ঠিক আছে কিনা দেখুন।");
+                tg.showAlert("❌ Could not save to cloud.");
                 return;
             }
 
             tg.showAlert(`✅ Dress "${name}" published successfully!`);
-            
-            document.getElementById('newName').value = '';
-            document.getElementById('newProductCode').value = '';
-            document.getElementById('newSubCat').value = '';
-            document.getElementById('newPrice').value = '';
-            document.getElementById('newDetails').value = '';
-            document.getElementById('colorName1').value = '';
-            document.getElementById('colorName2').value = '';
-            document.getElementById('colorName3').value = '';
-            clearImageSlot(1);
-            clearImageSlot(2);
-            clearImageSlot(3);
-            document.getElementById('productVideoFile').value = '';
-            document.getElementById('isTrending').checked = false;
-            document.getElementById('isNewArrival').checked = false;
-            addedSizesList = {};
-            renderSizeTable();
+            location.reload();
         }
     </script>
 </body>
