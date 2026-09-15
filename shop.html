@@ -143,6 +143,17 @@
         tg.expand();
         let currentFilteredDresses = [];
 
+        // Neutral "no photo" placeholder. Previously a missing image fell back to a
+        // real product photo, which made every image-less product look like that
+        // same old dress. An obvious placeholder makes the real problem visible.
+        const NO_IMAGE_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360">
+                <rect width="100%" height="100%" fill="#f3f4f6"/>
+                <text x="50%" y="48%" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#9ca3af">🖼️</text>
+                <text x="50%" y="60%" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#9ca3af">No photo</text>
+            </svg>`
+        );
+
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesFilter();
             await renderProducts();
@@ -208,7 +219,7 @@
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
-                            <img src="${mainImg}" alt="${dress.name}" onerror="this.src='https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'">
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
                         <div>
@@ -254,7 +265,8 @@
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
-            mainImageEl.src = images[0];
+            images = (images || []).filter(Boolean); // drop empty/undefined entries
+            mainImageEl.src = images[0] || NO_IMAGE_PLACEHOLDER;
             thumbContainer.innerHTML = '';
 
             if (images.length > 1) {
@@ -283,7 +295,7 @@
             });
 
             let initialStock = firstSize ? sizesObj[firstSize] : 0;
-            let mainImg = (dress.images && dress.images[0]) || dress.image || '';
+            let mainImg = (dress.images && dress.images[0]) || dress.image || NO_IMAGE_PLACEHOLDER;
 
             let imagesHtml = '';
             if (dress.images && dress.images.length > 0) {
