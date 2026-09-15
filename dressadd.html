@@ -270,7 +270,7 @@
             let type = resourceType || "image";
             let formData = new FormData();
             formData.append("file", file);
-            formData.append("upload_preset", "ml_default");
+            formData.append("upload_preset", "whiteflowery_unsigned");
             // NOTE: folder name must not contain spaces — "shop/Product add" was
             // getting rejected by Cloudinary, which is why no image URL was ever saved.
             formData.append("folder", "shop/product_add");
