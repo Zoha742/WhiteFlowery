@@ -299,8 +299,9 @@
                 }
 
                 let elapsedMs = currentTime - order.createdAt;
-                let tenMinutesMs = 10 * 60 * 1000;
-                let timeLeftMs = tenMinutesMs - elapsedMs;
+                let isCOD = (order.paymentMethod || '').includes('COD');
+                let cancelWindowMs = isCOD ? 5 * 60 * 1000 : 10 * 60 * 1000;
+                let timeLeftMs = cancelWindowMs - elapsedMs;
 
                 let itemsHtml = '';
                 if (order.items && order.items.length > 0) {
@@ -542,14 +543,16 @@
             if (order) {
                 let currentTime = Date.now();
                 let elapsedMs = currentTime - (order.createdAt || currentTime);
-                let tenMinutesMs = 10 * 60 * 1000;
+                let isCOD = (order.paymentMethod || '').includes('COD');
+                let cancelWindowMs = isCOD ? 5 * 60 * 1000 : 10 * 60 * 1000;
+                let windowMinutes = isCOD ? 5 : 10;
 
-                if (elapsedMs <= tenMinutesMs) {
+                if (elapsedMs <= cancelWindowMs) {
                     await updateOrder(order._key, { status: 'Cancelled' });
                     await loadUserOrders();
-                    tg.showAlert("✅ Order cancelled successfully within the 10-minute window!");
+                    tg.showAlert(`✅ Order cancelled successfully within the ${windowMinutes}-minute window!`);
                 } else {
-                    tg.showAlert("⚠️ 10-minute cancellation window has expired!");
+                    tg.showAlert(`⚠️ ${windowMinutes}-minute cancellation window has expired!`);
                 }
             }
         }
