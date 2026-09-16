@@ -91,6 +91,7 @@
         .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
         .nav-icon-wrap { position: relative; display: inline-block; }
+        .nav-label { display: block; }
         .nav-badge {
             position: absolute; top: -5px; right: -9px; background: #ef4444; color: #fff;
             font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; line-height: 15px;
@@ -167,10 +168,10 @@
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
-        <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span>Cart</a>
-        <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+        <a class="nav-item" href="index.html"><span class="nav-icon-wrap"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+        <a class="nav-item active" href="shop.html"><span class="nav-icon-wrap"><i class="fa-solid fa-store"></i></span><span class="nav-label">Shop</span></a>
+        <a class="nav-item" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span><span class="nav-label">Cart</span></a>
+        <a class="nav-item" href="profile.html"><span class="nav-icon-wrap"><i class="fa-solid fa-user"></i></span><span class="nav-label">Profile</span></a>
     </div>
 
     <script src="db.js"></script>
@@ -276,7 +277,7 @@
                     mainImg = dress.images[0];
                 }
 
-                let isWished = wishlist.some(w => w.name === dress.name);
+                let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
                 let summary = ratingSummary(getReviewsForDress(dress));
@@ -309,8 +310,13 @@
             let dress = currentFilteredDresses[index];
             if (!dress) return;
 
+            // দুইটা আলাদা প্রোডাক্টের নাম একই হতে পারে (যেমন কালার-ভ্যারিয়েন্ট আলাদা
+            // এন্ট্রি হিসেবে যোগ করা হলে) — তাই নাম দিয়ে ম্যাচ করলে একটাকে wishlist
+            // করলে একই নামের বাকিগুলোও ভুলভাবে "loved" দেখাতো। এখন _key (unique id)
+            // দিয়ে ম্যাচ হচ্ছে; _key না থাকা পুরনো এন্ট্রির জন্য নাম fallback হিসেবে থাকছে।
+            let uniqueId = dress._key || dress.name;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
-            let existingIdx = wishlist.findIndex(w => w.name === dress.name);
+            let existingIdx = wishlist.findIndex(w => (w.productId || w.name) === uniqueId);
 
             if (existingIdx !== -1) {
                 wishlist.splice(existingIdx, 1);
@@ -319,6 +325,7 @@
                 tg.showAlert("🗑️ Removed from wishlist!");
             } else {
                 wishlist.push({
+                    productId: uniqueId,
                     name: dress.name,
                     price: dress.price,
                     image: dress.image || (dress.images ? dress.images[0] : ''),
