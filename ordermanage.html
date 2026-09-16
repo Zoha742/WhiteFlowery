@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Order Management</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; box-sizing: border-box; padding-bottom: 50px; background: #fff; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: 600; }
+
+        .form-control { width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; margin-bottom: 14px; }
+        .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 13px; font-weight: 700; color: #111; margin: 0 0 12px 0; display: flex; align-items: center; gap: 8px; }
+        
+        .list-box { display: flex; flex-direction: column; gap: 10px; }
+        .list-item { background: #f9fafb; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; display: flex; gap: 12px; align-items: center; }
+        .order-img { width: 65px; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); cursor: pointer; background: #fff; }
+        .order-info { flex: 1; }
+        .item-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; }
+        .item-title { color: #7c3aed; }
+        .item-badge { color: #d97706; font-size: 9px; background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .item-body { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+        
+        .action-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .btn-sm { padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: bold; border: none; cursor: pointer; color: #fff; }
+        .btn-accept { background: #059669; }
+        .btn-cancel { background: #dc2626; }
+        .btn-screenshot { background: #2563eb; }
+        .btn-exchange-toggle { background: #6b7280; }
+        .btn-exchange-toggle.on { background: #7c3aed; }
+
+        .tabs-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-content { background: #fff; border: 1px solid var(--card-border); width: 90%; max-width: 400px; padding: 16px; border-radius: 12px; position: relative; text-align: center; }
+
+        .service-detail-box { background: #fff; border: 1px dashed var(--card-border); border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+        .service-detail-box b { color: #111; }
+        .service-type-pill { font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 4px; }
+
+        .img-thumb-wrap { position: relative; flex-shrink: 0; }
+        .view-badge {
+            position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+            background: #7c3aed; color: #fff; font-size: 8px; font-weight: bold; padding: 1px 6px;
+            border-radius: 5px; display: flex; align-items: center; gap: 2px; white-space: nowrap; cursor: pointer;
+        }
+        .order-date-line { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .replacement-thumb { width: 44px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); vertical-align: middle; margin-right: 6px; cursor: pointer; }
+        .replacement-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+
+        /* Tracking stages */
+        .track-box { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11px; }
+        .track-stage-pill { display: inline-block; font-size: 9px; font-weight: bold; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; }
+        .btn-track { background: #2563eb; }
+        .courier-info { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Review moderation cards */
+        .review-card { background: #f9fafb; border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; }
+        .review-stars { color: #f59e0b; font-size: 13px; letter-spacing: 1px; }
+        .review-product-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .review-product-thumb { width: 40px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--card-border); }
+        .review-comment { font-size: 11px; color: #374151; margin: 6px 0; line-height: 1.4; }
+
+        /* Tracking info modal (courier name + tracking number) */
+        .modal-content .form-control { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-box"></i> Order Management</h3>
+            <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
+        </div>
+
+        <input type="text" id="searchUserId" class="form-control" placeholder="🔍 Search by User ID or Name..." onkeyup="filterOrdersByUserId()">
+
+        <div class="tabs-row">
+            <button class="btn-sm" style="background:#111;" onclick="switchOrderSub('live')">Live Orders</button>
+            <button class="btn-sm btn-accept" onclick="switchOrderSub('accepted')">Accepted History</button>
+            <button class="btn-sm btn-cancel" onclick="switchOrderSub('rejected')">Rejected History</button>
+            <button class="btn-sm" style="background:#7c3aed;" onclick="switchOrderSub('exchange')">Exchange & Refund</button>
+            <button class="btn-sm" style="background:#f59e0b;" onclick="switchOrderSub('reviews')">⭐ Reviews</button>
+        </div>
+
+        <!-- Customer Lookup -->
+        <div id="sub-search" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#7c3aed;"><i class="fa-solid fa-user-magnifying-glass"></i> Customer Lookup</h4>
+            <div class="list-box" id="searchResultsContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">Type a User ID or Name above.</div>
+            </div>
+        </div>
+
+        <!-- Live Orders -->
+        <div id="sub-live" class="order-sub-section admin-card">
+            <h4 class="card-title">Live Orders</h4>
+            <div class="list-box" id="liveOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No live orders found.</div>
+            </div>
+        </div>
+
+        <!-- Accepted History -->
+        <div id="sub-accepted" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#059669;">Accepted Orders History</h4>
+            <div class="list-box" id="acceptedOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>
+            </div>
+        </div>
+
+        <!-- Rejected History -->
+        <div id="sub-rejected" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#dc2626;">Rejected Orders History</h4>
+            <div class="list-box" id="rejectedOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>
+            </div>
+        </div>
+
+        <!-- Exchange & Refund Requests -->
+        <div id="sub-exchange" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#7c3aed;">Exchange & Refund Requests</h4>
+            <div class="list-box" id="exchangeOrdersContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No exchange/refund requests yet.</div>
+            </div>
+        </div>
+
+        <!-- Reviews (moderation) -->
+        <div id="sub-reviews" class="order-sub-section admin-card" style="display:none;">
+            <h4 class="card-title" style="color:#f59e0b;">Customer Reviews</h4>
+            <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Delete a review if it's fake or inappropriate.</p>
+            <div class="list-box" id="reviewsContainer">
+                <div class="item-body" style="text-align: center; color: var(--text-muted);">No reviews yet.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal()">&times;</span>
+            <h4 style="color:#111; margin-bottom:10px;">Preview</h4>
+            <img id="modalImgSrc" src="" alt="Preview" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px;">
+        </div>
+    </div>
+
+    <div id="trackingModal" class="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:10px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeTrackingModal()">&times;</span>
+            <h4 style="color:#111; margin-bottom:10px;">Mark Out for Delivery</h4>
+            <input type="text" id="courierNameInput" class="form-control" placeholder="Courier name (e.g. Pathao, Sundarban)">
+            <input type="text" id="trackingNumberInput" class="form-control" placeholder="Tracking number (optional)">
+            <button class="btn-sm btn-track" style="width:100%; padding:10px;" onclick="submitTrackingInfo()">Confirm & Send</button>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        // requireAdmin();       // ডেমোর জন্য সাময়িকভাবে বন্ধ — সবাই এই পেজ খুলতে পারবে। পরে আনকমেন্ট করে আবার লক করুন।
+
+        let lastActiveTab = 'live';
+        let ALL_ORDERS = [];     // ক্লাউড থেকে লোড হওয়া সব অর্ডার
+
+        function formatDateTime(ts) {
+            if (!ts) return 'N/A';
+            let d = new Date(ts);
+            return d.toLocaleDateString() + ' , ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadAllOrders();
+            await loadReviews();
+        });
+
+        async function loadAllOrders() {
+            // সব টেলিগ্রাম আইডির অর্ডার একসাথে — ক্লাউড ডাটাবেজ থেকে
+            ALL_ORDERS = await getAllOrders();
+            let orders = ALL_ORDERS;
+            let liveContainer = document.getElementById('liveOrdersContainer');
+            let acceptedContainer = document.getElementById('acceptedOrdersContainer');
+            let rejectedContainer = document.getElementById('rejectedOrdersContainer');
+            let exchangeContainer = document.getElementById('exchangeOrdersContainer');
+
+            liveContainer.innerHTML = '';
+            acceptedContainer.innerHTML = '';
+            rejectedContainer.innerHTML = '';
+            exchangeContainer.innerHTML = '';
+
+            let hasLive = false, hasAccepted = false, hasRejected = false, hasExchange = false;
+
+            orders.forEach((order, index) => {
+                let itemsDesc = '';
+                if(order.items && order.items.length > 0) {
+                    itemsDesc = order.items.map(i => `${i.name} (Size: ${i.size || 'N/A'}, Qty: ${i.qty})`).join(', ');
+                }
+                let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+
+                let exchangeToggleHtml = '';
+                if (order.status === 'Accepted') {
+                    exchangeToggleHtml = `
+                        <div class="action-row">
+                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled(${index})">
+                                <i class="fa-solid fa-rotate"></i> ${order.exchangeEnabled ? 'Exchange/Refund: ON' : 'Enable Exchange/Refund'}
+                            </button>
+                        </div>
+                    `;
+                }
+
+                let itemHtml = buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml);
+
+                if(order.status === 'Accepted') {
+                    hasAccepted = true;
+                    acceptedContainer.innerHTML += itemHtml;
+                } else if(order.status === 'Rejected') {
+                    hasRejected = true;
+                    rejectedContainer.innerHTML += itemHtml;
+                } else {
+                    hasLive = true;
+                    liveContainer.innerHTML += itemHtml;
+                }
+
+                if (order.serviceRequest) {
+                    hasExchange = true;
+                    exchangeContainer.innerHTML += buildExchangeRequestItemHtml(order, index);
+                }
+            });
+
+            if(!hasLive) liveContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No live orders found.</div>`;
+            if(!hasAccepted) acceptedContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No accepted orders yet.</div>`;
+            if(!hasRejected) rejectedContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No rejected orders yet.</div>`;
+            if(!hasExchange) exchangeContainer.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No exchange/refund requests yet.</div>`;
+        }
+
+        // ---------- Reviews (moderation) ----------
+        let ALL_REVIEWS = [];
+
+        async function loadReviews() {
+            ALL_REVIEWS = await getAllReviews();
+            let container = document.getElementById('reviewsContainer');
+
+            if (ALL_REVIEWS.length === 0) {
+                container.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No reviews yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = ALL_REVIEWS.map((rev, idx) => {
+                let starsHtml = '★'.repeat(rev.rating || 0) + '☆'.repeat(5 - (rev.rating || 0));
+                return `
+                    <div class="review-card">
+                        <div class="review-product-row">
+                            <img src="${rev.productImage || 'https://via.placeholder.com/100'}" class="review-product-thumb">
+                            <div>
+                                <div style="font-weight:bold; font-size:12px; color:#111;">${rev.productName || 'Product'}</div>
+                                <div class="review-stars">${starsHtml}</div>
+                            </div>
+                        </div>
+                        <div class="review-comment">"${rev.comment || ''}"</div>
+                        <div class="order-date-line">
+                            <b>${rev.userName || 'Customer'}</b> &nbsp;|&nbsp; Order #${rev.orderId || 'N/A'} &nbsp;|&nbsp; ${formatDateTime(rev.createdAt)}
+                        </div>
+                        <div class="action-row">
+                            <button class="btn-sm btn-cancel" onclick="deleteReviewByKey(${idx})"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function deleteReviewByKey(idx) {
+            let rev = ALL_REVIEWS[idx];
+            if (!rev) return;
+            if (!confirm("Delete this review permanently?")) return;
+            await deleteReview(rev._key);
+            await loadReviews();
+            tg.showAlert("🗑️ Review deleted.");
+        }
+
+        function buildExchangeRequestItemHtml(order, index) {
+            let sr = order.serviceRequest;
+            let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+            let typeColor = sr.type === 'exchange' ? '#7c3aed' : '#d97706';
+            let typeBg = sr.type === 'exchange' ? '#ede9fe' : '#fef3c7';
+
+            let statusColor = sr.status === 'Delivered' ? '#059669' : sr.status === 'Rejected' ? '#dc2626' : sr.status === 'Processing' ? '#2563eb' : '#d97706';
+            let statusBg = sr.status === 'Delivered' ? '#ecfdf5' : sr.status === 'Rejected' ? '#fee2e2' : sr.status === 'Processing' ? '#dbeafe' : '#fef3c7';
+
+            let replacementHtml = (sr.type === 'exchange' && sr.newItem)
+                ? `<div class="replacement-row">
+                       <img src="${sr.newItem.image || 'https://via.placeholder.com/100'}" class="replacement-thumb" onclick="viewModalImage(this.src)">
+                       <div>
+                           <div><b>Replacement:</b> ${sr.newItem.name}</div>
+                           <div>Tk ${Number(sr.newItem.price).toLocaleString()}.00</div>
+                       </div>
+                   </div>`
+                : '';
+
+            let actionButtons = '';
+            if (sr.status === 'Requested') {
+                actionButtons = `
+                    <div class="action-row">
+                        <button class="btn-sm btn-accept" onclick="updateServiceStatus(${index}, 'Processing')">Start Processing</button>
+                        <button class="btn-sm btn-cancel" onclick="updateServiceStatus(${index}, 'Rejected')">Reject</button>
+                    </div>
+                `;
+            } else if (sr.status === 'Processing') {
+                actionButtons = `
+                    <div class="action-row">
+                        <button class="btn-sm btn-accept" onclick="updateServiceStatus(${index}, 'Delivered')">Mark Delivered</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
+                    <div class="img-thumb-wrap">
+                        <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                        <span class="view-badge" onclick="viewModalImage('${imgUrl}')"><i class="fa-solid fa-eye"></i> View</span>
+                    </div>
+                    <div class="order-info">
+                        <div class="item-header">
+                            <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
+                            <span class="item-badge" style="color:${statusColor}; background:${statusBg};">${sr.status}</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Customer:</b> ${order.userName || 'Customer'}
+                            <span class="service-type-pill" style="color:${typeColor}; background:${typeBg};">${sr.type}</span>
+                            <div class="order-date-line"><i class="fa-regular fa-clock"></i> Requested: ${formatDateTime(sr.requestedAt)}</div>
+                        </div>
+                        <div class="service-detail-box">
+                            <b>Reason:</b> ${sr.reason}
+                            ${replacementHtml}
+                        </div>
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml) {
+            let serviceSummaryHtml = '';
+            if (order.serviceRequest) {
+                let sr = order.serviceRequest;
+                let typeColor = sr.type === 'exchange' ? '#7c3aed' : '#d97706';
+                let typeBg = sr.type === 'exchange' ? '#ede9fe' : '#fef3c7';
+                let replacementHtml = (sr.type === 'exchange' && sr.newItem)
+                    ? `<div class="replacement-row">
+                           <img src="${sr.newItem.image || 'https://via.placeholder.com/100'}" class="replacement-thumb" onclick="viewModalImage(this.src)">
+                           <span>${sr.newItem.name} (Tk ${Number(sr.newItem.price).toLocaleString()}.00)</span>
+                       </div>`
+                    : '';
+                serviceSummaryHtml = `
+                    <div class="service-detail-box">
+                        <span class="service-type-pill" style="color:${typeColor}; background:${typeBg};">${sr.type}</span>
+                        <b>Status:</b> ${sr.status} &nbsp;|&nbsp; <b>Reason:</b> ${sr.reason}
+                        ${replacementHtml}
+                    </div>
+                `;
+            }
+
+            let trackingHtml = '';
+            if (order.status === 'Accepted') {
+                trackingHtml = buildTrackingSectionHtml(order, index);
+            }
+
+            return `
+                <div class="list-item" data-userid="${order.userId || 'Guest'}" data-index="${index}">
+                    <div class="img-thumb-wrap">
+                        <img src="${imgUrl}" class="order-img" onclick="viewModalImage(this.src)">
+                        <span class="view-badge" onclick="viewModalImage('${imgUrl}')"><i class="fa-solid fa-eye"></i> View</span>
+                    </div>
+                    <div class="order-info">
+                        <div class="item-header">
+                            <span class="item-title">Order #${order.orderId || 'WF-9021'}</span>
+                            <span class="item-badge" style="${order.status === 'Accepted' ? 'color:#059669; background:#ecfdf5;' : order.status === 'Rejected' ? 'color:#dc2626; background:#fee2e2;' : ''}">${order.status || 'Pending'}</span>
+                        </div>
+                        <div class="item-body">
+                            <b>Customer:</b> ${order.userName || 'Customer'}<br>
+                            <b>Items:</b> ${itemsDesc}<br>
+                            <b>Total:</b> Tk ${Number(order.totalAmount || 0).toLocaleString()}.00
+                            <div class="order-date-line"><i class="fa-regular fa-clock"></i> ${formatDateTime(order.createdAt)}</div>
+                        </div>
+                        ${order.status === 'Pending' || !order.status ? `
+                            <div class="action-row">
+                                <button class="btn-sm btn-accept" onclick="updateOrderStatus(${index}, 'Accepted')">Accept</button>
+                                <button class="btn-sm btn-cancel" onclick="updateOrderStatus(${index}, 'Rejected')">Reject</button>
+                            </div>
+                        ` : ''}
+                        ${trackingHtml}
+                        ${exchangeToggleHtml}
+                        ${serviceSummaryHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Builds the tracking-stage badge + the admin's next-step button for an Accepted order
+        function buildTrackingSectionHtml(order, index) {
+            let stage = order.trackingStage || 'Processing';
+            let stageColors = {
+                'Processing': { color: '#d97706', bg: '#fef3c7' },
+                'Out for Delivery': { color: '#2563eb', bg: '#dbeafe' },
+                'Delivered': { color: '#059669', bg: '#ecfdf5' },
+                'Confirmed': { color: '#059669', bg: '#ecfdf5' }
+            };
+            let sc = stageColors[stage] || stageColors['Processing'];
+
+            let courierLine = (stage === 'Out for Delivery' || stage === 'Delivered' || stage === 'Confirmed') && order.courierName
+                ? `<div class="courier-info"><b>Courier:</b> ${order.courierName}${order.trackingNumber ? ` &nbsp;|&nbsp; <b>Tracking #:</b> ${order.trackingNumber}` : ''}</div>`
+                : '';
+
+            let actionBtn = '';
+            if (stage === 'Processing') {
+                actionBtn = `<button class="btn-sm btn-track" onclick="openTrackingModal(${index})"><i class="fa-solid fa-truck"></i> Mark Out for Delivery</button>`;
+            } else if (stage === 'Out for Delivery') {
+                actionBtn = `<button class="btn-sm btn-accept" onclick="markStageDelivered(${index})"><i class="fa-solid fa-box-open"></i> Mark Delivered</button>`;
+            } else if (stage === 'Delivered') {
+                actionBtn = `<span style="font-size:10px; color:var(--text-muted);"><i class="fa-solid fa-hourglass-half"></i> Waiting for customer to confirm receipt...</span>`;
+            } else if (stage === 'Confirmed') {
+                actionBtn = `<span style="font-size:10px; color:#059669; font-weight:bold;"><i class="fa-solid fa-circle-check"></i> Completed — customer confirmed receipt</span>`;
+            }
+
+            return `
+                <div class="track-box">
+                    <span class="track-stage-pill" style="color:${sc.color}; background:${sc.bg};">${stage}</span>
+                    ${courierLine}
+                    <div class="action-row">${actionBtn}</div>
+                </div>
+            `;
+        }
+
+        async function updateOrderStatus(index, newStatus) {
+            let order = ALL_ORDERS[index];
+            if (!order) return;
+            let patch = { status: newStatus };
+            if (newStatus === 'Accepted') {
+                // The moment admin accepts, the customer should immediately see "Processing"
+                patch.trackingStage = 'Processing';
+            }
+            await updateOrder(order._key, patch);
+            await loadAllOrders();
+            tg.showAlert(`✅ Order #${order.orderId} marked as ${newStatus}!`);
+        }
+
+        // ---------- Delivery tracking progression ----------
+        let activeTrackingOrderIndex = null;
+
+        function openTrackingModal(index) {
+            activeTrackingOrderIndex = index;
+            document.getElementById('courierNameInput').value = '';
+            document.getElementById('trackingNumberInput').value = '';
+            document.getElementById('trackingModal').style.display = 'flex';
+        }
+
+        function closeTrackingModal() {
+            document.getElementById('trackingModal').style.display = 'none';
+        }
+
+        async function submitTrackingInfo() {
+            if (activeTrackingOrderIndex === null) return;
+            let order = ALL_ORDERS[activeTrackingOrderIndex];
+            if (!order) return;
+
+            let courierName = document.getElementById('courierNameInput').value.trim();
+            let trackingNumber = document.getElementById('trackingNumberInput').value.trim();
+
+            await updateOrder(order._key, {
+                trackingStage: 'Out for Delivery',
+                courierName: courierName || 'N/A',
+                trackingNumber: trackingNumber || ''
+            });
+            closeTrackingModal();
+            await loadAllOrders();
+            tg.showAlert(`🚚 Order #${order.orderId} marked as Out for Delivery!`);
+        }
+
+        async function markStageDelivered(index) {
+            let order = ALL_ORDERS[index];
+            if (!order) return;
+            await updateOrder(order._key, { trackingStage: 'Delivered' });
+            await loadAllOrders();
+            tg.showAlert(`✅ Order #${order.orderId} marked as Delivered — waiting for customer confirmation.`);
+        }
+
+        async function toggleExchangeEnabled(index) {
+            let order = ALL_ORDERS[index];
+            if (!order) return;
+            let newVal = !order.exchangeEnabled;
+            await updateOrder(order._key, { exchangeEnabled: newVal });
+            await loadAllOrders();
+            tg.showAlert(newVal
+                ? `✅ Exchange/Refund enabled for Order #${order.orderId}!`
+                : `⚠️ Exchange/Refund disabled for Order #${order.orderId}.`);
+        }
+
+        async function updateServiceStatus(index, newStatus) {
+            let order = ALL_ORDERS[index];
+            if (!order || !order.serviceRequest) return;
+            let sr = { ...order.serviceRequest, status: newStatus };
+            await updateOrder(order._key, { serviceRequest: sr });
+            await loadAllOrders();
+            tg.showAlert(`✅ ${sr.type} request marked as ${newStatus}!`);
+        }
+
+        function switchOrderSub(subId) {
+            lastActiveTab = subId;
+            document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
+            document.getElementById(`sub-${subId}`).style.display = 'block';
+        }
+
+        function closeModal() { document.getElementById('imageModal').style.display = 'none'; }
+        
+        function viewModalImage(imgUrl) {
+            if (!imgUrl) return;
+            document.getElementById('modalImgSrc').src = imgUrl;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function filterOrdersByUserId() {
+            let query = document.getElementById('searchUserId').value.trim().toLowerCase();
+
+            if (!query) {
+                switchOrderSub(lastActiveTab || 'live');
+                return;
+            }
+
+            document.querySelectorAll('.order-sub-section').forEach(el => el.style.display = 'none');
+            document.getElementById('sub-search').style.display = 'block';
+
+            let orders = ALL_ORDERS;
+            let container = document.getElementById('searchResultsContainer');
+
+            let matches = orders
+                .map((o, idx) => ({ order: o, index: idx }))
+                .filter(({ order }) => {
+                    let uid = (order.userId || '').toString().toLowerCase();
+                    let uname = (order.userName || '').toString().toLowerCase();
+                    return uid.includes(query) || uname.includes(query);
+                });
+
+            if (matches.length === 0) {
+                container.innerHTML = `<div class="item-body" style="text-align: center; color: var(--text-muted);">No orders found for "${query}".</div>`;
+                return;
+            }
+
+            container.innerHTML = matches.map(({ order, index }) => {
+                let itemsDesc = (order.items && order.items.length > 0)
+                    ? order.items.map(i => `${i.name} (Size: ${i.size || 'N/A'}, Qty: ${i.qty})`).join(', ')
+                    : 'N/A';
+                let imgUrl = (order.items && order.items[0] && order.items[0].image) ? order.items[0].image : 'https://via.placeholder.com/100';
+
+                let exchangeToggleHtml = '';
+                if (order.status === 'Accepted') {
+                    exchangeToggleHtml = `
+                        <div class="action-row">
+                            <button class="btn-sm btn-exchange-toggle ${order.exchangeEnabled ? 'on' : ''}" onclick="toggleExchangeEnabled(${index})">
+                                <i class="fa-solid fa-rotate"></i> ${order.exchangeEnabled ? 'Exchange/Refund: ON' : 'Enable Exchange/Refund'}
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return buildOrderListItemHtml(order, index, itemsDesc, imgUrl, exchangeToggleHtml);
+            }).join('');
+        }
+    </script>
+</body>
+</html>

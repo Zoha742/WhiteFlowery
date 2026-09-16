@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - My Orders</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-border: #e5e7eb;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 90px 0;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 480px; padding: 16px; box-sizing: border-box; background: #ffffff; }
+
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .brand-title { margin: 0; font-size: 18px; font-weight: 800; color: #111111; display: flex; align-items: center; gap: 8px; }
+        .back-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; padding: 6px 12px; border-radius: 8px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+
+        /* Order Card Style */
+        .orders-list { display: flex; flex-direction: column; gap: 14px; }
+        .order-card {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 12px; padding: 16px; position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .order-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 12px;
+            font-size: 12px;
+        }
+        .order-id { color: #7c3aed; font-weight: bold; }
+        
+        /* Status Badges */
+        .status-badge { font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+        .status-accepted { background: #ecfdf5; color: #059669; border: 1px solid #10b981; }
+        .status-pending { background: #fef3c7; color: #d97706; border: 1px solid #f59e0b; }
+        .status-cancelled { background: #fee2e2; color: #dc2626; border: 1px solid #ef4444; }
+
+        .order-item-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #f3f4f6; padding-bottom: 8px; }
+        .order-item-img { width: 55px; height: 65px; object-fit: contain; border-radius: 6px; background: #f9fafb; border: 1px solid var(--card-border); flex-shrink: 0; cursor: pointer; }
+
+        .mini-view-btn {
+            display: inline-flex; align-items: center; gap: 4px; background: #ede9fe; color: #7c3aed;
+            border: 1px solid #ddd6fe; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px; cursor: pointer; margin-left: 6px;
+        }
+        .order-date-line { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        
+        .dress-name { font-weight: bold; color: #111; margin-bottom: 2px; font-size: 13px; }
+        .dress-specs { display: flex; gap: 10px; color: var(--text-muted); font-size: 11px; }
+        .spec-item { background: #f9fafb; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--card-border); }
+
+        .order-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--card-border); padding-top: 10px; margin-top: 10px;
+        }
+        .total-label { font-size: 11px; color: var(--text-muted); }
+        .total-amount { font-size: 15px; font-weight: bold; color: #111; }
+
+        .cancel-btn {
+            background: #fee2e2; color: #dc2626; border: 1px solid #fecaca;
+            padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px; margin-top: 8px;
+        }
+        .cancel-btn:active { background: #dc2626; color: #fff; }
+
+        .cooldown-timer { font-size: 11px; color: #d97706; font-weight: 600; margin-top: 6px; display: block; }
+
+        /* Delivery tracking */
+        .track-timeline { display: flex; justify-content: space-between; margin: 10px 0 6px 0; position: relative; }
+        .track-step { flex: 1; text-align: center; font-size: 9px; color: #9ca3af; position: relative; }
+        .track-step .dot { width: 18px; height: 18px; border-radius: 50%; background: #e5e7eb; color: #fff; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px auto; font-size: 9px; }
+        .track-step.done .dot { background: #059669; }
+        .track-step.current .dot { background: #7c3aed; }
+        .track-step.done, .track-step.current { color: #111; font-weight: 600; }
+        .track-line { position: absolute; top: 9px; left: -50%; width: 100%; height: 2px; background: #e5e7eb; z-index: -1; }
+        .track-step:first-child .track-line { display: none; }
+        .track-step.done .track-line, .track-step.current .track-line { background: #059669; }
+        .courier-line { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 4px; }
+
+        .confirm-delivery-btn {
+            width: 100%; background: #059669; color: #fff; border: none; padding: 9px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+
+        /* Per-item review */
+        .review-item-box { background: #f9fafb; border: 1px solid var(--card-border); border-radius: 8px; padding: 8px 10px; margin-top: 6px; }
+        .review-item-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .review-item-name { font-size: 11px; font-weight: 600; color: #111; }
+        .rate-btn {
+            background: #f59e0b; color: #fff; border: none; padding: 5px 10px; border-radius: 6px;
+            font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .submitted-stars { color: #f59e0b; font-size: 13px; letter-spacing: 1px; }
+        .submitted-comment { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        .star-picker { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; }
+        .star-picker span { font-size: 30px; color: #d1d5db; cursor: pointer; }
+        .star-picker span.active { color: #f59e0b; }
+
+        /* Exchange / Refund service buttons + status */
+        .service-btn-row { display: flex; gap: 6px; margin-top: 10px; }
+        .service-btn {
+            flex: 1; border: none; padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; color: #fff;
+        }
+        .exchange-btn { background: #7c3aed; }
+        .exchange-btn:active { background: #6d28d9; }
+        .refund-btn { background: #d97706; }
+        .refund-btn:active { background: #b45309; }
+
+        .service-status-box {
+            margin-top: 10px; background: #f9fafb; border: 1px solid var(--card-border); border-radius: 8px;
+            padding: 8px 10px; font-size: 11px; color: var(--text-muted);
+        }
+        .service-status-box b { color: #111; }
+        .service-status-pill {
+            display: inline-block; font-size: 9px; font-weight: bold; padding: 2px 7px; border-radius: 5px;
+            text-transform: uppercase; margin-left: 4px;
+        }
+
+        /* Modals (Reason popup + Exchange product picker) — hidden by default */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 16px; box-sizing: border-box; }
+        .modal-content { background: #fff; border: 1px solid var(--card-border); width: 100%; max-width: 400px; padding: 18px; border-radius: 14px; position: relative; max-height: 85vh; overflow-y: auto; }
+        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer; color: #111; }
+        .modal-title { margin: 0 0 4px 0; font-size: 15px; font-weight: 800; color: #111; }
+        .modal-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        .reason-textarea {
+            width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111;
+            padding: 10px; border-radius: 8px; box-sizing: border-box; font-size: 12px; height: 80px; resize: none; margin-bottom: 12px;
+        }
+        .modal-submit-btn {
+            width: 100%; border: none; padding: 11px; border-radius: 8px; font-weight: 700; font-size: 13px;
+            color: #fff; cursor: pointer;
+        }
+
+        .exchange-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+        .exchange-pick-card {
+            border: 1px solid var(--card-border); border-radius: 10px; padding: 8px; cursor: pointer; background: #f9fafb;
+        }
+        .exchange-pick-card:active { background: #ede9fe; border-color: #7c3aed; }
+        .exchange-pick-card img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-bottom: 6px; }
+        .exchange-pick-name { font-size: 11px; font-weight: bold; color: #111; }
+        .exchange-pick-price { font-size: 11px; color: #7c3aed; font-weight: bold; }
+
+        /* White Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: #ffffff;
+            border-top: 1px solid var(--card-border); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+        }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #111111; font-weight: 700; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="app-header">
+            <h3 class="brand-title"><i class="fa-solid fa-box-archive"></i> My Orders</h3>
+            <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
+        </div>
+
+        <!-- Orders List Container -->
+        <div class="orders-list" id="ordersListContainer">
+            <!-- Dynamically populated from localStorage -->
+        </div>
+    </div>
+
+    <!-- Reason Popup (Exchange or Refund) - hidden by default -->
+    <div id="serviceReasonModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeServiceReasonModal()">&times;</span>
+            <h4 class="modal-title" id="serviceModalTitle">Request Exchange</h4>
+            <p class="modal-sub">Please tell us the reason so we can review it:</p>
+            <textarea id="serviceReasonInput" class="reason-textarea" placeholder="e.g. Wrong size received, fabric/color issue, etc."></textarea>
+            <button class="modal-submit-btn" id="serviceModalSubmitBtn" style="background:#7c3aed;" onclick="proceedServiceRequest()">Continue</button>
+        </div>
+    </div>
+
+    <!-- Exchange Replacement Product Picker - hidden by default -->
+    <div id="exchangePickerModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeExchangePicker()">&times;</span>
+            <h4 class="modal-title">Select Replacement Product</h4>
+            <p class="modal-sub">Pick the product you'd like to exchange for:</p>
+            <div class="exchange-grid" id="exchangeProductGrid"></div>
+        </div>
+    </div>
+
+    <!-- Image Zoom Modal (used for order items + exchange replacement photos) -->
+    <div id="imageZoomModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <span class="modal-close" onclick="closeImageZoom()">&times;</span>
+            <img id="zoomModalImg" src="" alt="Zoom" style="width:100%; max-height:350px; object-fit:contain; border-radius:8px;">
+        </div>
+    </div>
+
+    <!-- Review Modal (per product) - hidden by default -->
+    <div id="reviewModal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <span class="modal-close" onclick="closeReviewModal()">&times;</span>
+            <h4 class="modal-title" id="reviewModalProductName">Rate this product</h4>
+            <p class="modal-sub">How was it? Tap a star:</p>
+            <div class="star-picker" id="starPicker">
+                <span data-val="1" onclick="setReviewRating(1)">★</span>
+                <span data-val="2" onclick="setReviewRating(2)">★</span>
+                <span data-val="3" onclick="setReviewRating(3)">★</span>
+                <span data-val="4" onclick="setReviewRating(4)">★</span>
+                <span data-val="5" onclick="setReviewRating(5)">★</span>
+            </div>
+            <textarea id="reviewCommentInput" class="reason-textarea" style="text-align:left;" placeholder="Write a short comment (fabric, fit, quality, etc.)"></textarea>
+            <button class="modal-submit-btn" style="background:#f59e0b;" onclick="submitReview()">Submit Review</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item active" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+    </div>
+
+    <script src="db.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Which order + which service (exchange/refund) the popup is currently working on
+        let activeServiceOrderIndex = null;
+        let activeServiceType = null;
+        let pendingExchangeReason = "";
+
+        let CURRENT_ORDERS = [];   // এই বায়ারের অর্ডার, ক্লাউড থেকে লোড হওয়া
+        let EXCHANGE_DRESSES = []; // এক্সচেঞ্জ পিকারে দেখানো প্রোডাক্ট লিস্ট
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadUserOrders();          // ক্লাউড থেকে প্রথমবার লোড
+            setInterval(renderOrders, 1000);       // প্রতি সেকেন্ডে শুধু টাইমার রিফ্রেশ (নেটওয়ার্ক কল ছাড়া)
+            setInterval(loadUserOrders, 8000);     // প্রতি ৮ সেকেন্ডে ক্লাউড থেকে নতুন স্ট্যাটাস চেক
+        });
+
+        function formatDateTime(ts) {
+            if (!ts) return 'N/A';
+            let d = new Date(ts);
+            return d.toLocaleDateString() + ' , ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function openImageZoom(url) {
+            if (!url) return;
+            document.getElementById('zoomModalImg').src = url;
+            document.getElementById('imageZoomModal').style.display = 'flex';
+        }
+
+        function closeImageZoom() {
+            document.getElementById('imageZoomModal').style.display = 'none';
+        }
+
+        async function loadUserOrders() {
+            // এই টেলিগ্রাম আইডির অর্ডার শুধু — ক্লাউড ডাটাবেজ থেকে
+            CURRENT_ORDERS = await getMyOrders(currentUserId());
+            renderOrders();
+        }
+
+        function renderOrders() {
+            let container = document.getElementById('ordersListContainer');
+            let orders = CURRENT_ORDERS;
+
+            container.innerHTML = '';
+
+            if (orders.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color: #666; padding: 40px; font-size: 13px;">No orders placed yet.</div>`;
+                return;
+            }
+
+            let currentTime = Date.now();
+            let updated = false;
+
+            orders.forEach((order, index) => {
+                if (!order.createdAt) {
+                    order.createdAt = currentTime;
+                    updated = true;
+                }
+
+                let elapsedMs = currentTime - order.createdAt;
+                let tenMinutesMs = 10 * 60 * 1000;
+                let timeLeftMs = tenMinutesMs - elapsedMs;
+
+                let itemsHtml = '';
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        let img = item.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp';
+                        itemsHtml += `
+                            <div class="order-item-row">
+                                <img src="${img}" class="order-item-img" alt="${item.name}" onclick="openImageZoom('${img}')">
+                                <div>
+                                    <div class="dress-name">${item.name}</div>
+                                    <div class="dress-specs">
+                                        <span class="spec-item">Size: <b>${item.size || 'N/A'}</b></span>
+                                        <span class="spec-item">Qty: <b>${item.qty} Pcs</b></span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                let statusBadgeHtml = '';
+                let actionHtml = '';
+
+                if (order.status === 'Cancelled') {
+                    statusBadgeHtml = `<span class="status-badge status-cancelled"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+                } else if (order.status === 'Accepted') {
+                    let stage = order.trackingStage || 'Processing';
+                    let stageLabel = stage === 'Confirmed' ? 'Delivered & Reviewed' : stage;
+                    statusBadgeHtml = `<span class="status-badge status-accepted"><i class="fa-solid fa-check-circle"></i> ${stageLabel}</span>`;
+                    actionHtml += buildTrackingTimelineHtml(order, index, stage);
+                    if (stage === 'Confirmed') {
+                        actionHtml += buildReviewSectionHtml(order, index);
+                    }
+                    // Exchange / Refund service — only offered once Admin has enabled it for this order
+                    actionHtml += buildServiceSectionHtml(order, index);
+                } else {
+                    if (timeLeftMs > 0) {
+                        let minutes = Math.floor((timeLeftMs % (1000 * 60 * 60)) / (1000 * 60));
+                        let seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
+                        let timerStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                        statusBadgeHtml = `<span class="status-badge status-pending"><i class="fa-solid fa-clock"></i> Pending (Review)</span>`;
+                        actionHtml = `
+                            <span class="cooldown-timer"><i class="fa-solid hourglass-start"></i> Cancellation available for: <b>${timerStr}</b></span>
+                            <button class="cancel-btn" onclick="cancelOrder(${index})"><i class="fa-solid fa-xmark"></i> Cancel Order</button>
+                        `;
+                    } else {
+                        // 10 minutes passed, order goes to Admin live orders
+                        statusBadgeHtml = `<span class="status-badge status-pending"><i class="fa-solid fa-paper-plane"></i> Sent to Admin</span>`;
+                    }
+                }
+
+                container.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <span class="order-id">#${order.orderId || 'WF-9021'}</span>
+                                <div class="order-date-line"><i class="fa-regular fa-clock"></i> ${formatDateTime(order.createdAt)}</div>
+                            </div>
+                            ${statusBadgeHtml}
+                        </div>
+                        <div class="order-details">
+                            ${itemsHtml}
+                        </div>
+                        <div class="order-footer">
+                            <div>
+                                <span class="total-label">Total Payment</span>
+                            </div>
+                            <div class="total-amount">Tk ${Number(order.totalAmount || 0).toLocaleString()}.00</div>
+                        </div>
+                        ${actionHtml}
+                    </div>
+                `;
+            });
+
+            // updated createdAt টাইমস্ট্যাম্প ক্লাউডে সিঙ্ক করা (কালেভদ্রে ঘটে)
+            if (updated) {
+                orders.forEach(o => { if (o._key) updateOrder(o._key, { createdAt: o.createdAt }); });
+            }
+        }
+
+        // Builds the Exchange/Refund buttons OR the current request's status box for an accepted order
+        // Builds the visual Processing -> Out for Delivery -> Delivered timeline,
+        // plus the "Confirm Delivery" button once the courier has delivered it.
+        function buildTrackingTimelineHtml(order, index, stage) {
+            let steps = ['Processing', 'Out for Delivery', 'Delivered'];
+            let currentIdx = stage === 'Confirmed' ? 2 : steps.indexOf(stage);
+            if (currentIdx < 0) currentIdx = 0;
+
+            let stepsHtml = steps.map((label, i) => {
+                let cls = i < currentIdx ? 'done' : (i === currentIdx ? 'current' : '');
+                let icon = i < currentIdx || (i === currentIdx && stage === 'Confirmed') ? '<i class="fa-solid fa-check"></i>' : (i + 1);
+                return `
+                    <div class="track-step ${cls}">
+                        <div class="track-line"></div>
+                        <div class="dot">${icon}</div>
+                        ${label}
+                    </div>
+                `;
+            }).join('');
+
+            let courierLine = order.courierName
+                ? `<div class="courier-line"><b>Courier:</b> ${order.courierName}${order.trackingNumber ? ` &nbsp;|&nbsp; <b>Tracking #:</b> ${order.trackingNumber}` : ''}</div>`
+                : '';
+
+            let confirmBtn = (stage === 'Delivered')
+                ? `<button class="confirm-delivery-btn" onclick="confirmDelivery(${index})"><i class="fa-solid fa-box-open"></i> I Received This — Confirm Delivery</button>`
+                : '';
+
+            return `
+                <div class="track-timeline">${stepsHtml}</div>
+                ${courierLine}
+                ${confirmBtn}
+            `;
+        }
+
+        async function confirmDelivery(index) {
+            let order = CURRENT_ORDERS[index];
+            if (!order) return;
+            await updateOrder(order._key, { trackingStage: 'Confirmed' });
+            await loadUserOrders();
+            tg.showAlert("✅ Delivery confirmed! You can now rate & review your item(s).");
+        }
+
+        // ---------- Per-item reviews (shown once delivery is Confirmed) ----------
+        let activeReviewOrderIndex = null;
+        let activeReviewItemIndex = null;
+        let activeReviewRating = 0;
+
+        function buildReviewSectionHtml(order, index) {
+            if (!order.items || order.items.length === 0) return '';
+            let itemReviews = order.itemReviews || {};
+
+            return order.items.map((item, itemIdx) => {
+                let rev = itemReviews[itemIdx];
+                if (rev) {
+                    let starsHtml = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+                    return `
+                        <div class="review-item-box">
+                            <div class="review-item-name">${item.name}</div>
+                            <div class="submitted-stars">${starsHtml}</div>
+                            ${rev.comment ? `<div class="submitted-comment">"${rev.comment}"</div>` : ''}
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="review-item-box">
+                        <div class="review-item-row">
+                            <span class="review-item-name">${item.name}</span>
+                            <button class="rate-btn" onclick="openReviewModal(${index}, ${itemIdx})"><i class="fa-solid fa-star"></i> Rate & Review</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openReviewModal(orderIndex, itemIndex) {
+            activeReviewOrderIndex = orderIndex;
+            activeReviewItemIndex = itemIndex;
+            activeReviewRating = 0;
+
+            let order = CURRENT_ORDERS[orderIndex];
+            let item = order.items[itemIndex];
+            document.getElementById('reviewModalProductName').innerText = `Rate: ${item.name}`;
+            document.getElementById('reviewCommentInput').value = '';
+            document.querySelectorAll('#starPicker span').forEach(s => s.classList.remove('active'));
+            document.getElementById('reviewModal').style.display = 'flex';
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        function setReviewRating(val) {
+            activeReviewRating = val;
+            document.querySelectorAll('#starPicker span').forEach(s => {
+                s.classList.toggle('active', Number(s.getAttribute('data-val')) <= val);
+            });
+        }
+
+        async function submitReview() {
+            if (activeReviewRating === 0) { tg.showAlert("⚠️ Please tap a star to rate first!"); return; }
+
+            let order = CURRENT_ORDERS[activeReviewOrderIndex];
+            let item = order.items[activeReviewItemIndex];
+            let comment = document.getElementById('reviewCommentInput').value.trim();
+
+            // productId ties this review to a specific product in the shop. Cart/checkout
+            // may not carry item.productId yet (older flow) — falls back to matching by name.
+            await saveReview({
+                orderId: order.orderId,
+                orderKey: order._key,
+                productId: item.productId || item.name,
+                productName: item.name,
+                productImage: item.image || '',
+                rating: activeReviewRating,
+                comment: comment
+            });
+
+            let itemReviews = { ...(order.itemReviews || {}) };
+            itemReviews[activeReviewItemIndex] = { rating: activeReviewRating, comment: comment, createdAt: Date.now() };
+            await updateOrder(order._key, { itemReviews: itemReviews });
+
+            closeReviewModal();
+            await loadUserOrders();
+            tg.showAlert("🌟 Thanks for your review!");
+        }
+
+        function buildServiceSectionHtml(order, index) {
+            if (!order.exchangeEnabled) return ''; // Admin hasn't enabled this service for this order yet
+
+            if (order.serviceRequest) {
+                let sr = order.serviceRequest;
+                let label = sr.type === 'exchange' ? 'Exchange' : 'Refund';
+                let pillColor = sr.status === 'Delivered' ? '#059669' : sr.status === 'Rejected' ? '#dc2626' : '#d97706';
+                let pillBg = sr.status === 'Delivered' ? '#ecfdf5' : sr.status === 'Rejected' ? '#fee2e2' : '#fef3c7';
+                let extra = (sr.type === 'exchange' && sr.newItem)
+                    ? `<br><b>Replacement:</b> ${sr.newItem.name}${sr.newItem.image ? `<button class="mini-view-btn" onclick="openImageZoom('${sr.newItem.image}')"><i class="fa-solid fa-eye"></i> View</button>` : ''}`
+                    : '';
+                return `
+                    <div class="service-status-box">
+                        <b>${label} Request</b>
+                        <span class="service-status-pill" style="color:${pillColor}; background:${pillBg};">${sr.status}</span>
+                        <br><b>Reason:</b> ${sr.reason}${extra}
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="service-btn-row">
+                    <button class="service-btn exchange-btn" onclick="openServiceReasonModal(${index}, 'exchange')"><i class="fa-solid fa-rotate"></i> Exchange</button>
+                    <button class="service-btn refund-btn" onclick="openServiceReasonModal(${index}, 'refund')"><i class="fa-solid fa-hand-holding-dollar"></i> Refund</button>
+                </div>
+            `;
+        }
+
+        async function cancelOrder(index) {
+            let order = CURRENT_ORDERS[index];
+            if (order) {
+                let currentTime = Date.now();
+                let elapsedMs = currentTime - (order.createdAt || currentTime);
+                let tenMinutesMs = 10 * 60 * 1000;
+
+                if (elapsedMs <= tenMinutesMs) {
+                    await updateOrder(order._key, { status: 'Cancelled' });
+                    await loadUserOrders();
+                    tg.showAlert("✅ Order cancelled successfully within the 10-minute window!");
+                } else {
+                    tg.showAlert("⚠️ 10-minute cancellation window has expired!");
+                }
+            }
+        }
+
+        // ---------- Exchange / Refund reason popup ----------
+        function openServiceReasonModal(index, type) {
+            activeServiceOrderIndex = index;
+            activeServiceType = type;
+            document.getElementById('serviceReasonInput').value = '';
+            document.getElementById('serviceModalTitle').innerText = type === 'exchange' ? 'Request Exchange' : 'Request Refund';
+            document.getElementById('serviceModalSubmitBtn').style.background = type === 'exchange' ? '#7c3aed' : '#d97706';
+            document.getElementById('serviceModalSubmitBtn').innerText = type === 'exchange' ? 'Continue' : 'Submit Refund Request';
+            document.getElementById('serviceReasonModal').style.display = 'flex';
+        }
+
+        function closeServiceReasonModal() {
+            document.getElementById('serviceReasonModal').style.display = 'none';
+        }
+
+        function proceedServiceRequest() {
+            let reason = document.getElementById('serviceReasonInput').value.trim();
+            if (!reason) { tg.showAlert("⚠️ Please write a reason first!"); return; }
+
+            if (activeServiceType === 'exchange') {
+                // Reason captured — now ask them to pick a replacement product
+                pendingExchangeReason = reason;
+                closeServiceReasonModal();
+                openExchangePicker();
+            } else {
+                // Refund needs no product selection — submit immediately
+                saveServiceRequest({ type: 'refund', reason: reason, status: 'Requested', requestedAt: Date.now() });
+                closeServiceReasonModal();
+                tg.showAlert("✅ Refund request submitted! Our team will review it soon.");
+            }
+        }
+
+        // ---------- Exchange replacement product picker ----------
+        async function openExchangePicker() {
+            let grid = document.getElementById('exchangeProductGrid');
+            grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; font-size:11px; padding:20px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>`;
+            let dresses = await getDresses();
+            EXCHANGE_DRESSES = dresses;
+
+            if (dresses.length === 0) {
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; font-size:11px; padding:20px;">No products available right now.</div>`;
+            } else {
+                grid.innerHTML = dresses.map((dress, dIdx) => {
+                    let mainImg = (dress.images && dress.images[0]) || dress.image || '';
+                    return `
+                        <div class="exchange-pick-card" onclick="selectExchangeProduct(${dIdx})">
+                            <img src="${mainImg}" alt="${dress.name}">
+                            <div class="exchange-pick-name">${dress.name}</div>
+                            <div class="exchange-pick-price">৳ ${Number(dress.price).toLocaleString()}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('exchangePickerModal').style.display = 'flex';
+        }
+
+        function closeExchangePicker() {
+            document.getElementById('exchangePickerModal').style.display = 'none';
+        }
+
+        function selectExchangeProduct(dressIndex) {
+            let dresses = EXCHANGE_DRESSES;
+            let dress = dresses[dressIndex];
+            if (!dress) return;
+
+            let mainImg = (dress.images && dress.images[0]) || dress.image || '';
+
+            saveServiceRequest({
+                type: 'exchange',
+                reason: pendingExchangeReason,
+                status: 'Requested',
+                requestedAt: Date.now(),
+                newItem: { name: dress.name, price: dress.price, image: mainImg }
+            });
+
+            closeExchangePicker();
+            tg.showAlert(`✅ Exchange request submitted for "${dress.name}"! Our team will review it soon.`);
+        }
+
+        async function saveServiceRequest(serviceRequest) {
+            if (activeServiceOrderIndex === null) return;
+            let order = CURRENT_ORDERS[activeServiceOrderIndex];
+            if (order) {
+                await updateOrder(order._key, { serviceRequest: serviceRequest });
+                await loadUserOrders();
+            }
+            activeServiceOrderIndex = null;
+            activeServiceType = null;
+            pendingExchangeReason = "";
+        }
+    </script>
+</body>
+</html>

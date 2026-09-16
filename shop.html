@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteFlowery - Pro Shop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --btn-dark: #111111;
+            --price-color: #111111;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0 0 95px 0;
+            display: flex; justify-content: center;
+        }
+        .container { width: 100%; max-width: 480px; padding: 12px; box-sizing: border-box; background: #ffffff; }
+
+        /* Top Filter & Sort Bar */
+        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
+        .filter-select-box, .sort-select-box {
+            flex: 1; background: #ffffff; border: 1px solid var(--border-color); padding: 10px 12px;
+            border-radius: 8px; font-size: 13px; font-weight: 600; color: #374151;
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+            outline: none; box-sizing: border-box; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 13px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
+
+        /* Products Grid */
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .product-card { background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 10px; }
+        
+        .product-img-box { width: 100%; height: 260px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .product-img-box:hover img { transform: scale(1.03); }
+
+        /* Wishlist Heart Icon Button */
+        .wishlist-btn {
+            position: absolute; top: 8px; right: 8px; width: 30px; height: 30px;
+            background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #666; font-size: 14px; cursor: pointer; z-index: 5; transition: 0.2s;
+        }
+        .wishlist-btn:hover, .wishlist-btn.active { color: #ec4899; background: #fff; }
+
+        .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 11px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.3px; }
+        .add-to-cart-btn:active { opacity: 0.85; }
+
+        .product-code { font-size: 10px; color: #7c3aed; text-align: center; font-weight: 700; margin-bottom: 2px; }
+        .product-title { margin: 0 0 4px 0; font-size: 13px; font-weight: 500; color: #1f2937; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-price { margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: var(--price-color); text-align: center; }
+
+        .quick-view-link { font-size: 11px; color: #7c3aed; text-align: center; cursor: pointer; font-weight: 600; text-decoration: underline; margin-bottom: 4px; }
+
+        .rating-line { font-size: 11px; color: #f59e0b; text-align: center; margin-bottom: 4px; }
+        .rating-line .count { color: #9ca3af; font-weight: 500; }
+
+        .review-list-item { border-top: 1px solid #f3f4f6; padding: 8px 0; }
+        .review-list-stars { color: #f59e0b; font-size: 12px; letter-spacing: 1px; }
+        .review-list-comment { font-size: 12px; color: #374151; margin: 3px 0; line-height: 1.4; }
+        .review-list-meta { font-size: 10px; color: #9ca3af; }
+
+        /* Modals & Popups */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99999; justify-content: center; align-items: flex-end; }
+        .modal-content { background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; position: relative; text-align: left; color: #111; animation: slideUp 0.3s ease; }
+        
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .size-pill { background: #f3f4f6; border: 1px solid #d1d5db; color: #374151; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; display: inline-block; margin: 4px; }
+        .size-pill.selected { background: #111111; color: #fff; border-color: #111111; }
+
+        /* White Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 480px; background: #ffffff;
+            border-top: 1px solid var(--border-color); display: flex; justify-content: space-around;
+            padding: 10px 0 14px 0; box-sizing: border-box; z-index: 9999;
+        }
+        .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
+        .nav-item.active { color: #111111; font-weight: 700; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Top Filter & Sort Bar -->
+        <div class="top-filter-bar">
+            <div class="filter-select-box">
+                <select id="categoryFilterDropdown" onchange="renderProducts()">
+                    <option value="All">All Category</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Summer">Summer</option>
+                    <option value="All-Time">All-Time</option>
+                </select>
+            </div>
+            <div class="sort-select-box">
+                <select id="sortDropdown" onchange="renderProducts()">
+                    <option value="new">Date, new to old</option>
+                    <option value="old">Date, old to new</option>
+                    <option value="price-low">Price, low to high</option>
+                    <option value="price-high">Price, high to low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="products-grid" id="shopProductsGrid">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+
+    <!-- Zoom Image Modal -->
+    <div id="zoomModal" class="modal-overlay" style="align-items: center;">
+        <div class="modal-content" style="border-radius: 16px; max-width: 420px; text-align: center; background: #ffffff; color: #111; border: 1px solid #e5e7eb;">
+            <span style="position:absolute; top:12px; right:16px; font-size:24px; cursor:pointer; color:#111; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:360px; object-fit:contain; border-radius:8px; margin-bottom:12px; background:#f9fafb;">
+            <div id="zoomThumbnails" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
+        </div>
+    </div>
+
+    <!-- Size, Stock & Details Popup Modal -->
+    <div id="quickViewModal" class="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:15px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('quickViewModal')">&times;</span>
+            <div id="modalBodyContent"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+    </div>
+
+    <script src="db.js"></script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        let currentFilteredDresses = [];
+        let ALL_REVIEWS = []; // fetched once per render, matched to products locally
+
+        function getReviewsForDress(dress) {
+            // A review's productId is normally the dress's own _key; fall back to
+            // matching by product name for reviews created before that was wired up.
+            return ALL_REVIEWS.filter(r => r.productId === dress._key || (!r.productId && r.productName === dress.name) || r.productId === dress.name);
+        }
+
+        function ratingSummary(reviews) {
+            if (!reviews || reviews.length === 0) return null;
+            let avg = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+            return { avg: avg, count: reviews.length };
+        }
+
+        // Neutral "no photo" placeholder. Previously a missing image fell back to a
+        // real product photo, which made every image-less product look like that
+        // same old dress. An obvious placeholder makes the real problem visible.
+        const NO_IMAGE_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360">
+                <rect width="100%" height="100%" fill="#f3f4f6"/>
+                <text x="50%" y="48%" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#9ca3af">🖼️</text>
+                <text x="50%" y="60%" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#9ca3af">No photo</text>
+            </svg>`
+        );
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadCategoriesFilter();
+            await renderProducts();
+        });
+
+        async function loadCategoriesFilter() {
+            let dropdown = document.getElementById('categoryFilterDropdown');
+            let categories = await getCategories();
+            
+            let currentSelected = dropdown.value;
+            dropdown.innerHTML = `<option value="All">All Category</option>`;
+            
+            categories.forEach(cat => {
+                dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+            dropdown.value = currentSelected;
+        }
+
+        async function renderProducts() {
+            let grid = document.getElementById('shopProductsGrid');
+            grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; padding:40px; font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</div>`;
+
+            // ক্লাউড ডাটাবেজ — সব অ্যাকাউন্ট/ডিভাইসে একই প্রোডাক্ট, নতুনগুলো আগে
+            let dresses = await getDresses();
+            ALL_REVIEWS = await getAllReviews();
+
+            let selectedCategory = document.getElementById('categoryFilterDropdown').value;
+            let sortType = document.getElementById('sortDropdown').value;
+            let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
+
+            if (selectedCategory !== 'All') {
+                dresses = dresses.filter(d => d.category === selectedCategory);
+            }
+
+            if (sortType === 'price-low') {
+                dresses.sort((a, b) => a.price - b.price);
+            } else if (sortType === 'price-high') {
+                dresses.sort((a, b) => b.price - a.price);
+            } else if (sortType === 'old') {
+                dresses.reverse();   // পুরোনো আগে
+            }
+            // default: getDresses() ইতিমধ্যেই নতুনগুলো আগে দিয়েছে
+
+            currentFilteredDresses = dresses;
+            grid.innerHTML = '';
+
+            if (currentFilteredDresses.length === 0) {
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: #666; padding: 40px; font-size: 13px;">No dresses found in this category.</div>`;
+                return;
+            }
+
+            currentFilteredDresses.forEach((dress, index) => {
+                let mainImg = dress.image || '';
+                if (dress.images && dress.images.length > 0) {
+                    mainImg = dress.images[0];
+                }
+
+                let isWished = wishlist.some(w => w.name === dress.name);
+                let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
+
+                let summary = ratingSummary(getReviewsForDress(dress));
+                let ratingHtml = summary
+                    ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
+                    : '';
+
+                grid.innerHTML += `
+                    <div class="product-card" id="card-${index}">
+                        <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
+                            <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
+                                <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
+                            </button>
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
+                        </div>
+                        <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
+                        <div>
+                            ${dress.productCode ? `<div class="product-code">Code: ${dress.productCode}</div>` : ''}
+                            <h4 class="product-title">${dress.name}</h4>
+                            <p class="product-price">Tk ${Number(dress.price).toLocaleString()}.00</p>
+                            ${ratingHtml}
+                            <div class="quick-view-link" onclick="openQuickView(${index})">View Size & Details</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleWishlist(index, btn) {
+            let dress = currentFilteredDresses[index];
+            if (!dress) return;
+
+            let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
+            let existingIdx = wishlist.findIndex(w => w.name === dress.name);
+
+            if (existingIdx !== -1) {
+                wishlist.splice(existingIdx, 1);
+                btn.classList.remove('active');
+                btn.innerHTML = `<i class="fa-regular fa-heart"></i>`;
+                tg.showAlert("🗑️ Removed from wishlist!");
+            } else {
+                wishlist.push({
+                    name: dress.name,
+                    price: dress.price,
+                    image: dress.image || (dress.images ? dress.images[0] : ''),
+                    size: 'M',
+                    qty: 1
+                });
+                btn.classList.add('active');
+                btn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+                tg.showAlert("❤️ Added to wishlist!");
+            }
+            localStorage.setItem('wishlistItems', JSON.stringify(wishlist));
+        }
+
+        function openZoomModal(encodedImages) {
+            let images = JSON.parse(decodeURIComponent(encodedImages));
+            let mainImageEl = document.getElementById('zoomedImg');
+            let thumbContainer = document.getElementById('zoomThumbnails');
+
+            images = (images || []).filter(Boolean); // drop empty/undefined entries
+            mainImageEl.src = images[0] || NO_IMAGE_PLACEHOLDER;
+            thumbContainer.innerHTML = '';
+
+            if (images.length > 1) {
+                images.forEach((imgUrl) => {
+                    thumbContainer.innerHTML += `
+                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:50px; height:60px; object-fit:cover; border-radius:4px; border:2px solid #111; cursor:pointer; background:#f9fafb;">
+                    `;
+                });
+            }
+
+            document.getElementById('zoomModal').style.display = 'flex';
+        }
+
+        function openQuickView(index) {
+            let dress = currentFilteredDresses[index];
+            if (!dress) return;
+
+            let sizesObj = dress.sizes || {};
+            let sizeKeys = Object.keys(sizesObj);
+            let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
+            
+            let sizePillsHtml = '';
+            sizeKeys.forEach((sKey, sIdx) => {
+                let cls = sIdx === 0 ? 'size-pill selected' : 'size-pill';
+                sizePillsHtml += `<span class="${cls}" id="modal-size-${sKey}" onclick="selectModalSize('${sKey}', ${sizesObj[sKey]})">${sKey}</span>`;
+            });
+
+            let initialStock = firstSize ? sizesObj[firstSize] : 0;
+            let mainImg = (dress.images && dress.images[0]) || dress.image || NO_IMAGE_PLACEHOLDER;
+
+            let imagesHtml = '';
+            if (dress.images && dress.images.length > 0) {
+                dress.images.forEach(img => {
+                    imagesHtml += `<img src="${img}" style="width:50px; height:60px; object-fit:contain; border-radius:4px; border:1px solid #ddd; cursor:pointer; background:#f9fafb;" onclick="document.getElementById('modalMainImg').src='${img}'">`;
+                });
+            }
+
+            let videoSection = dress.video ? `
+                <div style="margin-top:12px;">
+                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">PRODUCT VIDEO:</label>
+                    <video src="${dress.video}" controls style="width:100%; max-height:180px; border-radius:8px; background:#000;"></video>
+                </div>
+            ` : '';
+
+            let dressReviews = getReviewsForDress(dress);
+            let summary = ratingSummary(dressReviews);
+            let reviewsSection = `
+                <div style="margin-top:14px; border-top:1px solid #f3f4f6; padding-top:10px;">
+                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:6px;">
+                        CUSTOMER REVIEWS ${summary ? `— ★ ${summary.avg.toFixed(1)} (${summary.count})` : ''}
+                    </label>
+                    ${dressReviews.length === 0
+                        ? `<p style="font-size:11px; color:#999; margin:0;">No reviews yet.</p>`
+                        : dressReviews.map(r => `
+                            <div class="review-list-item">
+                                <div class="review-list-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                                ${r.comment ? `<div class="review-list-comment">"${r.comment}"</div>` : ''}
+                                <div class="review-list-meta">${r.userName || 'Customer'} · ${new Date(r.createdAt).toLocaleDateString()}</div>
+                            </div>
+                        `).join('')
+                    }
+                </div>
+            `;
+
+            let contentBox = document.getElementById('modalBodyContent');
+            contentBox.innerHTML = `
+                <div style="display:flex; gap:12px; margin-bottom:14px;">
+                    <img id="modalMainImg" src="${mainImg}" style="width:90px; height:110px; object-fit:contain; border-radius:8px; background:#f9fafb; border:1px solid #f3f4f6;">
+                    <div>
+                        ${dress.productCode ? `<span style="font-size:10px; color:#7c3aed; font-weight:bold;">Code: ${dress.productCode}</span>` : ''}
+                        <h4 style="margin:0 0 4px 0; font-size:15px; color:#111;">${dress.name}</h4>
+                        <p style="margin:0 0 6px 0; font-size:15px; font-weight:bold; color:#111;">Tk ${Number(dress.price).toLocaleString()}.00</p>
+                        <span id="modalStockText" style="font-size:11px; color:#059669; font-weight:bold; background:#ecfdf5; padding:2px 6px; border-radius:4px;">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
+                    </div>
+                </div>
+
+                ${imagesHtml ? `<div style="display:flex; gap:6px; margin-bottom:12px;">${imagesHtml}</div>` : ''}
+
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">SELECT SIZE:</label>
+                    <div id="modalSizeContainer">${sizePillsHtml || '<span style="font-size:11px; color:red;">Stock Out</span>'}</div>
+                </div>
+
+                <div style="margin-bottom:12px;">
+                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">DETAILS:</label>
+                    <p style="font-size:12px; color:#666; margin:0; line-height:1.5;">${dress.details || 'No details provided.'}</p>
+                </div>
+
+                ${videoSection}
+                ${reviewsSection}
+
+                <button class="add-to-cart-btn" style="margin-top:14px; background:#111111;" onclick="addToCartFromModal('${dress.name}', ${dress.price}, '${firstSize}', '${mainImg}', '${dress._key || ''}')">Add to Cart</button>
+            `;
+
+            window.activeSelectedSize = firstSize;
+            document.getElementById('quickViewModal').style.display = 'flex';
+        }
+
+        function selectModalSize(sizeKey, qty) {
+            document.querySelectorAll('#modalSizeContainer .size-pill').forEach(p => p.classList.remove('selected'));
+            let selectedPill = document.getElementById(`modal-size-${sizeKey}`);
+            if(selectedPill) selectedPill.classList.add('selected');
+
+            document.getElementById('modalStockText').innerText = `Stock (${sizeKey}): ${qty} Pcs`;
+            window.activeSelectedSize = sizeKey;
+        }
+
+        function addToCartFromModal(name, price, defaultSize, image, productId) {
+            let selectedSize = window.activeSelectedSize || defaultSize;
+            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+            let itemKey = `${name}_${selectedSize}`;
+            let existing = cart.find(it => it.key === itemKey); 
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    key: itemKey,
+                    name: name,
+                    price: Number(price),
+                    size: selectedSize,
+                    image: image,
+                    productId: productId || '',
+                    qty: 1
+                });
+            }
+
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+            closeModal('quickViewModal');
+            tg.showAlert(`✅ Added "${name}" (${selectedSize}) to cart! (Tk ${Number(price).toLocaleString()}.00)`);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+    </script>
+</body>
+</html>
