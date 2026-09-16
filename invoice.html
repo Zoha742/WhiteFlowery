@@ -188,6 +188,24 @@
             return 'Official Invoice / Receipt';
         }
 
+        // order.address is either the structured object saved by address.html
+        // ({name, phone, division, district, thana, postCode, area}) or, for older
+        // orders placed before this field existed, undefined — both handled gracefully.
+        function buildAddressRows(addr) {
+            if (!addr) return [];
+            if (typeof addr === 'string') {
+                return [['Delivery Address', addr]];
+            }
+            let rows = [];
+            if (addr.name || addr.phone) {
+                rows.push(['Recipient', [addr.name, addr.phone].filter(Boolean).join(' - ')]);
+            }
+            let line = [addr.area, addr.thana, addr.district, addr.division].filter(Boolean).join(', ');
+            if (addr.postCode) line += (line ? ' - ' : '') + addr.postCode;
+            if (line) rows.push(['Delivery Address', line]);
+            return rows;
+        }
+
         // বায়ারের নিজের Accepted অর্ডারগুলো থেকেই ইনভয়েস তৈরি হয় (ক্লাউড ডাটাবেজ থেকে)।
         // Exchange/Refund সম্পন্ন (Delivered) হলে সেটার জন্য আলাদা রিসিট যোগ হয়।
         function ordersToInvoices(orders) {
@@ -208,6 +226,7 @@
                     amount: o.totalAmount || 0,
                     userId: o.userId,
                     userName: o.userName,
+                    address: o.address,
                     type: 'purchase'
                 });
 
@@ -224,6 +243,7 @@
                         amount: sr.type === 'exchange' ? (sr.newItem ? sr.newItem.price : 0) : (o.totalAmount || 0),
                         userId: o.userId,
                         userName: o.userName,
+                        address: o.address,
                         type: sr.type === 'exchange' ? 'exchange' : 'cashback'
                     });
                 }
@@ -285,6 +305,7 @@
             if (inv.userName) rows.push(['Customer Name', inv.userName]);
             if (inv.userId) rows.push(['Customer ID', inv.userId]);
             if (inv.channel) rows.push(['Ordered Via', inv.channel]);
+            rows.push(...buildAddressRows(inv.address));
 
             if (type === 'exchange') {
                 rows.push(['Old Item', inv.itemName || 'N/A']);
