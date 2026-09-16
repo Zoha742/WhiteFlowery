@@ -306,6 +306,16 @@
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             let totalAmount = subtotal + 100;
 
+            // savedAddress আগে থেকেই JSON.stringify করা object (address.html থেকে),
+            // কিন্তু পুরনো 'userAddress' fallback হতে পারে plain string — তাই parse fail
+            // করলে সেটাকেই raw text হিসেবে রাখা হচ্ছে।
+            let addressData;
+            try {
+                addressData = JSON.parse(savedAddress);
+            } catch (e) {
+                addressData = savedAddress;
+            }
+
             // আগে ভুল Telegram API (tg.initUnsafeUser) ব্যবহার হচ্ছিল, তাই সব বায়ারের
             // অর্ডারে একই ফলব্যাক userId/name বসে যেত। এখন সঠিকভাবে আসল টেলিগ্রাম আইডি নেওয়া হয়।
             let pendingOrder = {
@@ -313,6 +323,7 @@
                 userId: currentUserId(),
                 userName: currentUserName(),
                 items: cart,
+                address: addressData,
                 totalAmount: totalAmount,
                 status: 'Pending',
                 date: new Date().toLocaleDateString(),
