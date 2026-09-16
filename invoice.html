@@ -34,6 +34,18 @@
         .back-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; font-size: 12px; text-decoration: none; backdrop-filter: blur(10px); }
 
         /* Invoice List / Chart */
+        .search-box-wrap {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
+            backdrop-filter: blur(10px); color: var(--text-muted); font-size: 12px;
+        }
+        .search-box-wrap input {
+            flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text-main); font-size: 12px;
+        }
+        .search-box-wrap input::placeholder { color: var(--text-muted); }
+
         .invoice-list { display: flex; flex-direction: column; gap: 14px; }
         .invoice-card {
             background: var(--card-bg); border: 1px solid var(--card-border);
@@ -125,6 +137,12 @@
             <a href="profile.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Profile</a>
         </div>
 
+        <!-- Search by Order ID -->
+        <div class="search-box-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="invoiceSearchInput" placeholder="Search by Order ID (e.g. WF-6773)" oninput="filterInvoicesByOrderId()">
+        </div>
+
         <!-- Invoice Chart Container -->
         <div class="invoice-list" id="invoiceContainer">
             <!-- Dynamic Invoices will load here -->
@@ -197,9 +215,8 @@
                 return [['Delivery Address', addr]];
             }
             let rows = [];
-            if (addr.name || addr.phone) {
-                rows.push(['Recipient', [addr.name, addr.phone].filter(Boolean).join(' - ')]);
-            }
+            if (addr.name) rows.push(['Recipient Name', addr.name]);
+            if (addr.phone) rows.push(['Phone Number', addr.phone]);
             let line = [addr.area, addr.thana, addr.district, addr.division].filter(Boolean).join(', ');
             if (addr.postCode) line += (line ? ' - ' : '') + addr.postCode;
             if (line) rows.push(['Delivery Address', line]);
@@ -227,6 +244,8 @@
                     userId: o.userId,
                     userName: o.userName,
                     address: o.address,
+                    courierName: o.courierName,
+                    trackingNumber: o.trackingNumber,
                     type: 'purchase'
                 });
 
@@ -244,6 +263,8 @@
                         userId: o.userId,
                         userName: o.userName,
                         address: o.address,
+                        courierName: o.courierName,
+                        trackingNumber: o.trackingNumber,
                         type: sr.type === 'exchange' ? 'exchange' : 'cashback'
                     });
                 }
@@ -260,14 +281,20 @@
             renderInvoiceList();
         });
 
-        function renderInvoiceList() {
+        function renderInvoiceList(list) {
             let container = document.getElementById('invoiceContainer');
+            let entries = list || allInvoices.map((inv, idx) => ({ inv, idx }));
+
             if (allInvoices.length === 0) {
                 container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px; font-size:12px;">No invoices yet.</div>`;
                 return;
             }
+            if (entries.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px; font-size:12px;">No invoice found for that Order ID.</div>`;
+                return;
+            }
             container.innerHTML = '';
-            allInvoices.forEach((inv, idx) => {
+            entries.forEach(({ inv, idx }) => {
                 let status = getStatusInfo(inv);
                 container.innerHTML += `
                     <div class="invoice-card">
@@ -291,6 +318,20 @@
                     </div>
                 `;
             });
+        }
+
+        // Filters the visible list by Order ID as the user types, without losing
+        // each invoice's original index (needed by View/Download buttons).
+        function filterInvoicesByOrderId() {
+            let query = document.getElementById('invoiceSearchInput').value.trim().toLowerCase();
+            if (!query) {
+                renderInvoiceList();
+                return;
+            }
+            let filtered = allInvoices
+                .map((inv, idx) => ({ inv, idx }))
+                .filter(({ inv }) => (inv.orderId || '').toString().toLowerCase().includes(query));
+            renderInvoiceList(filtered);
         }
 
         // Builds the clean, printable invoice markup shared by the View modal
@@ -317,6 +358,9 @@
             } else {
                 rows.push(['Item', inv.itemName || 'N/A']);
             }
+
+            if (inv.courierName) rows.push(['Courier', inv.courierName]);
+            if (inv.trackingNumber) rows.push(['Tracking Number', inv.trackingNumber]);
 
             rows.push(['Payment Method', inv.method || 'N/A']);
             rows.push(['Status', status.text, status.color]);
