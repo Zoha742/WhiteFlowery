@@ -90,6 +90,28 @@
         .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
         .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        .nav-icon-wrap { position: relative; display: inline-block; }
+        .nav-badge {
+            position: absolute; top: -5px; right: -9px; background: #ef4444; color: #fff;
+            font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; line-height: 15px;
+            border-radius: 8px; text-align: center; padding: 0 3px; display: none;
+        }
+
+        /* Fullscreen Reel-style Video Modal */
+        .video-reel-overlay {
+            display: none; position: fixed; inset: 0; background: #000; z-index: 999999;
+            justify-content: center; align-items: center;
+        }
+        .video-reel-overlay video { width: 100%; height: 100%; max-width: 480px; object-fit: contain; background: #000; }
+        .video-reel-close {
+            position: absolute; top: 16px; right: 16px; font-size: 26px; color: #fff;
+            cursor: pointer; z-index: 10; background: rgba(0,0,0,0.4); width: 34px; height: 34px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .video-play-badge {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.25); border-radius: 8px; color: #fff; font-size: 28px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -137,11 +159,17 @@
         </div>
     </div>
 
+    <!-- Fullscreen Reel-style Video Modal -->
+    <div id="videoReelModal" class="video-reel-overlay">
+        <span class="video-reel-close" onclick="closeVideoReel()">&times;</span>
+        <video id="reelVideoPlayer" src="" controls autoplay playsinline></video>
+    </div>
+
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span>Cart</a>
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
@@ -178,7 +206,23 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesFilter();
             await renderProducts();
+            updateCartBadge();
         });
+
+        function updateCartBadge() {
+            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+            let totalQty = cart.reduce((sum, it) => sum + (it.qty || 1), 0);
+            let badge = document.getElementById('cartNavBadge');
+            if (!badge) return;
+            if (totalQty > 0) {
+                badge.innerText = totalQty > 99 ? '99+' : totalQty;
+                badge.style.display = 'flex';
+                badge.style.alignItems = 'center';
+                badge.style.justifyContent = 'center';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
 
         async function loadCategoriesFilter() {
             let dropdown = document.getElementById('categoryFilterDropdown');
@@ -335,7 +379,10 @@
             let videoSection = dress.video ? `
                 <div style="margin-top:12px;">
                     <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">PRODUCT VIDEO:</label>
-                    <video src="${dress.video}" controls style="width:100%; max-height:180px; border-radius:8px; background:#000;"></video>
+                    <div style="position:relative; border-radius:8px; overflow:hidden; background:#000;">
+                        <video src="${dress.video}" muted playsinline style="width:100%; max-height:180px; display:block; pointer-events:none;"></video>
+                        <div class="video-play-badge" onclick="openVideoReel('${dress.video}')"><i class="fa-solid fa-circle-play"></i></div>
+                    </div>
                 </div>
             ` : '';
 
@@ -384,9 +431,10 @@
                 </div>
 
                 ${videoSection}
-                ${reviewsSection}
 
                 <button class="add-to-cart-btn" style="margin-top:14px; background:#111111;" onclick="addToCartFromModal('${dress.name}', ${dress.price}, '${firstSize}', '${mainImg}', '${dress._key || ''}')">Add to Cart</button>
+
+                ${reviewsSection}
             `;
 
             window.activeSelectedSize = firstSize;
@@ -424,11 +472,26 @@
 
             localStorage.setItem('cartItems', JSON.stringify(cart));
             closeModal('quickViewModal');
+            updateCartBadge();
             tg.showAlert(`✅ Added "${name}" (${selectedSize}) to cart! (Tk ${Number(price).toLocaleString()}.00)`);
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openVideoReel(videoUrl) {
+            let player = document.getElementById('reelVideoPlayer');
+            player.src = videoUrl;
+            player.muted = false;
+            document.getElementById('videoReelModal').style.display = 'flex';
+        }
+
+        function closeVideoReel() {
+            let player = document.getElementById('reelVideoPlayer');
+            player.pause();
+            player.src = '';
+            document.getElementById('videoReelModal').style.display = 'none';
         }
     </script>
 </body>
