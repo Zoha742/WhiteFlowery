@@ -69,8 +69,11 @@
             </div>
 
             <div class="form-group">
-                <label>Product Code (e.g. WF-101)</label>
-                <input type="text" id="newProductCode" class="form-control" placeholder="WF-101">
+                <label>Product Code</label>
+                <div style="display: flex; align-items: stretch;">
+                    <span style="display:flex; align-items:center; background:#e5e7eb; border:1px solid var(--card-border); border-right:none; padding:0 10px; border-radius:8px 0 0 8px; font-size:12px; font-weight:700; color:#111;">WF-</span>
+                    <input type="text" id="newProductCodeNumber" class="form-control" placeholder="101" style="border-radius:0 8px 8px 0;">
+                </div>
             </div>
 
             <div class="checkbox-row">
@@ -350,7 +353,8 @@
 
         async function publishDress() {
             let name = document.getElementById('newName').value.trim();
-            let productCode = document.getElementById('newProductCode').value.trim();
+            let productCodeNumber = document.getElementById('newProductCodeNumber').value.trim();
+            let productCode = productCodeNumber ? ('WF-' + productCodeNumber) : '';
             let cat = document.getElementById('newCat').value;
             let subCat = document.getElementById('newSubCat').value.trim();
             let price = parseFloat(document.getElementById('newPrice').value) || 0;
