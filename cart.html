@@ -114,6 +114,12 @@
         .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
         .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
+        .nav-icon-wrap { position: relative; display: inline-block; }
+        .nav-badge {
+            position: absolute; top: -5px; right: -9px; background: #ef4444; color: #fff;
+            font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; line-height: 15px;
+            border-radius: 8px; text-align: center; padding: 0 3px; display: none;
+        }
     </style>
 </head>
 <body>
@@ -149,7 +155,7 @@
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
         <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item active" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item active" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span>Cart</a>
         <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
@@ -170,6 +176,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             renderCart();
+            updateCartBadge();
         });
 
         function getCart() {
@@ -178,6 +185,22 @@
 
         function saveCart(cart) {
             localStorage.setItem('cartItems', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        function updateCartBadge() {
+            let cart = getCart();
+            let totalQty = cart.reduce((sum, it) => sum + (it.qty || 1), 0);
+            let badge = document.getElementById('cartNavBadge');
+            if (!badge) return;
+            if (totalQty > 0) {
+                badge.innerText = totalQty > 99 ? '99+' : totalQty;
+                badge.style.display = 'flex';
+                badge.style.alignItems = 'center';
+                badge.style.justifyContent = 'center';
+            } else {
+                badge.style.display = 'none';
+            }
         }
 
         function renderCart() {
