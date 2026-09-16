@@ -90,6 +90,7 @@
         .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
         .nav-icon-wrap { position: relative; display: inline-block; }
+        .nav-label { display: block; }
         .nav-badge {
             position: absolute; top: -5px; right: -9px; background: #ef4444; color: #fff;
             font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; line-height: 15px;
@@ -112,10 +113,10 @@
 
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
-        <a class="nav-item" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
-        <a class="nav-item" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span>Cart</a>
-        <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
+        <a class="nav-item" href="index.html"><span class="nav-icon-wrap"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
+        <a class="nav-item" href="shop.html"><span class="nav-icon-wrap"><i class="fa-solid fa-store"></i></span><span class="nav-label">Shop</span></a>
+        <a class="nav-item" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span><span class="nav-label">Cart</span></a>
+        <a class="nav-item" href="profile.html"><span class="nav-icon-wrap"><i class="fa-solid fa-user"></i></span><span class="nav-label">Profile</span></a>
     </div>
 
     <script>
@@ -253,6 +254,7 @@
                     price: Number(item.price),
                     size: item.size || 'M',
                     image: item.image || '',
+                    productId: item.productId || '',
                     qty: item.qty || 1
                 });
             }
