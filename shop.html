@@ -26,7 +26,7 @@
             padding: 0 0 100px 0; 
             display: flex; 
             justify-content: center;
-            overflow-x: hidden; /* স্ক্রিনের বাইরে যাওয়া বন্ধ করতে */
+            overflow-x: hidden;
         }
         .container { width: 100%; max-width: 480px; padding: 12px; box-sizing: border-box; background: #ffffff; overflow-x: hidden; }
 
@@ -40,7 +40,7 @@
         }
         .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 12px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
 
-        /* Products Grid - Fixed Overflow Issue (minmax added) */
+        /* Products Grid */
         .products-grid { 
             display: grid; 
             grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -63,9 +63,29 @@
             overflow: hidden;
         }
         
-        /* Product Image Box */
-        .product-img-box { width: 100%; height: 190px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: contain; padding: 4px; box-sizing: border-box; transition: transform 0.3s; }
+        /* 🔥 Strongly Fixed Image Box with Rounded Corners */
+        .product-img-box { 
+            width: 100%; 
+            height: 215px !important; /* ফ্রেমের উচ্চতা একদম ফিক্সড */
+            background: #f9fafb; 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px !important; /* হালকা রাউন্ড শেপ */
+            overflow: hidden; /* ফ্রেমের বাইরে কোনো ছবি যাবে না */
+            position: relative; 
+            margin-bottom: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+        }
+        
+        .product-img-box img { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 10px; /* ইমেজের কোণাও রাউন্ড করা হলো */
+            /* object-fit inline style থেকে আসবে (cover/contain), কিন্তু ফ্রেম ভাঙবে না */
+            transition: transform 0.3s; 
+        }
         .product-img-box:hover img { transform: scale(1.03); }
 
         /* Wishlist Heart Icon Button */
@@ -91,7 +111,7 @@
         .rating-line .count { color: #9ca3af; font-weight: 500; }
 
         /* Modals & Popups */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; justify-content: center; align-items: flex-end; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: flex-end; }
         .modal-content { background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; position: relative; text-align: left; color: #111; animation: slideUp 0.3s ease; }
         
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -174,9 +194,9 @@
 
     <!-- Zoom Image Modal (Click outside to close) -->
     <div id="zoomModal" class="modal-overlay" style="align-items: center;" onclick="closeModal('zoomModal')">
-        <div class="modal-content" style="background: transparent; box-shadow: none; padding: 10px; display: flex; flex-direction: column; align-items: center; border: none;" onclick="event.stopPropagation()">
-            <span style="position:absolute; top:-30px; right:10px; font-size:28px; cursor:pointer; color:#ffffff; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
-            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:75vh; object-fit:contain; border-radius:12px; background: #ffffff; padding: 5px;">
+        <div class="modal-content" style="background: transparent; box-shadow: none; padding: 10px; display: flex; flex-direction: column; align-items: center; border: none; max-height: 95vh;" onclick="event.stopPropagation()">
+            <span style="position:absolute; top:-10px; right:10px; font-size:32px; cursor:pointer; color:#ffffff; z-index:10; background: rgba(0,0,0,0.5); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onclick="closeModal('zoomModal')">&times;</span>
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:75vh; object-fit:contain; border-radius:12px; background: transparent; padding: 0;">
             <div id="zoomThumbnails" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top: 14px;"></div>
         </div>
     </div>
@@ -307,7 +327,9 @@
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
                     : '';
 
+                // ড্রেসের ছবির জন্য top center পজিশন যুক্ত করা হলো যেন মাথা কেটে না যায়
                 let fitMode = dress.imageFit === 'cover' ? 'cover' : 'contain';
+                let positionStr = fitMode === 'cover' ? 'top center' : 'center';
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
@@ -315,7 +337,7 @@
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
-                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" style="object-fit:${fitMode};" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" style="object-fit:${fitMode}; object-position:${positionStr};" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
                         <div class="product-info-wrap">
