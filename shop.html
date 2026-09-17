@@ -37,39 +37,12 @@
         }
         .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 13px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
 
-        /* Products Grid & Uniform Card Layout */
+        /* Products Grid */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .product-card { 
-            background: var(--card-bg); 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            position: relative; 
-            margin-bottom: 10px; 
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 16px; 
-            padding: 10px;
-            box-sizing: border-box;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-        }
+        .product-card { background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 10px; }
         
-        /* Forced Portrait / Vertical Image Box (যেকোনো ইমেজকে লম্বালম্বি সমান সাইজে দেখাবে) */
-        .product-img-box { 
-            width: 100%; 
-            aspect-ratio: 3 / 4; 
-            background: #f9fafb; 
-            border: 1px solid var(--border-color); 
-            border-radius: 12px; 
-            overflow: hidden; 
-            position: relative; 
-            margin-bottom: 8px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-        }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .product-img-box { width: 100%; aspect-ratio: 3 / 4; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
         /* Wishlist Heart Icon Button */
@@ -81,7 +54,7 @@
         }
         .wishlist-btn:hover, .wishlist-btn.active { color: #ec4899; background: #fff; }
 
-        .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.3px; }
+        .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 11px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.3px; }
         .add-to-cart-btn:active { opacity: 0.85; }
 
         .product-code { font-size: 10px; color: #7c3aed; text-align: center; font-weight: 700; margin-bottom: 2px; }
@@ -206,9 +179,11 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let currentFilteredDresses = [];
-        let ALL_REVIEWS = [];
+        let ALL_REVIEWS = []; // fetched once per render, matched to products locally
 
         function getReviewsForDress(dress) {
+            // A review's productId is normally the dress's own _key; fall back to
+            // matching by product name for reviews created before that was wired up.
             return ALL_REVIEWS.filter(r => r.productId === dress._key || (!r.productId && r.productName === dress.name) || r.productId === dress.name);
         }
 
@@ -218,8 +193,11 @@
             return { avg: avg, count: reviews.length };
         }
 
+        // Neutral "no photo" placeholder. Previously a missing image fell back to a
+        // real product photo, which made every image-less product look like that
+        // same old dress. An obvious placeholder makes the real problem visible.
         const NO_IMAGE_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400">
+            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360">
                 <rect width="100%" height="100%" fill="#f3f4f6"/>
                 <text x="50%" y="48%" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#9ca3af">🖼️</text>
                 <text x="50%" y="60%" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#9ca3af">No photo</text>
@@ -264,6 +242,7 @@
             let grid = document.getElementById('shopProductsGrid');
             grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; padding:40px; font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</div>`;
 
+            // ক্লাউড ডাটাবেজ — সব অ্যাকাউন্ট/ডিভাইসে একই প্রোডাক্ট, নতুনগুলো আগে
             let dresses = await getDresses();
             ALL_REVIEWS = await getAllReviews();
 
@@ -280,8 +259,9 @@
             } else if (sortType === 'price-high') {
                 dresses.sort((a, b) => b.price - a.price);
             } else if (sortType === 'old') {
-                dresses.reverse();
+                dresses.reverse();   // পুরোনো আগে
             }
+            // default: getDresses() ইতিমধ্যেই নতুনগুলো আগে দিয়েছে
 
             currentFilteredDresses = dresses;
             grid.innerHTML = '';
@@ -300,7 +280,6 @@
                 let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
-                let frameFit = dress.imageFit || 'cover';
                 let summary = ratingSummary(getReviewsForDress(dress));
                 let ratingHtml = summary
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
@@ -308,7 +287,7 @@
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
-                        <div class="product-img-box" onclick="openZoomModal('${encodedImages}', '${frameFit}')">
+                        <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
@@ -331,6 +310,10 @@
             let dress = currentFilteredDresses[index];
             if (!dress) return;
 
+            // দুইটা আলাদা প্রোডাক্টের নাম একই হতে পারে (যেমন কালার-ভ্যারিয়েন্ট আলাদা
+            // এন্ট্রি হিসেবে যোগ করা হলে) — তাই নাম দিয়ে ম্যাচ করলে একটাকে wishlist
+            // করলে একই নামের বাকিগুলোও ভুলভাবে "loved" দেখাতো। এখন _key (unique id)
+            // দিয়ে ম্যাচ হচ্ছে; _key না থাকা পুরনো এন্ট্রির জন্য নাম fallback হিসেবে থাকছে।
             let uniqueId = dress._key || dress.name;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
             let existingIdx = wishlist.findIndex(w => (w.productId || w.name) === uniqueId);
@@ -356,14 +339,13 @@
             localStorage.setItem('wishlistItems', JSON.stringify(wishlist));
         }
 
-        function openZoomModal(encodedImages, fitMode) {
+        function openZoomModal(encodedImages) {
             let images = JSON.parse(decodeURIComponent(encodedImages));
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
-            images = (images || []).filter(Boolean);
+            images = (images || []).filter(Boolean); // drop empty/undefined entries
             mainImageEl.src = images[0] || NO_IMAGE_PLACEHOLDER;
-            mainImageEl.style.objectFit = fitMode || 'contain';
             thumbContainer.innerHTML = '';
 
             if (images.length > 1) {
@@ -393,7 +375,6 @@
 
             let initialStock = firstSize ? sizesObj[firstSize] : 0;
             let mainImg = (dress.images && dress.images[0]) || dress.image || NO_IMAGE_PLACEHOLDER;
-            let modalFit = dress.imageFit || 'contain';
 
             let imagesHtml = '';
             if (dress.images && dress.images.length > 0) {
@@ -435,7 +416,7 @@
             let contentBox = document.getElementById('modalBodyContent');
             contentBox.innerHTML = `
                 <div style="display:flex; gap:12px; margin-bottom:14px;">
-                    <img id="modalMainImg" src="${mainImg}" style="width:90px; height:110px; object-fit:${modalFit}; border-radius:12px; background:#f9fafb; border:1px solid #f3f4f6;">
+                    <img id="modalMainImg" src="${mainImg}" style="width:90px; height:110px; object-fit:contain; border-radius:8px; background:#f9fafb; border:1px solid #f3f4f6;">
                     <div>
                         ${dress.productCode ? `<span style="font-size:10px; color:#7c3aed; font-weight:bold;">Code: ${dress.productCode}</span>` : ''}
                         <h4 style="margin:0 0 4px 0; font-size:15px; color:#111;">${dress.name}</h4>
