@@ -521,6 +521,8 @@
             tg.showAlert("✅ Delivery fees updated!");
             await loadDeliveryFees();
         }
+
+        function filterInventory() {
             let query = document.getElementById('codeSearchInput').value.trim().toLowerCase();
 
             if (!query) {
