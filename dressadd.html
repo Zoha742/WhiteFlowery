@@ -102,7 +102,12 @@
 
             <div class="form-group">
                 <label>Product Details / Description</label>
+                <div style="display:flex; gap:6px; margin-bottom:6px;">
+                    <button type="button" onclick="wrapDetailsSelection('**')" title="Bold" style="width:32px; height:28px; border:1px solid var(--card-border); border-radius:6px; background:#f9fafb; color:#111; font-weight:800; font-size:12px; cursor:pointer;">B</button>
+                    <button type="button" onclick="insertDetailsBullet()" title="Bullet point" style="padding:0 10px; height:28px; border:1px solid var(--card-border); border-radius:6px; background:#f9fafb; color:#111; font-weight:600; font-size:11px; cursor:pointer;">• List</button>
+                </div>
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
+                <div style="font-size:9px; color:#999; margin-top:3px;">Select text then tap B to bold it, or tap • List to start a bullet line. Shop-এ এটাই bold/bullet হয়ে দেখাবে।</div>
             </div>
 
             <!-- Global Size Setup (General Stock) -->
@@ -273,6 +278,32 @@
                 img.style.display = 'none';
                 document.getElementById('framePreviewPlaceholder').style.display = 'block';
             }
+        }
+
+        // Details বক্সে সিলেক্ট করা লেখাকে **bold** মার্কার দিয়ে wrap করে (Shop-এ এটাই <strong> হয়ে দেখাবে)
+        function wrapDetailsSelection(marker) {
+            let ta = document.getElementById('newDetails');
+            let start = ta.selectionStart, end = ta.selectionEnd;
+            let val = ta.value;
+            let selected = val.slice(start, end) || 'bold text';
+            ta.value = val.slice(0, start) + marker + selected + marker + val.slice(end);
+            ta.focus();
+            ta.selectionStart = start + marker.length;
+            ta.selectionEnd = start + marker.length + selected.length;
+        }
+
+        // কার্সার যেই লাইনে আছে সেই লাইনের শুরুতে "• " বসায় (Shop-এ এটাই bullet list হয়ে দেখাবে)
+        function insertDetailsBullet() {
+            let ta = document.getElementById('newDetails');
+            let start = ta.selectionStart;
+            let val = ta.value;
+            let lineStart = val.lastIndexOf('\n', start - 1) + 1;
+            if (val.slice(lineStart, lineStart + 2) !== '• ') {
+                ta.value = val.slice(0, lineStart) + '• ' + val.slice(lineStart);
+                start += 2;
+            }
+            ta.focus();
+            ta.selectionStart = ta.selectionEnd = start;
         }
 
         async function loadCategoriesDropdown() {
