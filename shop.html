@@ -41,8 +41,8 @@
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .product-card { background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 10px; }
         
-        .product-img-box { width: 100%; height: 260px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .product-img-box { width: 100%; aspect-ratio: var(--frame-ratio, 3/4); background: #f9fafb; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: var(--frame-fit, contain); transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
         /* Wishlist Heart Icon Button */
@@ -280,6 +280,12 @@
                 let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
+                // অ্যাডমিন Add Dress পেজ থেকে প্রতিটা প্রোডাক্টের জন্য আলাদা ফ্রেম শেপ ও
+                // ফিট মোড সেট করতে পারবে; না দিলে ডিফল্ট 3:4 / contain ব্যবহার হবে —
+                // তাতে সব কার্ডের ফ্রেম সাইজ একই রকম দেখাবে।
+                let frameRatio = dress.imageRatio || '3/4';
+                let frameFit = dress.imageFit || 'contain';
+
                 let summary = ratingSummary(getReviewsForDress(dress));
                 let ratingHtml = summary
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
@@ -287,7 +293,7 @@
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
-                        <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
+                        <div class="product-img-box" style="--frame-ratio:${frameRatio}; --frame-fit:${frameFit};" onclick="openZoomModal('${encodedImages}', '${frameFit}')">
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
@@ -339,13 +345,14 @@
             localStorage.setItem('wishlistItems', JSON.stringify(wishlist));
         }
 
-        function openZoomModal(encodedImages) {
+        function openZoomModal(encodedImages, fitMode) {
             let images = JSON.parse(decodeURIComponent(encodedImages));
             let mainImageEl = document.getElementById('zoomedImg');
             let thumbContainer = document.getElementById('zoomThumbnails');
 
             images = (images || []).filter(Boolean); // drop empty/undefined entries
             mainImageEl.src = images[0] || NO_IMAGE_PLACEHOLDER;
+            mainImageEl.style.objectFit = fitMode || 'contain';
             thumbContainer.innerHTML = '';
 
             if (images.length > 1) {
@@ -375,6 +382,7 @@
 
             let initialStock = firstSize ? sizesObj[firstSize] : 0;
             let mainImg = (dress.images && dress.images[0]) || dress.image || NO_IMAGE_PLACEHOLDER;
+            let modalFit = dress.imageFit || 'contain';
 
             let imagesHtml = '';
             if (dress.images && dress.images.length > 0) {
@@ -416,7 +424,7 @@
             let contentBox = document.getElementById('modalBodyContent');
             contentBox.innerHTML = `
                 <div style="display:flex; gap:12px; margin-bottom:14px;">
-                    <img id="modalMainImg" src="${mainImg}" style="width:90px; height:110px; object-fit:contain; border-radius:8px; background:#f9fafb; border:1px solid #f3f4f6;">
+                    <img id="modalMainImg" src="${mainImg}" style="width:90px; height:110px; object-fit:${modalFit}; border-radius:12px; background:#f9fafb; border:1px solid #f3f4f6;">
                     <div>
                         ${dress.productCode ? `<span style="font-size:10px; color:#7c3aed; font-weight:bold;">Code: ${dress.productCode}</span>` : ''}
                         <h4 style="margin:0 0 4px 0; font-size:15px; color:#111;">${dress.name}</h4>
