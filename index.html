@@ -204,8 +204,8 @@
             let trendingGrid = document.getElementById('trendingGrid');
             let newArrivalGrid = document.getElementById('newArrivalGrid');
 
-            let trendingItems = dresses.filter(d => d.isTrending);
-            let newItems = dresses.filter(d => d.isNewArrival);
+            let trendingItems = dresses.filter(d => d.isTrending).sort((a, b) => (a.trendingOrder || 0) - (b.trendingOrder || 0));
+            let newItems = dresses.filter(d => d.isNewArrival).sort((a, b) => (a.newArrivalOrder || 0) - (b.newArrivalOrder || 0));
 
             // Trending Render
             if (trendingItems.length === 0) {
