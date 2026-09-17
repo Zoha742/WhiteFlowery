@@ -55,6 +55,12 @@
         .tab-btn.active { background: #111; color: #fff; border-color: #111; }
         .cover-preview-box { width: 100%; height: 150px; background: #f9fafb; border: 1px dashed var(--card-border); border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .cover-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .cover-thumb-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .cover-thumb { position: relative; width: 84px; height: 84px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); background: #f9fafb; }
+        .cover-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .cover-thumb .del-thumb { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .cover-thumb .new-badge { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(16,185,129,0.9); color: #fff; font-size: 8px; text-align: center; padding: 2px 0; font-weight: 700; }
+        .add-cover-slot { width: 84px; height: 84px; border-radius: 8px; border: 1px dashed var(--card-border); background: #f9fafb; display: flex; align-items: center; justify-content: center; color: #7c3aed; font-size: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -178,15 +184,15 @@
                 <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Eta index.html-er top banner-e dekhabe (Home page).</p>
 
                 <div class="form-group">
-                    <label>Cover Image (একটাই ছবি দেওয়া যাবে)</label>
-                    <div id="coverPreviewBox" class="cover-preview-box">
-                        <span style="font-size:11px; color:var(--text-muted);">No cover image set</span>
+                    <label>Cover Images (একাধিক ছবি দেওয়া যাবে — Slide হয়ে দেখাবে)</label>
+                    <div id="coverThumbGrid" class="cover-thumb-grid">
+                        <label class="add-cover-slot" for="coverImgFile"><i class="fa-solid fa-plus"></i></label>
                     </div>
-                    <input type="file" id="coverImgFile" class="form-control" accept="image/*" onchange="previewCoverImage()">
+                    <input type="file" id="coverImgFile" class="form-control" accept="image/*" multiple onchange="previewCoverImage()" style="display:none;">
                     <div style="font-size:9px; color:#999; margin-top:5px; line-height:1.5;">
-                        প্রস্তাবিত সাইজ: <b>1200 × 600 px</b> (2:1 ratio, landscape) — কম হলে অন্তত 800 × 400 px।<br>
-                        ফাইল সাইজ 1MB-এর নিচে রাখলে লোড ফাস্ট হবে। ফরম্যাট: JPG/PNG/WebP।<br>
-                        নতুন ছবি সিলেক্ট করলে পুরনোটা বদলে যাবে — একসাথে শুধু একটাই cover থাকে।
+                        প্রস্তাবিত সাইজ: <b>1200 × 600 px</b> (2:1 ratio, landscape) — কম হলে অন্তত 800 × 400 px, সব ছবি একই সাইজের কাছাকাছি হলে slide সুন্দর দেখাবে।<br>
+                        প্রতিটা ছবি 1MB-এর নিচে রাখলে লোড ফাস্ট হবে। ফরম্যাট: JPG/PNG/WebP।<br>
+                        একাধিক ছবি দিলে home page-এ ছবিগুলো নিজে নিজে slide/carousel হয়ে ঘুরবে। যেকোনো ছবির উপর ❌ চাপলে সেটা বাদ দেওয়া যাবে, + চাপলে নতুন ছবি যোগ করা যাবে।
                     </div>
                 </div>
 
@@ -235,13 +241,47 @@
         }
 
         // ---------- Landing Page Cover (same feature also lives in dresslist.html) ----------
-        let coverImageFile = null;
+        let existingCoverImages = [];   // urls already saved in cloud
+        let newCoverFiles = [];         // File objects picked, not yet uploaded
+
+        function renderCoverThumbs() {
+            let grid = document.getElementById('coverThumbGrid');
+            let html = '';
+            existingCoverImages.forEach((url, i) => {
+                html += `
+                    <div class="cover-thumb">
+                        <img src="${url}">
+                        <button type="button" class="del-thumb" onclick="removeExistingCoverImage(${i})"><i class="fa-solid fa-xmark"></i></button>
+                    </div>`;
+            });
+            newCoverFiles.forEach((file, i) => {
+                html += `
+                    <div class="cover-thumb">
+                        <img src="${URL.createObjectURL(file)}">
+                        <span class="new-badge">NEW</span>
+                        <button type="button" class="del-thumb" onclick="removeNewCoverFile(${i})"><i class="fa-solid fa-xmark"></i></button>
+                    </div>`;
+            });
+            html += `<label class="add-cover-slot" for="coverImgFile"><i class="fa-solid fa-plus"></i></label>`;
+            grid.innerHTML = html;
+        }
 
         function previewCoverImage() {
-            let file = document.getElementById('coverImgFile').files[0];
-            if (!file) return;
-            coverImageFile = file;
-            document.getElementById('coverPreviewBox').innerHTML = `<img src="${URL.createObjectURL(file)}">`;
+            let files = Array.from(document.getElementById('coverImgFile').files || []);
+            if (files.length === 0) return;
+            newCoverFiles = newCoverFiles.concat(files);
+            document.getElementById('coverImgFile').value = '';
+            renderCoverThumbs();
+        }
+
+        function removeExistingCoverImage(i) {
+            existingCoverImages.splice(i, 1);
+            renderCoverThumbs();
+        }
+
+        function removeNewCoverFile(i) {
+            newCoverFiles.splice(i, 1);
+            renderCoverThumbs();
         }
 
         async function loadCoverConfig() {
@@ -249,12 +289,12 @@
             document.getElementById('coverTitle').value = cfg.landingTitle || '';
             document.getElementById('coverSubtitle').value = cfg.landingSubtitle || '';
             document.getElementById('coverImgFile').value = '';
-            coverImageFile = null;
 
-            let box = document.getElementById('coverPreviewBox');
-            box.innerHTML = cfg.landingCoverImage
-                ? `<img src="${cfg.landingCoverImage}">`
-                : `<span style="font-size:11px; color:var(--text-muted);">No cover image set</span>`;
+            existingCoverImages = Array.isArray(cfg.landingCoverImages) && cfg.landingCoverImages.length
+                ? [...cfg.landingCoverImages]
+                : (cfg.landingCoverImage ? [cfg.landingCoverImage] : []);
+            newCoverFiles = [];
+            renderCoverThumbs();
         }
 
         async function uploadCoverToCloudinary(file) {
@@ -262,7 +302,7 @@
             formData.append("file", file);
             formData.append("upload_preset", "whiteflowery_unsigned");
             formData.append("folder", "shop/site_config");
-            formData.append("public_id", `cover_${Date.now()}`);
+            formData.append("public_id", `cover_${Date.now()}_${Math.floor(Math.random() * 1000000)}`);
             try {
                 let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
                 let data = await res.json();
@@ -276,14 +316,24 @@
         async function saveCoverConfig() {
             let title = document.getElementById('coverTitle').value.trim();
             let subtitle = document.getElementById('coverSubtitle').value.trim();
-            let patch = { landingTitle: title, landingSubtitle: subtitle };
 
-            if (coverImageFile) {
-                tg.showAlert("⏳ Uploading cover image...");
-                let url = await uploadCoverToCloudinary(coverImageFile);
-                if (!url) { tg.showAlert("❌ Cover image upload failed. Please try again."); return; }
-                patch.landingCoverImage = url;
+            let finalImages = [...existingCoverImages];
+
+            if (newCoverFiles.length > 0) {
+                tg.showAlert(`⏳ Uploading ${newCoverFiles.length} cover image(s)...`);
+                for (let file of newCoverFiles) {
+                    let url = await uploadCoverToCloudinary(file);
+                    if (!url) { tg.showAlert("❌ Cover image upload failed. Please try again."); return; }
+                    finalImages.push(url);
+                }
             }
+
+            let patch = {
+                landingTitle: title,
+                landingSubtitle: subtitle,
+                landingCoverImages: finalImages,
+                landingCoverImage: finalImages[0] || ""   // backward-compat for any old code reading single field
+            };
 
             await saveSiteConfig(patch);
             tg.showAlert("✅ Landing page cover updated!");
