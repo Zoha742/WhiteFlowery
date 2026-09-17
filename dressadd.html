@@ -42,10 +42,6 @@
 
         .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-
-        .pos-btn { background: #fff; border: 1px solid var(--card-border); border-radius: 6px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #888; font-size: 11px; }
-        .pos-btn.active { background: #111; color: #fff; border-color: #111; }
-        .pos-btn i { font-size: 11px; }
         
         .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
@@ -151,41 +147,6 @@
                 </button>
             </div>
 
-            <!-- Image Frame Resize: Color 1-এর ছবি সিলেক্ট করলেই সিস্টেম নিজে থেকে
-                 প্রোডাক্টের চারপাশের ফাঁকা/সাদা জায়গা ডিটেক্ট করে Zoom ও Position বসিয়ে
-                 দেয় — যাতে ছবি যত বড়ই হোক বা যতই ফাঁকা জায়গা থাকুক, শপ পেইজে সব সময়
-                 একই ফিক্সড ফ্রেমে সুন্দরভাবে দেখায়। প্রয়োজনে ম্যানুয়ালি বদলানো যাবে। -->
-            <div class="admin-card" style="padding:12px; background:#fafafa;">
-                <h4 class="card-title"><i class="fa-solid fa-crop-simple"></i> Image Frame (Auto Zoom & Position)</h4>
-                <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
-                    <div style="flex:1; min-width:150px;">
-                        <div class="form-group">
-                            <label>Zoom: <span id="zoomValueLabel">100%</span> <span style="color:#9ca3af; font-weight:500;">(auto-detected, adjust if needed)</span></label>
-                            <input type="range" id="imgZoomSlider" min="100" max="250" value="100" step="5" style="width:100%;" oninput="updateFramePreview()">
-                        </div>
-                        <div class="form-group" style="margin-bottom:0;">
-                            <label>Focus Position</label>
-                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:110px;">
-                                <button type="button" class="pos-btn" data-x="0" data-y="0" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-up" style="transform:rotate(-45deg);"></i></button>
-                                <button type="button" class="pos-btn" data-x="50" data-y="0" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-up"></i></button>
-                                <button type="button" class="pos-btn" data-x="100" data-y="0" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-up" style="transform:rotate(45deg);"></i></button>
-                                <button type="button" class="pos-btn" data-x="0" data-y="50" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-left"></i></button>
-                                <button type="button" class="pos-btn active" data-x="50" data-y="50" onclick="setFramePosition(this)"><i class="fa-solid fa-circle" style="font-size:6px;"></i></button>
-                                <button type="button" class="pos-btn" data-x="100" data-y="50" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-right"></i></button>
-                                <button type="button" class="pos-btn" data-x="0" data-y="100" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-down" style="transform:rotate(45deg);"></i></button>
-                                <button type="button" class="pos-btn" data-x="50" data-y="100" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-down"></i></button>
-                                <button type="button" class="pos-btn" data-x="100" data-y="100" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-down" style="transform:rotate(-45deg);"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="text-align:center;">
-                        <div id="framePreviewBox" style="width:110px; height:122px; border:2px dashed #ccc; border-radius:12px; overflow:hidden; background:#f3f4f6; background-repeat:no-repeat; background-size:cover; background-position:center top; margin:0 auto;"></div>
-                        <div style="font-size:9px; color:#999; margin-top:4px;">Shop Preview</div>
-                    </div>
-                </div>
-                <div style="font-size:10px; color:#888; margin-top:8px;">Color 1-এর ছবি দিলেই প্রোডাক্টের চারপাশের ফাঁকা জায়গা নিজে থেকে বাদ দিয়ে ফ্রেম ফিট করা হবে। প্রিভিউ পছন্দ না হলে Zoom/Position ম্যানুয়ালি বদলে নিতে পারবেন।</div>
-            </div>
-
             <div class="form-group">
                 <label>Product Video (Optional)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;">
@@ -207,16 +168,12 @@
         let addedSizesList = {};
         let colorSizesData = {};
         let colorSlotCount = 0;
-        let frameZoom = 100;
-        let framePosX = 50;
-        let framePosY = 50;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
             addColorSlot();
             addColorSlot();
             addColorSlot();
-            updateFramePreview();
         });
 
         function createColorSlotHTML(n) {
@@ -258,117 +215,6 @@
             let el = document.querySelector(`.color-slot[data-slot="${n}"]`);
             if (el) el.remove();
             delete colorSizesData[n];
-        }
-
-        // Zoom/Position শুধু Color 1-এর ছবিতে প্রযোজ্য, কারণ শপ কার্ডে সেটাই মূল ছবি হিসেবে দেখানো হয়
-        function setFramePosition(btn) {
-            document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            framePosX = Number(btn.dataset.x);
-            framePosY = Number(btn.dataset.y);
-            updateFramePreview();
-        }
-
-        function updateFramePreview() {
-            let zoomSlider = document.getElementById('imgZoomSlider');
-            frameZoom = Number(zoomSlider.value);
-            document.getElementById('zoomValueLabel').innerText = frameZoom + '%';
-
-            let box = document.getElementById('framePreviewBox');
-            box.style.backgroundSize = frameZoom + '%';
-            box.style.backgroundPosition = `${framePosX}% ${framePosY}%`;
-
-            let file1Input = document.getElementById('imgFile1');
-            let file1 = file1Input && file1Input.files.length > 0 ? file1Input.files[0] : null;
-            if (file1) {
-                box.style.backgroundImage = `url('${URL.createObjectURL(file1)}')`;
-            } else {
-                box.style.backgroundImage = 'none';
-            }
-        }
-
-        // ছবিতে যত সাদা/ফাঁকা জায়গাই থাক না কেন, প্রোডাক্টটা নিজে থেকে খুঁজে বের করে
-        // তার চারপাশের ফাঁকা অংশ বাদ দিয়ে Zoom/Position অটোমেটিক বসিয়ে দেয় — যাতে
-        // অ্যাডমিনকে হাত দিয়ে স্লাইডার টানতে না হয়, তাও পরে চাইলে ম্যানুয়ালি বদলানো যাবে।
-        function detectSubjectFrame(file) {
-            return new Promise((resolve) => {
-                let img = new Image();
-                img.onload = () => {
-                    try {
-                        let maxDim = 180;
-                        let scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-                        let w = Math.max(1, Math.round(img.width * scale));
-                        let h = Math.max(1, Math.round(img.height * scale));
-                        let canvas = document.createElement('canvas');
-                        canvas.width = w; canvas.height = h;
-                        let ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-                        let data = ctx.getImageData(0, 0, w, h).data;
-
-                        // চার কোণার রঙ গড় করে ব্যাকগ্রাউন্ড রঙ ধরে নেওয়া হচ্ছে
-                        let corners = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
-                        let bg = [0,0,0];
-                        corners.forEach(([x,y]) => {
-                            let i = (y*w+x)*4;
-                            bg[0]+=data[i]; bg[1]+=data[i+1]; bg[2]+=data[i+2];
-                        });
-                        bg = bg.map(v => v/4);
-
-                        let threshold = 28;
-                        let minX=w, minY=h, maxX=0, maxY=0, found=false;
-                        for (let y=0; y<h; y++) {
-                            for (let x=0; x<w; x++) {
-                                let i=(y*w+x)*4;
-                                let dr=data[i]-bg[0], dg=data[i+1]-bg[1], db=data[i+2]-bg[2];
-                                if (Math.sqrt(dr*dr+dg*dg+db*db) > threshold) {
-                                    found = true;
-                                    if (x<minX) minX=x;
-                                    if (x>maxX) maxX=x;
-                                    if (y<minY) minY=y;
-                                    if (y>maxY) maxY=y;
-                                }
-                            }
-                        }
-
-                        if (!found) { resolve(null); return; }
-
-                        let bw = (maxX - minX) / w;
-                        let bh = (maxY - minY) / h;
-                        let boxFrac = Math.max(bw, bh);
-                        if (boxFrac < 0.05 || boxFrac > 0.98) { resolve(null); return; } // ফুল-বডি/এজ-টু-এজ ছবি হলে অটো-জুমের দরকার নেই
-
-                        let cx = ((minX + maxX) / 2) / w;
-                        let cy = ((minY + maxY) / 2) / h;
-                        let zoom = Math.round((1 / boxFrac) * 82); // প্রোডাক্টের চারপাশে সামান্য মার্জিন রেখে জুম হিসাব
-                        zoom = Math.min(250, Math.max(100, zoom));
-
-                        resolve({
-                            zoom: zoom,
-                            posX: Math.round(cx * 100),
-                            posY: Math.round(cy * 100)
-                        });
-                    } catch (e) {
-                        resolve(null); // ক্যানভাস পড়তে সমস্যা হলে অটো-ডিটেক্ট বাদ, ডিফল্ট ভ্যালুতেই থাকবে
-                    }
-                };
-                img.onerror = () => resolve(null);
-                img.src = URL.createObjectURL(file);
-            });
-        }
-
-        async function autoFitFrame(file) {
-            let result = await detectSubjectFrame(file);
-            if (!result) return; // ডিটেক্ট করা না গেলে ডিফল্ট 100%/center-ই থাকবে, অ্যাডমিন ম্যানুয়ালি ঠিক করতে পারবে
-
-            frameZoom = result.zoom;
-            framePosX = result.posX;
-            framePosY = result.posY;
-
-            document.getElementById('imgZoomSlider').value = frameZoom;
-            document.querySelectorAll('.pos-btn').forEach(b => {
-                b.classList.toggle('active', Number(b.dataset.x) === framePosX && Number(b.dataset.y) === framePosY);
-            });
-            updateFramePreview();
         }
 
         function wrapDetailsSelection(marker) {
@@ -480,10 +326,6 @@
                 wrap.style.display = 'none';
                 img.src = '';
             }
-            if (n == 1) {
-                updateFramePreview();
-                if (file) autoFitFrame(file);
-            }
         }
 
         function clearImageSlot(n) {
@@ -492,16 +334,6 @@
             document.getElementById('previewImg' + n).src = '';
             colorSizesData[n] = {};
             document.getElementById(`colorSizeList${n}`).innerText = '';
-            if (n == 1) {
-                frameZoom = 100;
-                framePosX = 50;
-                framePosY = 50;
-                document.getElementById('imgZoomSlider').value = 100;
-                document.querySelectorAll('.pos-btn').forEach(b => {
-                    b.classList.toggle('active', Number(b.dataset.x) === 50 && Number(b.dataset.y) === 50);
-                });
-                updateFramePreview();
-            }
         }
 
         let lastUploadError = "";
@@ -539,10 +371,6 @@
             let isNewArrival = document.getElementById('isNewArrival').checked;
             
             let videoInput = document.getElementById('productVideoFile');
-
-            let imageZoom = frameZoom;
-            let imagePosX = framePosX;
-            let imagePosY = framePosY;
 
             let slotEls = Array.from(document.querySelectorAll('.color-slot'));
             let firstSlotNum = slotEls.length > 0 ? slotEls[0].dataset.slot : null;
@@ -616,10 +444,7 @@
                 sizes: combinedSizes,
                 totalStock: totalStock,
                 isTrending: isTrending,
-                isNewArrival: isNewArrival,
-                imageZoom: imageZoom,
-                imagePosX: imagePosX,
-                imagePosY: imagePosY
+                isNewArrival: isNewArrival
             };
 
             let savedKey = await saveDress(newDress);
