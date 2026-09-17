@@ -285,13 +285,18 @@
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
                     : '';
 
+                // dressadd.html-এ admin যেই Fit Mode বেছে দিয়েছে (Fill/Cover বা Show Full/Contain)
+                // সেটাই এখানে প্রয়োগ হচ্ছে — box height সবসময় 260px ফিক্সড থাকায় (নিচের CSS),
+                // frame/box সাইজ সব কার্ডে একই থাকে, ছবি ছোট/বড় যাই হোক না কেন।
+                let fitMode = dress.imageFit === 'contain' ? 'contain' : 'cover';
+
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
                         <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
-                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" style="object-fit:${fitMode};" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
                         <div>
@@ -434,7 +439,7 @@
 
                 <div style="margin-bottom:12px;">
                     <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">DETAILS:</label>
-                    <p style="font-size:12px; color:#666; margin:0; line-height:1.5;">${dress.details || 'No details provided.'}</p>
+                    <div style="font-size:12px; color:#666; line-height:1.5;">${formatDetailsText(dress.details)}</div>
                 </div>
 
                 ${videoSection}
@@ -446,6 +451,28 @@
 
             window.activeSelectedSize = firstSize;
             document.getElementById('quickViewModal').style.display = 'flex';
+        }
+
+        // dressadd.html-এর Details বক্সে admin **bold** আর "• " দিয়ে বুলেট লিখতে পারবে —
+        // এখানে সেটাকে আসল <strong> আর <ul><li> এ রূপান্তর করা হচ্ছে
+        function formatDetailsText(text) {
+            if (!text) return 'No details provided.';
+            let escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            let lines = escaped.split('\n');
+            let html = '';
+            let inList = false;
+            lines.forEach(line => {
+                let boldLine = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                if (/^•\s?/.test(line.trim())) {
+                    if (!inList) { html += '<ul style="margin:4px 0 8px 18px; padding:0;">'; inList = true; }
+                    html += `<li style="margin-bottom:3px;">${boldLine.replace(/^\s*•\s?/, '')}</li>`;
+                } else {
+                    if (inList) { html += '</ul>'; inList = false; }
+                    html += line.trim() === '' ? '<br>' : `<p style="margin:0 0 4px 0;">${boldLine}</p>`;
+                }
+            });
+            if (inList) html += '</ul>';
+            return html;
         }
 
         function selectModalSize(sizeKey, qty) {
