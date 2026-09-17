@@ -151,15 +151,16 @@
                 </button>
             </div>
 
-            <!-- Image Frame Resize: Color 1-এর ছবিতে যদি অনেক ফাঁকা/সাদা জায়গা থাকে
-                 (যেমন ইলেকট্রনিক্স প্রোডাক্ট ফটো), Zoom বাড়িয়ে ও Focus Position ঠিক করে
-                 সেই অংশ বাদ দিয়ে শপ পেইজে প্রোডাক্টটা বড় ও সুন্দরভাবে দেখানো যাবে। -->
+            <!-- Image Frame Resize: Color 1-এর ছবি সিলেক্ট করলেই সিস্টেম নিজে থেকে
+                 প্রোডাক্টের চারপাশের ফাঁকা/সাদা জায়গা ডিটেক্ট করে Zoom ও Position বসিয়ে
+                 দেয় — যাতে ছবি যত বড়ই হোক বা যতই ফাঁকা জায়গা থাকুক, শপ পেইজে সব সময়
+                 একই ফিক্সড ফ্রেমে সুন্দরভাবে দেখায়। প্রয়োজনে ম্যানুয়ালি বদলানো যাবে। -->
             <div class="admin-card" style="padding:12px; background:#fafafa;">
-                <h4 class="card-title"><i class="fa-solid fa-crop-simple"></i> Image Frame (Zoom & Position)</h4>
+                <h4 class="card-title"><i class="fa-solid fa-crop-simple"></i> Image Frame (Auto Zoom & Position)</h4>
                 <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
                     <div style="flex:1; min-width:150px;">
                         <div class="form-group">
-                            <label>Zoom: <span id="zoomValueLabel">100%</span></label>
+                            <label>Zoom: <span id="zoomValueLabel">100%</span> <span style="color:#9ca3af; font-weight:500;">(auto-detected, adjust if needed)</span></label>
                             <input type="range" id="imgZoomSlider" min="100" max="250" value="100" step="5" style="width:100%;" oninput="updateFramePreview()">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
@@ -182,7 +183,7 @@
                         <div style="font-size:9px; color:#999; margin-top:4px;">Shop Preview</div>
                     </div>
                 </div>
-                <div style="font-size:10px; color:#888; margin-top:8px;">এই সেটিং Color 1-এর ছবি অনুযায়ী শপ পেইজের কার্ডে দেখানো হবে — অনেক ফাঁকা/সাদা জায়গাওয়ালা ছবিতে Zoom বাড়িয়ে প্রোডাক্টটা ফ্রেম জুড়ে দেখান।</div>
+                <div style="font-size:10px; color:#888; margin-top:8px;">Color 1-এর ছবি দিলেই প্রোডাক্টের চারপাশের ফাঁকা জায়গা নিজে থেকে বাদ দিয়ে ফ্রেম ফিট করা হবে। প্রিভিউ পছন্দ না হলে Zoom/Position ম্যানুয়ালি বদলে নিতে পারবেন।</div>
             </div>
 
             <div class="form-group">
@@ -284,6 +285,90 @@
             } else {
                 box.style.backgroundImage = 'none';
             }
+        }
+
+        // ছবিতে যত সাদা/ফাঁকা জায়গাই থাক না কেন, প্রোডাক্টটা নিজে থেকে খুঁজে বের করে
+        // তার চারপাশের ফাঁকা অংশ বাদ দিয়ে Zoom/Position অটোমেটিক বসিয়ে দেয় — যাতে
+        // অ্যাডমিনকে হাত দিয়ে স্লাইডার টানতে না হয়, তাও পরে চাইলে ম্যানুয়ালি বদলানো যাবে।
+        function detectSubjectFrame(file) {
+            return new Promise((resolve) => {
+                let img = new Image();
+                img.onload = () => {
+                    try {
+                        let maxDim = 180;
+                        let scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                        let w = Math.max(1, Math.round(img.width * scale));
+                        let h = Math.max(1, Math.round(img.height * scale));
+                        let canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        let ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        let data = ctx.getImageData(0, 0, w, h).data;
+
+                        // চার কোণার রঙ গড় করে ব্যাকগ্রাউন্ড রঙ ধরে নেওয়া হচ্ছে
+                        let corners = [[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+                        let bg = [0,0,0];
+                        corners.forEach(([x,y]) => {
+                            let i = (y*w+x)*4;
+                            bg[0]+=data[i]; bg[1]+=data[i+1]; bg[2]+=data[i+2];
+                        });
+                        bg = bg.map(v => v/4);
+
+                        let threshold = 28;
+                        let minX=w, minY=h, maxX=0, maxY=0, found=false;
+                        for (let y=0; y<h; y++) {
+                            for (let x=0; x<w; x++) {
+                                let i=(y*w+x)*4;
+                                let dr=data[i]-bg[0], dg=data[i+1]-bg[1], db=data[i+2]-bg[2];
+                                if (Math.sqrt(dr*dr+dg*dg+db*db) > threshold) {
+                                    found = true;
+                                    if (x<minX) minX=x;
+                                    if (x>maxX) maxX=x;
+                                    if (y<minY) minY=y;
+                                    if (y>maxY) maxY=y;
+                                }
+                            }
+                        }
+
+                        if (!found) { resolve(null); return; }
+
+                        let bw = (maxX - minX) / w;
+                        let bh = (maxY - minY) / h;
+                        let boxFrac = Math.max(bw, bh);
+                        if (boxFrac < 0.05 || boxFrac > 0.98) { resolve(null); return; } // ফুল-বডি/এজ-টু-এজ ছবি হলে অটো-জুমের দরকার নেই
+
+                        let cx = ((minX + maxX) / 2) / w;
+                        let cy = ((minY + maxY) / 2) / h;
+                        let zoom = Math.round((1 / boxFrac) * 82); // প্রোডাক্টের চারপাশে সামান্য মার্জিন রেখে জুম হিসাব
+                        zoom = Math.min(250, Math.max(100, zoom));
+
+                        resolve({
+                            zoom: zoom,
+                            posX: Math.round(cx * 100),
+                            posY: Math.round(cy * 100)
+                        });
+                    } catch (e) {
+                        resolve(null); // ক্যানভাস পড়তে সমস্যা হলে অটো-ডিটেক্ট বাদ, ডিফল্ট ভ্যালুতেই থাকবে
+                    }
+                };
+                img.onerror = () => resolve(null);
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        async function autoFitFrame(file) {
+            let result = await detectSubjectFrame(file);
+            if (!result) return; // ডিটেক্ট করা না গেলে ডিফল্ট 100%/center-ই থাকবে, অ্যাডমিন ম্যানুয়ালি ঠিক করতে পারবে
+
+            frameZoom = result.zoom;
+            framePosX = result.posX;
+            framePosY = result.posY;
+
+            document.getElementById('imgZoomSlider').value = frameZoom;
+            document.querySelectorAll('.pos-btn').forEach(b => {
+                b.classList.toggle('active', Number(b.dataset.x) === framePosX && Number(b.dataset.y) === framePosY);
+            });
+            updateFramePreview();
         }
 
         function wrapDetailsSelection(marker) {
@@ -395,7 +480,10 @@
                 wrap.style.display = 'none';
                 img.src = '';
             }
-            if (n == 1) updateFramePreview();
+            if (n == 1) {
+                updateFramePreview();
+                if (file) autoFitFrame(file);
+            }
         }
 
         function clearImageSlot(n) {
@@ -404,7 +492,16 @@
             document.getElementById('previewImg' + n).src = '';
             colorSizesData[n] = {};
             document.getElementById(`colorSizeList${n}`).innerText = '';
-            if (n == 1) updateFramePreview();
+            if (n == 1) {
+                frameZoom = 100;
+                framePosX = 50;
+                framePosY = 50;
+                document.getElementById('imgZoomSlider').value = 100;
+                document.querySelectorAll('.pos-btn').forEach(b => {
+                    b.classList.toggle('active', Number(b.dataset.x) === 50 && Number(b.dataset.y) === 50);
+                });
+                updateFramePreview();
+            }
         }
 
         let lastUploadError = "";
