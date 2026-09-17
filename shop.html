@@ -43,10 +43,13 @@
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; box-sizing: border-box; }
         .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; margin-bottom: 6px; box-sizing: border-box; }
         
-        /* Product Image Box - fixed size for every card; background-image so each
-           product's Zoom/Position (set in Add Dress) can crop out extra white
-           space instead of always showing the raw photo un-cropped. */
-        .product-img-box { width: 100%; height: 210px; background-color: #f9fafb; background-repeat: no-repeat; border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; position: relative; margin-bottom: 8px; cursor: pointer; transition: background-size 0.3s; }
+        /* Product Image Box - একটাই ফিক্সড ফ্রেম (aspect-ratio) সব প্রোডাক্টের জন্য।
+           object-fit:cover দিয়ে সব ছবি একইভাবে center থেকে ক্রপ হয়ে ফ্রেম পূরণ করবে —
+           প্রোডাক্ট টাইপ (ইলেকট্রনিক্স/ড্রেস ইত্যাদি) যাই হোক না কেন সাইজ একই থাকবে।
+           পুরো আনক্রপড ছবি দেখতে চাইলে ছবিতে ট্যাপ করলে Zoom Modal-এ ফুল ছবি দেখা যাবে। */
+        .product-img-box { width: 100%; aspect-ratio: 4 / 5; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; position: relative; margin-bottom: 8px; cursor: pointer; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform 0.3s; }
+        .product-img-box:hover img { transform: scale(1.03); }
 
         /* Wishlist Heart Icon Button */
         .wishlist-btn {
@@ -286,13 +289,6 @@
                 let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
-                // অ্যাডমিন Add Dress পেইজ থেকে প্রতিটা প্রোডাক্টের ছবির জন্য আলাদা Zoom ও
-                // Focus Position সেট করতে পারবে (সাদা/ফাঁকা জায়গাওয়ালা ছবি বাদ দিতে)।
-                // পুরোনো প্রোডাক্টে এই ভ্যালু না থাকলে আগের মতোই cover/center-top দেখাবে।
-                let hasCustomFrame = (dress.imageZoom !== undefined && dress.imageZoom !== null && dress.imageZoom !== '');
-                let bgSizeVal = hasCustomFrame ? `${dress.imageZoom}%` : 'cover';
-                let bgPosVal = hasCustomFrame ? `${dress.imagePosX}% ${dress.imagePosY}%` : 'center top';
-
                 let summary = ratingSummary(getReviewsForDress(dress));
                 let ratingHtml = summary
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
@@ -300,10 +296,11 @@
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
-                        <div class="product-img-box" style="background-image:url('${mainImg || NO_IMAGE_PLACEHOLDER}'); background-size:${bgSizeVal}; background-position:${bgPosVal};" onclick="openZoomModal('${encodedImages}')">
+                        <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
                         <div>
