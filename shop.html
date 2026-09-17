@@ -26,9 +26,9 @@
             padding: 0 0 100px 0; 
             display: flex; 
             justify-content: center;
-            overflow-x: hidden; /* ডানে-বামে ফ্রেম যাওয়া বন্ধ */
+            overflow-x: hidden; /* ফ্রেম যেন ডানে-বামে না ভাঙে */
         }
-        .container { width: 100%; max-width: 480px; padding: 10px; box-sizing: border-box; background: #ffffff; overflow-x: hidden; }
+        .container { width: 100%; max-width: 480px; padding: 12px; box-sizing: border-box; background: #ffffff; overflow-x: hidden; }
 
         .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
         .filter-select-box, .sort-select-box {
@@ -39,13 +39,13 @@
         }
         .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 12px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
 
-        /* 🔥 Products Grid - স্ট্রং ফিক্স (minmax) যাতে ফ্রেম না কাটে */
+        /* 🔥 Products Grid Fixed (minmax added to prevent overflow) */
         .products-grid { 
             display: grid; 
             grid-template-columns: repeat(2, minmax(0, 1fr)); 
-            gap: 10px; 
+            gap: 12px; 
             box-sizing: border-box; 
-            width: 100%; 
+            width: 100%;
         }
         .product-card { 
             background: var(--card-bg); 
@@ -57,18 +57,18 @@
             justify-content: space-between; 
             position: relative; 
             margin-bottom: 6px; 
-            box-sizing: border-box; 
+            box-sizing: border-box;
             width: 100%;
-            overflow: hidden; 
+            overflow: hidden;
         }
         
-        /* 🔥 Image Box - ফিক্সড হাইট, রাউন্ড শেপ */
+        /* 🔥 Product Image Box - Fixed Height & Rounded Corners */
         .product-img-box { 
             width: 100%; 
-            height: 220px !important; /* ফ্রেমের উচ্চতা একদম ফিক্সড */
+            height: 220px; 
             background: #f9fafb; 
             border: 1px solid var(--border-color); 
-            border-radius: 12px !important; /* হালকা রাউন্ড */
+            border-radius: 12px; /* রাউন্ড শেপ */
             overflow: hidden; 
             position: relative; 
             margin-bottom: 8px; 
@@ -80,9 +80,8 @@
         .product-img-box img { 
             width: 100%; 
             height: 100%; 
-            object-fit: cover !important; /* ড্রেস পুরো ফ্রেম জুড়ে থাকবে */
-            object-position: top center !important; /* মাথা যাতে না কাটে */
-            border-radius: 10px; 
+            object-fit: cover; 
+            object-position: top center; /* ছবি লম্বা হলে মাথা কাটবে না */
             transition: transform 0.3s; 
         }
         .product-img-box:hover img { transform: scale(1.03); }
@@ -98,9 +97,8 @@
         .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 9px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.2px; }
         .add-to-cart-btn:active { opacity: 0.85; }
 
-        .product-info-wrap { width: 100%; overflow: hidden; }
         .product-code { font-size: 9px; color: #7c3aed; text-align: center; font-weight: 700; margin-bottom: 2px; }
-        /* Title text truncation */
+        /* টেক্সট বড় হলে যেন ফ্রেম না কাটে */
         .product-title { margin: 0 0 3px 0; font-size: 12px; font-weight: 500; color: #1f2937; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
         .product-price { margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: var(--price-color); text-align: center; }
 
@@ -175,8 +173,8 @@
     <!-- 🔥 Zoom Image Modal (Click outside to close) -->
     <div id="zoomModal" class="modal-overlay" style="align-items: center;" onclick="closeModal('zoomModal')">
         <div class="modal-content" style="background: transparent; box-shadow: none; border: none; padding: 10px; max-height: 95vh; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
-            <span style="position:absolute; top:-20px; right:10px; font-size:32px; cursor:pointer; color:#ffffff; z-index:10; background: rgba(0,0,0,0.5); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onclick="closeModal('zoomModal')">&times;</span>
-            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:70vh; object-fit:contain; border-radius:12px; background: transparent;">
+            <span style="position:absolute; top:-15px; right:10px; font-size:32px; cursor:pointer; color:#ffffff; z-index:10; background: rgba(0,0,0,0.5); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onclick="closeModal('zoomModal')">&times;</span>
+            <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:75vh; object-fit:contain; border-radius:12px; background: transparent;">
             <div id="zoomThumbnails" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top: 14px;"></div>
         </div>
     </div>
@@ -189,11 +187,13 @@
         </div>
     </div>
 
+    <!-- Fullscreen Reel-style Video Modal -->
     <div id="videoReelModal" class="video-reel-overlay">
         <span class="video-reel-close" onclick="closeVideoReel()">&times;</span>
         <video id="reelVideoPlayer" src="" controls autoplay playsinline></video>
     </div>
 
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><span class="nav-icon-wrap"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
         <a class="nav-item active" href="shop.html"><span class="nav-icon-wrap"><i class="fa-solid fa-store"></i></span><span class="nav-label">Shop</span></a>
@@ -250,9 +250,13 @@
         async function loadCategoriesFilter() {
             let dropdown = document.getElementById('categoryFilterDropdown');
             let categories = await getCategories();
+            
             let currentSelected = dropdown.value;
             dropdown.innerHTML = `<option value="All">All Category</option>`;
-            categories.forEach(cat => { dropdown.innerHTML += `<option value="${cat}">${cat}</option>`; });
+            
+            categories.forEach(cat => {
+                dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
             dropdown.value = currentSelected;
         }
 
@@ -260,7 +264,6 @@
             let grid = document.getElementById('shopProductsGrid');
             grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; padding:40px; font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</div>`;
 
-            // Data loading unchanged to ensure it works
             let dresses = await getDresses();
             ALL_REVIEWS = await getAllReviews();
 
@@ -268,11 +271,17 @@
             let sortType = document.getElementById('sortDropdown').value;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
 
-            if (selectedCategory !== 'All') { dresses = dresses.filter(d => d.category === selectedCategory); }
+            if (selectedCategory !== 'All') {
+                dresses = dresses.filter(d => d.category === selectedCategory);
+            }
 
-            if (sortType === 'price-low') { dresses.sort((a, b) => a.price - b.price); }
-            else if (sortType === 'price-high') { dresses.sort((a, b) => b.price - a.price); }
-            else if (sortType === 'old') { dresses.reverse(); }
+            if (sortType === 'price-low') {
+                dresses.sort((a, b) => a.price - b.price);
+            } else if (sortType === 'price-high') {
+                dresses.sort((a, b) => b.price - a.price);
+            } else if (sortType === 'old') {
+                dresses.reverse();
+            }
 
             currentFilteredDresses = dresses;
             grid.innerHTML = '';
@@ -284,12 +293,19 @@
 
             currentFilteredDresses.forEach((dress, index) => {
                 let mainImg = dress.image || '';
-                if (dress.images && dress.images.length > 0) { mainImg = dress.images[0]; }
+                if (dress.images && dress.images.length > 0) {
+                    mainImg = dress.images[0];
+                }
+
                 let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
                 let summary = ratingSummary(getReviewsForDress(dress));
-                let ratingHtml = summary ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>` : '';
+                let ratingHtml = summary
+                    ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
+                    : '';
+
+                let fitMode = dress.imageFit === 'contain' ? 'contain' : 'cover';
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
@@ -297,10 +313,10 @@
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
-                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" style="object-fit:${fitMode};" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
-                        <div class="product-info-wrap">
+                        <div>
                             ${dress.productCode ? `<div class="product-code">Code: ${dress.productCode}</div>` : ''}
                             <h4 class="product-title">${dress.name}</h4>
                             <p class="product-price">Tk ${Number(dress.price).toLocaleString()}.00</p>
@@ -315,6 +331,7 @@
         function toggleWishlist(index, btn) {
             let dress = currentFilteredDresses[index];
             if (!dress) return;
+
             let uniqueId = dress._key || dress.name;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
             let existingIdx = wishlist.findIndex(w => (w.productId || w.name) === uniqueId);
@@ -325,7 +342,14 @@
                 btn.innerHTML = `<i class="fa-regular fa-heart"></i>`;
                 tg.showAlert("🗑️ Removed from wishlist!");
             } else {
-                wishlist.push({ productId: uniqueId, name: dress.name, price: dress.price, image: dress.image || (dress.images ? dress.images[0] : ''), size: 'M', qty: 1 });
+                wishlist.push({
+                    productId: uniqueId,
+                    name: dress.name,
+                    price: dress.price,
+                    image: dress.image || (dress.images ? dress.images[0] : ''),
+                    size: 'M',
+                    qty: 1
+                });
                 btn.classList.add('active');
                 btn.innerHTML = `<i class="fa-solid fa-heart"></i>`;
                 tg.showAlert("❤️ Added to wishlist!");
@@ -345,16 +369,18 @@
             if (images.length > 1) {
                 images.forEach((imgUrl) => {
                     thumbContainer.innerHTML += `
-                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:50px; height:60px; object-fit:cover; border-radius:8px; border:2px solid #fff; cursor:pointer; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                        <img src="${imgUrl}" onclick="document.getElementById('zoomedImg').src='${imgUrl}'" style="width:50px; height:60px; object-fit:cover; border-radius:4px; border:2px solid #111; cursor:pointer; background:#f9fafb;">
                     `;
                 });
             }
+
             document.getElementById('zoomModal').style.display = 'flex';
         }
 
         function openQuickView(index) {
             let dress = currentFilteredDresses[index];
             if (!dress) return;
+
             let sizesObj = dress.sizes || {};
             let sizeKeys = Object.keys(sizesObj);
             let firstSize = sizeKeys.length > 0 ? sizeKeys[0] : '';
@@ -415,19 +441,26 @@
                         <span id="modalStockText" style="font-size:11px; color:#059669; font-weight:bold; background:#ecfdf5; padding:2px 6px; border-radius:4px;">Stock (${firstSize || 'N/A'}): ${initialStock} Pcs</span>
                     </div>
                 </div>
+
                 ${imagesHtml ? `<div style="display:flex; gap:6px; margin-bottom:12px;">${imagesHtml}</div>` : ''}
+
                 <div style="margin-bottom:12px;">
                     <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">SELECT SIZE:</label>
                     <div id="modalSizeContainer">${sizePillsHtml || '<span style="font-size:11px; color:red;">Stock Out</span>'}</div>
                 </div>
+
                 <div style="margin-bottom:12px;">
                     <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">DETAILS:</label>
                     <div style="font-size:12px; color:#666; line-height:1.5;">${formatDetailsText(dress.details)}</div>
                 </div>
+
                 ${videoSection}
+
                 <button class="add-to-cart-btn" style="margin-top:14px; background:#111111;" onclick="addToCartFromModal('${dress.name}', ${dress.price}, '${firstSize}', '${mainImg}', '${dress._key || ''}')">Add to Cart</button>
+
                 ${reviewsSection}
             `;
+
             window.activeSelectedSize = firstSize;
             document.getElementById('quickViewModal').style.display = 'flex';
         }
@@ -456,6 +489,7 @@
             document.querySelectorAll('#modalSizeContainer .size-pill').forEach(p => p.classList.remove('selected'));
             let selectedPill = document.getElementById(`modal-size-${sizeKey}`);
             if(selectedPill) selectedPill.classList.add('selected');
+
             document.getElementById('modalStockText').innerText = `Stock (${sizeKey}): ${qty} Pcs`;
             window.activeSelectedSize = sizeKey;
         }
@@ -465,10 +499,21 @@
             let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
             let itemKey = `${name}_${selectedSize}`;
             let existing = cart.find(it => it.key === itemKey); 
-            if (existing) { existing.qty += 1; } 
-            else {
-                cart.push({ key: itemKey, name: name, price: Number(price), size: selectedSize, image: image, productId: productId || '', qty: 1 });
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    key: itemKey,
+                    name: name,
+                    price: Number(price),
+                    size: selectedSize,
+                    image: image,
+                    productId: productId || '',
+                    qty: 1
+                });
             }
+
             localStorage.setItem('cartItems', JSON.stringify(cart));
             closeModal('quickViewModal');
             updateCartBadge();
