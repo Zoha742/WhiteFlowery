@@ -48,8 +48,36 @@
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
         .delete-preview-btn { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 
-        .submit-btn { background: var(--btn-dark); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
+        .submit-btn { background: var(--btn-dark); background-image: linear-gradient(135deg, #111 0%, #333 100%); color: #fff; border: none; padding: 13px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; letter-spacing: 0.3px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
+
+        /* Premium formatting toolbar for details textarea */
+        .format-toolbar { display: flex; gap: 6px; margin-bottom: 6px; }
+        .format-btn { background: #111; background-image: linear-gradient(135deg, #222, #000); color: #fff; border: none; min-width: 32px; height: 28px; padding: 0 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .format-btn:active { transform: scale(0.96); }
+        .format-hint { font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+
+        /* Add color slot button */
+        .add-color-slot-btn { width: 100%; background: #111; background-image: linear-gradient(135deg, #111, #333); color: #fff; border: none; padding: 11px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 2px; display: flex; align-items: center; justify-content: center; gap: 7px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        .add-color-slot-btn:active { transform: scale(0.98); }
+        .remove-slot-btn { background: #ef4444; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 9px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+
+        /* Resize/re-crop button on image preview */
+        .resize-preview-btn { position: absolute; bottom: -6px; right: -6px; background: #111; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+
+        /* Image cropper modal */
+        .cropper-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; box-sizing: border-box; }
+        .cropper-title { color: #fff; font-size: 13px; font-weight: 700; text-align: center; }
+        .cropper-frame { width: 280px; height: 280px; max-width: 80vw; max-height: 80vw; border-radius: 14px; overflow: hidden; position: relative; background: #000; touch-action: none; border: 2px solid #fff; box-shadow: 0 0 0 2000px rgba(0,0,0,0.65); }
+        .cropper-frame img { position: absolute; user-select: none; -webkit-user-drag: none; cursor: grab; max-width: none; }
+        .cropper-controls { width: 280px; max-width: 80vw; display: flex; flex-direction: column; gap: 10px; }
+        .cropper-zoom-row { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; }
+        .cropper-zoom-row input[type=range] { flex: 1; }
+        .cropper-btn-row { display: flex; gap: 10px; width: 280px; max-width: 80vw; }
+        .cropper-btn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .cropper-btn.cancel { background: #374151; color: #fff; }
+        .cropper-btn.confirm { background: #10b981; color: #fff; }
+        .cropper-hint { color: #ccc; font-size: 10px; text-align: center; }
     </style>
 </head>
 <body>
@@ -102,7 +130,12 @@
 
             <div class="form-group">
                 <label>Product Details / Description</label>
+                <div class="format-toolbar">
+                    <button type="button" class="format-btn" onclick="formatText('bold')" title="Bold"><b>B</b></button>
+                    <button type="button" class="format-btn" onclick="formatText('bullet')" title="Bullet Point"><i class="fa-solid fa-list-ul"></i> Dot</button>
+                </div>
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
+                <div class="format-hint">Select text then tap B to bold, or tap Dot to add bullet points.</div>
             </div>
 
             <!-- Global Size Setup (General Stock) -->
@@ -134,78 +167,13 @@
                 </tbody>
             </table>
 
-            <!-- Color Variants: ৩টি কালার স্লট, প্রতিটিতে নিজস্ব সাইজ ও স্টক যুক্ত করার অপশন -->
+            <!-- Color Variants: ডায়নামিক কালার স্লট, প্রতিটিতে নিজস্ব সাইজ ও স্টক যুক্ত করার অপশন -->
             <div class="form-group">
-                <label><i class="fa-solid fa-palette"></i> Color Variants & Sizes (Up to 3)</label>
+                <label><i class="fa-solid fa-palette"></i> Color Variants & Sizes</label>
 
-                <!-- Color Slot 1 -->
-                <div class="color-slot">
-                    <div class="color-slot-header">Color 1 <span style="color:#ef4444;">*Required</span></div>
-                    <input type="text" id="colorName1" class="form-control" placeholder="Color name e.g. Red" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile1" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(1)">
-                    <div class="img-preview-wrap" id="previewWrap1">
-                        <img id="previewImg1" src="" alt="Preview">
-                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(1)"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                    <!-- Color 1 Specific Sizes -->
-                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
-                        <label style="font-size:10px; font-weight:bold; color:#555;">Color 1 Sizes & Qty:</label>
-                        <div style="display:flex; gap:4px; margin-bottom:6px;">
-                            <select id="colorSizeKey1" class="form-control" style="flex:1; padding:6px; font-size:11px;">
-                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
-                            </select>
-                            <input type="number" id="colorSizeQty1" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
-                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(1)">Add</button>
-                        </div>
-                        <div id="colorSizeList1" style="font-size:11px; color:#059669; font-weight:bold;"></div>
-                    </div>
-                </div>
+                <div id="colorSlotsContainer"></div>
 
-                <!-- Color Slot 2 -->
-                <div class="color-slot">
-                    <div class="color-slot-header">Color 2 (Optional)</div>
-                    <input type="text" id="colorName2" class="form-control" placeholder="Color name e.g. Blue" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile2" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(2)">
-                    <div class="img-preview-wrap" id="previewWrap2">
-                        <img id="previewImg2" src="" alt="Preview">
-                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(2)"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                    <!-- Color 2 Specific Sizes -->
-                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
-                        <label style="font-size:10px; font-weight:bold; color:#555;">Color 2 Sizes & Qty:</label>
-                        <div style="display:flex; gap:4px; margin-bottom:6px;">
-                            <select id="colorSizeKey2" class="form-control" style="flex:1; padding:6px; font-size:11px;">
-                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
-                            </select>
-                            <input type="number" id="colorSizeQty2" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
-                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(2)">Add</button>
-                        </div>
-                        <div id="colorSizeList2" style="font-size:11px; color:#059669; font-weight:bold;"></div>
-                    </div>
-                </div>
-
-                <!-- Color Slot 3 -->
-                <div class="color-slot">
-                    <div class="color-slot-header">Color 3 (Optional)</div>
-                    <input type="text" id="colorName3" class="form-control" placeholder="Color name e.g. Green" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile3" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(3)">
-                    <div class="img-preview-wrap" id="previewWrap3">
-                        <img id="previewImg3" src="" alt="Preview">
-                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(3)"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                    <!-- Color 3 Specific Sizes -->
-                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
-                        <label style="font-size:10px; font-weight:bold; color:#555;">Color 3 Sizes & Qty:</label>
-                        <div style="display:flex; gap:4px; margin-bottom:6px;">
-                            <select id="colorSizeKey3" class="form-control" style="flex:1; padding:6px; font-size:11px;">
-                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
-                            </select>
-                            <input type="number" id="colorSizeQty3" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
-                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(3)">Add</button>
-                        </div>
-                        <div id="colorSizeList3" style="font-size:11px; color:#059669; font-weight:bold;"></div>
-                    </div>
-                </div>
+                <button type="button" class="add-color-slot-btn" onclick="addColorSlot()"><i class="fa-solid fa-plus"></i> Add Another Color</button>
             </div>
 
             <div class="form-group">
@@ -222,16 +190,127 @@
         <span>Uploading images & publishing dress...</span>
     </div>
 
+    <!-- Image Cropper / Resize Modal -->
+    <div id="cropperOverlay" class="cropper-overlay">
+        <div class="cropper-title">Drag the photo to reposition, use slider to resize</div>
+        <div class="cropper-frame" id="cropperFrame">
+            <img id="cropperImage" src="" alt="Crop preview">
+        </div>
+        <div class="cropper-controls">
+            <div class="cropper-zoom-row">
+                <i class="fa-solid fa-minus"></i>
+                <input type="range" id="cropperZoomSlider" min="1" max="3" step="0.01" value="1" oninput="cropperZoomChange(this.value)">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <div class="cropper-hint">Tap & drag the image to move it around inside the frame</div>
+        </div>
+        <div class="cropper-btn-row">
+            <button type="button" class="cropper-btn cancel" onclick="cropperCancel()">Cancel</button>
+            <button type="button" class="cropper-btn confirm" onclick="cropperConfirm()"><i class="fa-solid fa-check"></i> Crop & Use</button>
+        </div>
+    </div>
+
     <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         let addedSizesList = {};
-        let colorSizesData = { 1: {}, 2: {}, 3: {} };
+        let colorSizesData = {};
+        let originalFiles = {};   // slot -> raw File selected by user
+        let croppedBlobs = {};    // slot -> final cropped/compressed Blob to upload
+        let colorSlotCount = 0;
+
+        const FRAME_SIZE = 280;
+        const OUTPUT_SIZE = 800; // final square output px, keeps upload size small
+        let cropperState = { slot: null, img: null, naturalW: 0, naturalH: 0, baseScale: 1, zoom: 1, offsetX: 0, offsetY: 0, dragging: false, startX: 0, startY: 0, startOffsetX: 0, startOffsetY: 0 };
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
+            addColorSlot(); // first required color slot
+            setupCropperDragHandlers();
         });
+
+        /* ---------------- Details formatting toolbar ---------------- */
+        function formatText(type) {
+            let ta = document.getElementById('newDetails');
+            let start = ta.selectionStart, end = ta.selectionEnd;
+            let text = ta.value;
+            let selected = text.substring(start, end);
+
+            if (type === 'bold') {
+                let content = selected || 'bold text';
+                let insert = `**${content}**`;
+                ta.value = text.substring(0, start) + insert + text.substring(end);
+                ta.focus();
+                ta.selectionStart = start + 2;
+                ta.selectionEnd = start + 2 + content.length;
+            } else if (type === 'bullet') {
+                if (selected) {
+                    let lines = selected.split('\n').map(l => l.startsWith('• ') ? l : '• ' + l);
+                    let insert = lines.join('\n');
+                    ta.value = text.substring(0, start) + insert + text.substring(end);
+                    ta.focus();
+                    ta.selectionStart = start;
+                    ta.selectionEnd = start + insert.length;
+                } else {
+                    let before = text.substring(0, start);
+                    let needsNewline = before.length > 0 && !before.endsWith('\n');
+                    let insert = (needsNewline ? '\n' : '') + '• ';
+                    ta.value = before + insert + text.substring(start);
+                    let pos = start + insert.length;
+                    ta.focus();
+                    ta.selectionStart = ta.selectionEnd = pos;
+                }
+            }
+        }
+
+        /* ---------------- Dynamic color slots ---------------- */
+        function addColorSlot() {
+            colorSlotCount++;
+            let n = colorSlotCount;
+            colorSizesData[n] = {};
+            let isFirst = (n === 1);
+
+            let slotHtml = `
+                <div class="color-slot" id="colorSlotDiv${n}">
+                    <div class="color-slot-header">
+                        <span>Color ${n} ${isFirst ? '<span style="color:#ef4444;">*Required</span>' : '<span style="color:#9ca3af; font-weight:500;">(Optional)</span>'}</span>
+                        ${isFirst ? '' : `<button type="button" class="remove-slot-btn" onclick="removeColorSlot(${n})"><i class="fa-solid fa-xmark"></i></button>`}
+                    </div>
+                    <input type="text" id="colorName${n}" class="form-control" placeholder="Color name e.g. Red" style="margin-bottom:8px;">
+                    <input type="file" id="imgFile${n}" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="handleImageSelect(${n})">
+                    <div class="img-preview-wrap" id="previewWrap${n}">
+                        <img id="previewImg${n}" src="" alt="Preview">
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(${n})"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" class="resize-preview-btn" onclick="openCropper(${n})" title="Resize / Reposition"><i class="fa-solid fa-crop-simple"></i></button>
+                    </div>
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <label style="font-size:10px; font-weight:bold; color:#555;">Color ${n} Sizes & Qty:</label>
+                        <div style="display:flex; gap:4px; margin-bottom:6px;">
+                            <select id="colorSizeKey${n}" class="form-control" style="flex:1; padding:6px; font-size:11px;">
+                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
+                            </select>
+                            <input type="number" id="colorSizeQty${n}" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
+                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(${n})">Add</button>
+                        </div>
+                        <div id="colorSizeList${n}" style="font-size:11px; color:#059669; font-weight:bold;"></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('colorSlotsContainer').insertAdjacentHTML('beforeend', slotHtml);
+        }
+
+        function removeColorSlot(n) {
+            let el = document.getElementById(`colorSlotDiv${n}`);
+            if (el) el.remove();
+            delete colorSizesData[n];
+            delete originalFiles[n];
+            delete croppedBlobs[n];
+        }
+
+        function getActiveSlotNumbers() {
+            return Array.from(document.querySelectorAll('.color-slot')).map(el => parseInt(el.id.replace('colorSlotDiv', '')));
+        }
 
         async function loadCategoriesDropdown() {
             let catSelect = document.getElementById('newCat');
@@ -306,33 +385,140 @@
             listContainer.innerText = text;
         }
 
-        function previewImage(n) {
-            let fileInput = document.getElementById('imgFile' + n);
-            let wrap = document.getElementById('previewWrap' + n);
-            let img = document.getElementById('previewImg' + n);
-            let file = fileInput.files[0];
-            if (file) {
-                img.src = URL.createObjectURL(file);
-                wrap.style.display = 'block';
-            } else {
-                wrap.style.display = 'none';
-                img.src = '';
-            }
-        }
-
         function clearImageSlot(n) {
             document.getElementById('imgFile' + n).value = '';
             document.getElementById('previewWrap' + n).style.display = 'none';
             document.getElementById('previewImg' + n).src = '';
-            colorSizesData[n] = {};
-            document.getElementById(`colorSizeList${n}`).innerText = '';
+            delete originalFiles[n];
+            delete croppedBlobs[n];
+        }
+
+        /* ---------------- Image crop / resize / reposition ---------------- */
+        function handleImageSelect(n) {
+            let fileInput = document.getElementById('imgFile' + n);
+            let file = fileInput.files[0];
+            if (!file) return;
+            originalFiles[n] = file;
+            openCropper(n);
+        }
+
+        function openCropper(n) {
+            let file = originalFiles[n];
+            if (!file) { tg.showAlert("⚠️ Please select an image first!"); return; }
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                let img = new Image();
+                img.onload = () => {
+                    cropperState.slot = n;
+                    cropperState.img = img;
+                    cropperState.naturalW = img.naturalWidth;
+                    cropperState.naturalH = img.naturalHeight;
+                    cropperState.baseScale = Math.max(FRAME_SIZE / img.naturalWidth, FRAME_SIZE / img.naturalHeight);
+                    cropperState.zoom = 1;
+                    cropperState.offsetX = (FRAME_SIZE - img.naturalWidth * cropperState.baseScale) / 2;
+                    cropperState.offsetY = (FRAME_SIZE - img.naturalHeight * cropperState.baseScale) / 2;
+                    document.getElementById('cropperZoomSlider').value = 1;
+                    document.getElementById('cropperImage').src = e.target.result;
+                    updateCropperTransform();
+                    document.getElementById('cropperOverlay').style.display = 'flex';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateCropperTransform() {
+            let scale = cropperState.baseScale * cropperState.zoom;
+            let w = cropperState.naturalW * scale;
+            let h = cropperState.naturalH * scale;
+            let minX = FRAME_SIZE - w, maxX = 0;
+            let minY = FRAME_SIZE - h, maxY = 0;
+            cropperState.offsetX = Math.min(maxX, Math.max(minX, cropperState.offsetX));
+            cropperState.offsetY = Math.min(maxY, Math.max(minY, cropperState.offsetY));
+            let cImg = document.getElementById('cropperImage');
+            cImg.style.width = w + 'px';
+            cImg.style.height = h + 'px';
+            cImg.style.left = cropperState.offsetX + 'px';
+            cImg.style.top = cropperState.offsetY + 'px';
+        }
+
+        function cropperZoomChange(val) {
+            cropperState.zoom = parseFloat(val);
+            updateCropperTransform();
+        }
+
+        function setupCropperDragHandlers() {
+            let frame = document.getElementById('cropperFrame');
+            const start = (e) => {
+                cropperState.dragging = true;
+                let point = e.touches ? e.touches[0] : e;
+                cropperState.startX = point.clientX;
+                cropperState.startY = point.clientY;
+                cropperState.startOffsetX = cropperState.offsetX;
+                cropperState.startOffsetY = cropperState.offsetY;
+            };
+            const move = (e) => {
+                if (!cropperState.dragging) return;
+                e.preventDefault();
+                let point = e.touches ? e.touches[0] : e;
+                let dx = point.clientX - cropperState.startX;
+                let dy = point.clientY - cropperState.startY;
+                cropperState.offsetX = cropperState.startOffsetX + dx;
+                cropperState.offsetY = cropperState.startOffsetY + dy;
+                updateCropperTransform();
+            };
+            const end = () => { cropperState.dragging = false; };
+
+            frame.addEventListener('mousedown', start);
+            window.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', end);
+            frame.addEventListener('touchstart', start, { passive: true });
+            frame.addEventListener('touchmove', move, { passive: false });
+            frame.addEventListener('touchend', end);
+        }
+
+        function cropperCancel() {
+            let n = cropperState.slot;
+            document.getElementById('cropperOverlay').style.display = 'none';
+            // Only clear the file input if this slot never had a confirmed crop before
+            if (!croppedBlobs[n]) {
+                let fi = document.getElementById('imgFile' + n);
+                if (fi) fi.value = '';
+                delete originalFiles[n];
+            }
+        }
+
+        function cropperConfirm() {
+            let n = cropperState.slot;
+            let scale = cropperState.baseScale * cropperState.zoom;
+            let srcX = (0 - cropperState.offsetX) / scale;
+            let srcY = (0 - cropperState.offsetY) / scale;
+            let srcSize = FRAME_SIZE / scale;
+
+            let canvas = document.createElement('canvas');
+            canvas.width = OUTPUT_SIZE;
+            canvas.height = OUTPUT_SIZE;
+            let ctx = canvas.getContext('2d');
+            ctx.drawImage(cropperState.img, srcX, srcY, srcSize, srcSize, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+            canvas.toBlob((blob) => {
+                croppedBlobs[n] = blob;
+                let url = URL.createObjectURL(blob);
+                document.getElementById('previewImg' + n).src = url;
+                document.getElementById('previewWrap' + n).style.display = 'block';
+                document.getElementById('cropperOverlay').style.display = 'none';
+            }, 'image/jpeg', 0.85);
         }
 
         let lastUploadError = "";
-        async function uploadToCloudinary(file, resourceType) {
+        async function uploadToCloudinary(file, resourceType, filename) {
             let type = resourceType || "image";
             let formData = new FormData();
-            formData.append("file", file);
+            if (filename) {
+                formData.append("file", file, filename);
+            } else {
+                formData.append("file", file);
+            }
             formData.append("upload_preset", "whiteflowery_unsigned");
             formData.append("folder", "shop/product_add");
             formData.append("public_id", `wf_${type}_${Date.now()}_${Math.floor(Math.random() * 1000000)}`);
@@ -362,16 +548,12 @@
             let isTrending = document.getElementById('isTrending').checked;
             let isNewArrival = document.getElementById('isNewArrival').checked;
             
-            let file1 = document.getElementById('imgFile1').files[0];
-            let file2 = document.getElementById('imgFile2').files[0];
-            let file3 = document.getElementById('imgFile3').files[0];
-            let colorName1 = document.getElementById('colorName1').value.trim() || 'Color 1';
-            let colorName2 = document.getElementById('colorName2').value.trim();
-            let colorName3 = document.getElementById('colorName3').value.trim();
             let videoInput = document.getElementById('productVideoFile');
+            let activeSlots = getActiveSlotNumbers(); // e.g. [1,2,3,4...]
 
             if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            if (!file1) { tg.showAlert("⚠️ Color 1 Photo is required!"); return; }
+            let firstSlot = activeSlots[0];
+            if (!croppedBlobs[firstSlot]) { tg.showAlert("⚠️ Color 1 Photo is required (please crop & confirm it)!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
 
@@ -379,50 +561,28 @@
             let colorVariants = [];
             let combinedSizes = { ...addedSizesList };
 
-            let url1 = await uploadToCloudinary(file1);
-            if (!url1) {
-                document.getElementById('uploadOverlay').style.display = 'none';
-                tg.showAlert(`❌ Photo 1 upload failed: ${lastUploadError}`);
-                return;
-            }
-            images.push(url1);
-            colorVariants.push({ 
-                colorName: colorName1, 
-                image: url1, 
-                sizes: colorSizesData[1] 
-            });
-            // Merge color 1 sizes into global sizes if added
-            for(let [k, v] of Object.entries(colorSizesData[1])) {
-                combinedSizes[k] = (combinedSizes[k] || 0) + v;
-            }
+            for (let idx = 0; idx < activeSlots.length; idx++) {
+                let n = activeSlots[idx];
+                let blob = croppedBlobs[n];
+                if (!blob) continue; // optional slots may be empty
 
-            if(file2) {
-                let url2 = await uploadToCloudinary(file2);
-                if(url2) {
-                    images.push(url2);
-                    colorVariants.push({ 
-                        colorName: colorName2 || 'Color 2', 
-                        image: url2, 
-                        sizes: colorSizesData[2] 
-                    });
-                    for(let [k, v] of Object.entries(colorSizesData[2])) {
-                        combinedSizes[k] = (combinedSizes[k] || 0) + v;
-                    }
+                let colorNameEl = document.getElementById('colorName' + n);
+                let colorName = (colorNameEl ? colorNameEl.value.trim() : '') || `Color ${idx + 1}`;
+
+                let url = await uploadToCloudinary(blob, "image", `wf_color${n}.jpg`);
+                if (!url) {
+                    document.getElementById('uploadOverlay').style.display = 'none';
+                    tg.showAlert(`❌ ${colorName} photo upload failed: ${lastUploadError}`);
+                    return;
                 }
-            }
-
-            if(file3) {
-                let url3 = await uploadToCloudinary(file3);
-                if(url3) {
-                    images.push(url3);
-                    colorVariants.push({ 
-                        colorName: colorName3 || 'Color 3', 
-                        image: url3, 
-                        sizes: colorSizesData[3] 
-                    });
-                    for(let [k, v] of Object.entries(colorSizesData[3])) {
-                        combinedSizes[k] = (combinedSizes[k] || 0) + v;
-                    }
+                images.push(url);
+                colorVariants.push({
+                    colorName: colorName,
+                    image: url,
+                    sizes: colorSizesData[n] || {}
+                });
+                for (let [k, v] of Object.entries(colorSizesData[n] || {})) {
+                    combinedSizes[k] = (combinedSizes[k] || 0) + v;
                 }
             }
 
