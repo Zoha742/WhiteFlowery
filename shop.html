@@ -54,10 +54,10 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
         
-        /* Fixed Uniform Image Box Size & Rounded Corners */
+        /* Portrait / Vertical Image Box (স্ক্রিনশটের মতো লম্বা সাইজ) */
         .product-img-box { 
             width: 100%; 
-            height: 200px; /* সব কার্ডের ইমেজ বক্সের উচ্চতা সমান করা হলো */
+            aspect-ratio: 3 / 4; /* লম্বালম্বি প্রফেশনাল প্রডাক্ট রেশিও */
             background: #f9fafb; 
             border: 1px solid var(--border-color); 
             border-radius: 12px; 
@@ -69,7 +69,7 @@
             justify-content: center; 
             cursor: pointer; 
         }
-        .product-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
         /* Wishlist Heart Icon Button */
@@ -219,7 +219,7 @@
         }
 
         const NO_IMAGE_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360">
+            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400">
                 <rect width="100%" height="100%" fill="#f3f4f6"/>
                 <text x="50%" y="48%" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#9ca3af">🖼️</text>
                 <text x="50%" y="60%" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#9ca3af">No photo</text>
@@ -300,7 +300,7 @@
                 let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
 
-                let frameFit = dress.imageFit || 'contain';
+                let frameFit = dress.imageFit || 'cover';
                 let summary = ratingSummary(getReviewsForDress(dress));
                 let ratingHtml = summary
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
