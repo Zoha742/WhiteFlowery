@@ -48,36 +48,8 @@
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
         .delete-preview-btn { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 
-        .submit-btn { background: var(--btn-dark); background-image: linear-gradient(135deg, #111 0%, #333 100%); color: #fff; border: none; padding: 13px; border-radius: 10px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; letter-spacing: 0.3px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+        .submit-btn { background: var(--btn-dark); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
-
-        /* Premium formatting toolbar for details textarea */
-        .format-toolbar { display: flex; gap: 6px; margin-bottom: 6px; }
-        .format-btn { background: #111; background-image: linear-gradient(135deg, #222, #000); color: #fff; border: none; min-width: 32px; height: 28px; padding: 0 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .format-btn:active { transform: scale(0.96); }
-        .format-hint { font-size: 9px; color: var(--text-muted); margin-top: 3px; }
-
-        /* Add color slot button */
-        .add-color-slot-btn { width: 100%; background: #111; background-image: linear-gradient(135deg, #111, #333); color: #fff; border: none; padding: 11px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; margin-top: 2px; display: flex; align-items: center; justify-content: center; gap: 7px; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-        .add-color-slot-btn:active { transform: scale(0.98); }
-        .remove-slot-btn { background: #ef4444; color: #fff; border: none; width: 20px; height: 20px; border-radius: 50%; font-size: 9px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-
-        /* Resize/re-crop button on image preview */
-        .resize-preview-btn { position: absolute; bottom: -6px; right: -6px; background: #111; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-
-        /* Image cropper modal */
-        .cropper-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10001; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 20px; box-sizing: border-box; }
-        .cropper-title { color: #fff; font-size: 13px; font-weight: 700; text-align: center; }
-        .cropper-frame { width: 280px; height: 280px; max-width: 80vw; max-height: 80vw; border-radius: 14px; overflow: hidden; position: relative; background: #000; touch-action: none; border: 2px solid #fff; box-shadow: 0 0 0 2000px rgba(0,0,0,0.65); }
-        .cropper-frame img { position: absolute; user-select: none; -webkit-user-drag: none; cursor: grab; max-width: none; }
-        .cropper-controls { width: 280px; max-width: 80vw; display: flex; flex-direction: column; gap: 10px; }
-        .cropper-zoom-row { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 14px; }
-        .cropper-zoom-row input[type=range] { flex: 1; }
-        .cropper-btn-row { display: flex; gap: 10px; width: 280px; max-width: 80vw; }
-        .cropper-btn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-weight: 700; font-size: 12px; cursor: pointer; }
-        .cropper-btn.cancel { background: #374151; color: #fff; }
-        .cropper-btn.confirm { background: #10b981; color: #fff; }
-        .cropper-hint { color: #ccc; font-size: 10px; text-align: center; }
     </style>
 </head>
 <body>
@@ -130,12 +102,7 @@
 
             <div class="form-group">
                 <label>Product Details / Description</label>
-                <div class="format-toolbar">
-                    <button type="button" class="format-btn" onclick="formatText('bold')" title="Bold"><b>B</b></button>
-                    <button type="button" class="format-btn" onclick="formatText('bullet')" title="Bullet Point"><i class="fa-solid fa-list-ul"></i> Dot</button>
-                </div>
                 <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
-                <div class="format-hint">Select text then tap B to bold, or tap Dot to add bullet points.</div>
             </div>
 
             <!-- Global Size Setup (General Stock) -->
@@ -167,13 +134,49 @@
                 </tbody>
             </table>
 
-            <!-- Color Variants: ডায়নামিক কালার স্লট, প্রতিটিতে নিজস্ব সাইজ ও স্টক যুক্ত করার অপশন -->
+            <!-- Color Variants: ৩টি কালার স্লট, প্রতিটিতে নিজস্ব সাইজ ও স্টক যুক্ত করার অপশন -->
             <div class="form-group">
                 <label><i class="fa-solid fa-palette"></i> Color Variants & Sizes</label>
 
-                <div id="colorSlotsContainer"></div>
+                <div id="colorSlotsContainer"><!-- Color slots generated by JS --></div>
 
-                <button type="button" class="add-color-slot-btn" onclick="addColorSlot()"><i class="fa-solid fa-plus"></i> Add Another Color</button>
+                <button type="button" class="submit-btn" style="background:#10b981; margin-top:4px;" onclick="addColorSlot()">
+                    <i class="fa-solid fa-plus"></i> Add More Color / Product Photo
+                </button>
+            </div>
+
+            <!-- Image Frame / Resize Feature: admin decides how this product's photo shows in Shop -->
+            <div class="admin-card" style="padding:12px; background:#fafafa;">
+                <h4 class="card-title"><i class="fa-solid fa-crop-simple"></i> Image Frame (Resize)</h4>
+                <div style="display:flex; gap:16px; align-items:flex-start;">
+                    <div style="flex:1;">
+                        <div class="form-group">
+                            <label>Fit Mode</label>
+                            <select id="imgFitMode" class="form-control" onchange="updateFramePreview()">
+                                <option value="contain" selected>Show Full Image (Fit Inside)</option>
+                                <option value="cover">Fill The Frame (Crop Edges)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Frame Shape</label>
+                            <select id="imgFrameRatio" class="form-control" onchange="updateFramePreview()">
+                                <option value="1/1">Square (1:1)</option>
+                                <option value="3/4" selected>Portrait (3:4)</option>
+                                <option value="2/3">Tall Portrait (2:3)</option>
+                                <option value="4/3">Landscape (4:3)</option>
+                                <option value="1/1.3">Extra Tall (1:1.3)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div id="framePreviewBox" style="width:110px; aspect-ratio:3/4; border:2px dashed #ccc; border-radius:14px; overflow:hidden; background:#f3f4f6; display:flex; align-items:center; justify-content:center; margin:0 auto;">
+                            <img id="framePreviewImg" src="" style="width:100%; height:100%; object-fit:contain; display:none;">
+                            <span id="framePreviewPlaceholder" style="font-size:10px; color:#aaa;">Preview</span>
+                        </div>
+                        <div style="font-size:9px; color:#999; margin-top:4px;">Shop Preview</div>
+                    </div>
+                </div>
+                <div style="font-size:10px; color:#888; margin-top:8px;">Shop পেইজে এই প্রোডাক্টের ছবি ঠিক এভাবেই দেখানো হবে — Fit Mode ও Frame Shape যা সিলেক্ট করবেন সেভাবে।</div>
             </div>
 
             <div class="form-group">
@@ -190,99 +193,38 @@
         <span>Uploading images & publishing dress...</span>
     </div>
 
-    <!-- Image Cropper / Resize Modal -->
-    <div id="cropperOverlay" class="cropper-overlay">
-        <div class="cropper-title">Drag the photo to reposition, use slider to resize</div>
-        <div class="cropper-frame" id="cropperFrame">
-            <img id="cropperImage" src="" alt="Crop preview">
-        </div>
-        <div class="cropper-controls">
-            <div class="cropper-zoom-row">
-                <i class="fa-solid fa-minus"></i>
-                <input type="range" id="cropperZoomSlider" min="1" max="3" step="0.01" value="1" oninput="cropperZoomChange(this.value)">
-                <i class="fa-solid fa-plus"></i>
-            </div>
-            <div class="cropper-hint">Tap & drag the image to move it around inside the frame</div>
-        </div>
-        <div class="cropper-btn-row">
-            <button type="button" class="cropper-btn cancel" onclick="cropperCancel()">Cancel</button>
-            <button type="button" class="cropper-btn confirm" onclick="cropperConfirm()"><i class="fa-solid fa-check"></i> Crop & Use</button>
-        </div>
-    </div>
-
     <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         let addedSizesList = {};
         let colorSizesData = {};
-        let originalFiles = {};   // slot -> raw File selected by user
-        let croppedBlobs = {};    // slot -> final cropped/compressed Blob to upload
         let colorSlotCount = 0;
-
-        const FRAME_SIZE = 280;
-        const OUTPUT_SIZE = 800; // final square output px, keeps upload size small
-        let cropperState = { slot: null, img: null, naturalW: 0, naturalH: 0, baseScale: 1, zoom: 1, offsetX: 0, offsetY: 0, dragging: false, startX: 0, startY: 0, startOffsetX: 0, startOffsetY: 0 };
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
-            addColorSlot(); // first required color slot
-            setupCropperDragHandlers();
+            // ডিফল্ট ৩টা কালার স্লট দিয়ে শুরু হবে, চাইলে "+ Add More Color" চেপে আরও বাড়ানো যাবে
+            addColorSlot(); // Color 1 - required, remove button hidden
+            addColorSlot(); // Color 2 - optional
+            addColorSlot(); // Color 3 - optional
+            updateFramePreview();
         });
 
-        /* ---------------- Details formatting toolbar ---------------- */
-        function formatText(type) {
-            let ta = document.getElementById('newDetails');
-            let start = ta.selectionStart, end = ta.selectionEnd;
-            let text = ta.value;
-            let selected = text.substring(start, end);
-
-            if (type === 'bold') {
-                let content = selected || 'bold text';
-                let insert = `**${content}**`;
-                ta.value = text.substring(0, start) + insert + text.substring(end);
-                ta.focus();
-                ta.selectionStart = start + 2;
-                ta.selectionEnd = start + 2 + content.length;
-            } else if (type === 'bullet') {
-                if (selected) {
-                    let lines = selected.split('\n').map(l => l.startsWith('• ') ? l : '• ' + l);
-                    let insert = lines.join('\n');
-                    ta.value = text.substring(0, start) + insert + text.substring(end);
-                    ta.focus();
-                    ta.selectionStart = start;
-                    ta.selectionEnd = start + insert.length;
-                } else {
-                    let before = text.substring(0, start);
-                    let needsNewline = before.length > 0 && !before.endsWith('\n');
-                    let insert = (needsNewline ? '\n' : '') + '• ';
-                    ta.value = before + insert + text.substring(start);
-                    let pos = start + insert.length;
-                    ta.focus();
-                    ta.selectionStart = ta.selectionEnd = pos;
-                }
-            }
-        }
-
-        /* ---------------- Dynamic color slots ---------------- */
-        function addColorSlot() {
-            colorSlotCount++;
-            let n = colorSlotCount;
-            colorSizesData[n] = {};
+        // প্রতিটা কালার স্লটের HTML টেমপ্লেট বানায়। n = স্লট নম্বর (unique, বাড়তেই থাকে,
+        // মাঝখান থেকে একটা রিমুভ করলেও বাকিদের নম্বর বদলায় না — তাই আইডি ক্ল্যাশ হয় না)
+        function createColorSlotHTML(n) {
             let isFirst = (n === 1);
-
-            let slotHtml = `
-                <div class="color-slot" id="colorSlotDiv${n}">
+            return `
+                <div class="color-slot" data-slot="${n}">
                     <div class="color-slot-header">
                         <span>Color ${n} ${isFirst ? '<span style="color:#ef4444;">*Required</span>' : '<span style="color:#9ca3af; font-weight:500;">(Optional)</span>'}</span>
-                        ${isFirst ? '' : `<button type="button" class="remove-slot-btn" onclick="removeColorSlot(${n})"><i class="fa-solid fa-xmark"></i></button>`}
+                        ${!isFirst ? `<button type="button" class="del-size" onclick="removeColorSlot(${n})"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                     <input type="text" id="colorName${n}" class="form-control" placeholder="Color name e.g. Red" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile${n}" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="handleImageSelect(${n})">
+                    <input type="file" id="imgFile${n}" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(${n})">
                     <div class="img-preview-wrap" id="previewWrap${n}">
                         <img id="previewImg${n}" src="" alt="Preview">
                         <button type="button" class="delete-preview-btn" onclick="clearImageSlot(${n})"><i class="fa-solid fa-trash"></i></button>
-                        <button type="button" class="resize-preview-btn" onclick="openCropper(${n})" title="Resize / Reposition"><i class="fa-solid fa-crop-simple"></i></button>
                     </div>
                     <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
                         <label style="font-size:10px; font-weight:bold; color:#555;">Color ${n} Sizes & Qty:</label>
@@ -295,21 +237,42 @@
                         </div>
                         <div id="colorSizeList${n}" style="font-size:11px; color:#059669; font-weight:bold;"></div>
                     </div>
-                </div>
-            `;
-            document.getElementById('colorSlotsContainer').insertAdjacentHTML('beforeend', slotHtml);
+                </div>`;
+        }
+
+        function addColorSlot() {
+            colorSlotCount++;
+            let n = colorSlotCount;
+            colorSizesData[n] = {};
+            document.getElementById('colorSlotsContainer').insertAdjacentHTML('beforeend', createColorSlotHTML(n));
         }
 
         function removeColorSlot(n) {
-            let el = document.getElementById(`colorSlotDiv${n}`);
+            let el = document.querySelector(`.color-slot[data-slot="${n}"]`);
             if (el) el.remove();
             delete colorSizesData[n];
-            delete originalFiles[n];
-            delete croppedBlobs[n];
         }
 
-        function getActiveSlotNumbers() {
-            return Array.from(document.querySelectorAll('.color-slot')).map(el => parseInt(el.id.replace('colorSlotDiv', '')));
+        // Fit Mode / Frame Shape বদলালে সাথে সাথে প্রিভিউ বক্সে দেখা যাবে —
+        // Color 1-এর ছবি বেছে নিলে সেটাই প্রিভিউতে দেখানো হয়
+        function updateFramePreview() {
+            let ratio = document.getElementById('imgFrameRatio').value;
+            let fit = document.getElementById('imgFitMode').value;
+            let box = document.getElementById('framePreviewBox');
+            let img = document.getElementById('framePreviewImg');
+            box.style.aspectRatio = ratio;
+            img.style.objectFit = fit;
+
+            let file1Input = document.getElementById('imgFile1');
+            let file1 = file1Input && file1Input.files.length > 0 ? file1Input.files[0] : null;
+            if (file1) {
+                img.src = URL.createObjectURL(file1);
+                img.style.display = 'block';
+                document.getElementById('framePreviewPlaceholder').style.display = 'none';
+            } else {
+                img.style.display = 'none';
+                document.getElementById('framePreviewPlaceholder').style.display = 'block';
+            }
         }
 
         async function loadCategoriesDropdown() {
@@ -385,140 +348,35 @@
             listContainer.innerText = text;
         }
 
+        function previewImage(n) {
+            let fileInput = document.getElementById('imgFile' + n);
+            let wrap = document.getElementById('previewWrap' + n);
+            let img = document.getElementById('previewImg' + n);
+            let file = fileInput.files[0];
+            if (file) {
+                img.src = URL.createObjectURL(file);
+                wrap.style.display = 'block';
+            } else {
+                wrap.style.display = 'none';
+                img.src = '';
+            }
+            if (n == 1) updateFramePreview();
+        }
+
         function clearImageSlot(n) {
             document.getElementById('imgFile' + n).value = '';
             document.getElementById('previewWrap' + n).style.display = 'none';
             document.getElementById('previewImg' + n).src = '';
-            delete originalFiles[n];
-            delete croppedBlobs[n];
-        }
-
-        /* ---------------- Image crop / resize / reposition ---------------- */
-        function handleImageSelect(n) {
-            let fileInput = document.getElementById('imgFile' + n);
-            let file = fileInput.files[0];
-            if (!file) return;
-            originalFiles[n] = file;
-            openCropper(n);
-        }
-
-        function openCropper(n) {
-            let file = originalFiles[n];
-            if (!file) { tg.showAlert("⚠️ Please select an image first!"); return; }
-            let reader = new FileReader();
-            reader.onload = (e) => {
-                let img = new Image();
-                img.onload = () => {
-                    cropperState.slot = n;
-                    cropperState.img = img;
-                    cropperState.naturalW = img.naturalWidth;
-                    cropperState.naturalH = img.naturalHeight;
-                    cropperState.baseScale = Math.max(FRAME_SIZE / img.naturalWidth, FRAME_SIZE / img.naturalHeight);
-                    cropperState.zoom = 1;
-                    cropperState.offsetX = (FRAME_SIZE - img.naturalWidth * cropperState.baseScale) / 2;
-                    cropperState.offsetY = (FRAME_SIZE - img.naturalHeight * cropperState.baseScale) / 2;
-                    document.getElementById('cropperZoomSlider').value = 1;
-                    document.getElementById('cropperImage').src = e.target.result;
-                    updateCropperTransform();
-                    document.getElementById('cropperOverlay').style.display = 'flex';
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function updateCropperTransform() {
-            let scale = cropperState.baseScale * cropperState.zoom;
-            let w = cropperState.naturalW * scale;
-            let h = cropperState.naturalH * scale;
-            let minX = FRAME_SIZE - w, maxX = 0;
-            let minY = FRAME_SIZE - h, maxY = 0;
-            cropperState.offsetX = Math.min(maxX, Math.max(minX, cropperState.offsetX));
-            cropperState.offsetY = Math.min(maxY, Math.max(minY, cropperState.offsetY));
-            let cImg = document.getElementById('cropperImage');
-            cImg.style.width = w + 'px';
-            cImg.style.height = h + 'px';
-            cImg.style.left = cropperState.offsetX + 'px';
-            cImg.style.top = cropperState.offsetY + 'px';
-        }
-
-        function cropperZoomChange(val) {
-            cropperState.zoom = parseFloat(val);
-            updateCropperTransform();
-        }
-
-        function setupCropperDragHandlers() {
-            let frame = document.getElementById('cropperFrame');
-            const start = (e) => {
-                cropperState.dragging = true;
-                let point = e.touches ? e.touches[0] : e;
-                cropperState.startX = point.clientX;
-                cropperState.startY = point.clientY;
-                cropperState.startOffsetX = cropperState.offsetX;
-                cropperState.startOffsetY = cropperState.offsetY;
-            };
-            const move = (e) => {
-                if (!cropperState.dragging) return;
-                e.preventDefault();
-                let point = e.touches ? e.touches[0] : e;
-                let dx = point.clientX - cropperState.startX;
-                let dy = point.clientY - cropperState.startY;
-                cropperState.offsetX = cropperState.startOffsetX + dx;
-                cropperState.offsetY = cropperState.startOffsetY + dy;
-                updateCropperTransform();
-            };
-            const end = () => { cropperState.dragging = false; };
-
-            frame.addEventListener('mousedown', start);
-            window.addEventListener('mousemove', move);
-            window.addEventListener('mouseup', end);
-            frame.addEventListener('touchstart', start, { passive: true });
-            frame.addEventListener('touchmove', move, { passive: false });
-            frame.addEventListener('touchend', end);
-        }
-
-        function cropperCancel() {
-            let n = cropperState.slot;
-            document.getElementById('cropperOverlay').style.display = 'none';
-            // Only clear the file input if this slot never had a confirmed crop before
-            if (!croppedBlobs[n]) {
-                let fi = document.getElementById('imgFile' + n);
-                if (fi) fi.value = '';
-                delete originalFiles[n];
-            }
-        }
-
-        function cropperConfirm() {
-            let n = cropperState.slot;
-            let scale = cropperState.baseScale * cropperState.zoom;
-            let srcX = (0 - cropperState.offsetX) / scale;
-            let srcY = (0 - cropperState.offsetY) / scale;
-            let srcSize = FRAME_SIZE / scale;
-
-            let canvas = document.createElement('canvas');
-            canvas.width = OUTPUT_SIZE;
-            canvas.height = OUTPUT_SIZE;
-            let ctx = canvas.getContext('2d');
-            ctx.drawImage(cropperState.img, srcX, srcY, srcSize, srcSize, 0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
-
-            canvas.toBlob((blob) => {
-                croppedBlobs[n] = blob;
-                let url = URL.createObjectURL(blob);
-                document.getElementById('previewImg' + n).src = url;
-                document.getElementById('previewWrap' + n).style.display = 'block';
-                document.getElementById('cropperOverlay').style.display = 'none';
-            }, 'image/jpeg', 0.85);
+            colorSizesData[n] = {};
+            document.getElementById(`colorSizeList${n}`).innerText = '';
+            if (n == 1) updateFramePreview();
         }
 
         let lastUploadError = "";
-        async function uploadToCloudinary(file, resourceType, filename) {
+        async function uploadToCloudinary(file, resourceType) {
             let type = resourceType || "image";
             let formData = new FormData();
-            if (filename) {
-                formData.append("file", file, filename);
-            } else {
-                formData.append("file", file);
-            }
+            formData.append("file", file);
             formData.append("upload_preset", "whiteflowery_unsigned");
             formData.append("folder", "shop/product_add");
             formData.append("public_id", `wf_${type}_${Date.now()}_${Math.floor(Math.random() * 1000000)}`);
@@ -549,11 +407,16 @@
             let isNewArrival = document.getElementById('isNewArrival').checked;
             
             let videoInput = document.getElementById('productVideoFile');
-            let activeSlots = getActiveSlotNumbers(); // e.g. [1,2,3,4...]
+            let imageFit = document.getElementById('imgFitMode').value;
+            let imageRatio = document.getElementById('imgFrameRatio').value;
+
+            // যতগুলো কালার স্লট এখন পেইজে আছে (৩টা ডিফল্ট, বা "+ Add More Color" চেপে যত বাড়ানো হয়েছে), সবগুলোই এখানে ধরা হবে
+            let slotEls = Array.from(document.querySelectorAll('.color-slot'));
+            let firstSlotNum = slotEls.length > 0 ? slotEls[0].dataset.slot : null;
+            let firstFile = firstSlotNum ? document.getElementById('imgFile' + firstSlotNum).files[0] : null;
 
             if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            let firstSlot = activeSlots[0];
-            if (!croppedBlobs[firstSlot]) { tg.showAlert("⚠️ Color 1 Photo is required (please crop & confirm it)!"); return; }
+            if (!firstFile) { tg.showAlert("⚠️ Color 1 Photo is required!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
 
@@ -561,29 +424,34 @@
             let colorVariants = [];
             let combinedSizes = { ...addedSizesList };
 
-            for (let idx = 0; idx < activeSlots.length; idx++) {
-                let n = activeSlots[idx];
-                let blob = croppedBlobs[n];
-                if (!blob) continue; // optional slots may be empty
+            for (let slotEl of slotEls) {
+                let n = slotEl.dataset.slot;
+                let fileInput = document.getElementById('imgFile' + n);
+                let file = fileInput.files[0];
+                if (!file) continue; // অপশনাল স্লটে ছবি না দিলে স্কিপ
 
-                let colorNameEl = document.getElementById('colorName' + n);
-                let colorName = (colorNameEl ? colorNameEl.value.trim() : '') || `Color ${idx + 1}`;
-
-                let url = await uploadToCloudinary(blob, "image", `wf_color${n}.jpg`);
+                let url = await uploadToCloudinary(file);
                 if (!url) {
                     document.getElementById('uploadOverlay').style.display = 'none';
-                    tg.showAlert(`❌ ${colorName} photo upload failed: ${lastUploadError}`);
+                    tg.showAlert(`❌ Color ${n} photo upload failed: ${lastUploadError}`);
                     return;
                 }
                 images.push(url);
+                let colorName = document.getElementById('colorName' + n).value.trim() || `Color ${n}`;
                 colorVariants.push({
                     colorName: colorName,
                     image: url,
                     sizes: colorSizesData[n] || {}
                 });
                 for (let [k, v] of Object.entries(colorSizesData[n] || {})) {
-                    combinedSizes[k] = (combinedSizes[k] || 0) + v;
+                    combinedSizes[k] = (combinedSizes[k] || 0) + Number(v);
                 }
+            }
+
+            if (images.length === 0) {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert("⚠️ Color 1 Photo is required!");
+                return;
             }
 
             if (Object.keys(combinedSizes).length === 0) {
@@ -615,7 +483,9 @@
                 sizes: combinedSizes,
                 totalStock: totalStock,
                 isTrending: isTrending,
-                isNewArrival: isNewArrival
+                isNewArrival: isNewArrival,
+                imageFit: imageFit,
+                imageRatio: imageRatio
             };
 
             let savedKey = await saveDress(newDress);
