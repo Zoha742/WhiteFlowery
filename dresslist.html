@@ -39,6 +39,17 @@
         .btn-delete { background: #dc2626; }
         .btn-view { background: #059669; }
 
+        .tabs-row { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+        .tab-btn { flex-shrink: 0; background: #f9fafb; border: 1px solid var(--card-border); color: #555; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .tab-btn.active { background: #111; color: #fff; border-color: #111; }
+
+        .toggle-pill { border: none; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; }
+        .toggle-pill.on { background: #111; color: #fff; }
+        .toggle-pill.off { background: #e5e7eb; color: #555; }
+
+        .cover-preview-box { width: 100%; height: 150px; background: #f9fafb; border: 1px dashed var(--card-border); border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .cover-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
@@ -57,23 +68,78 @@
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
-        <div class="admin-card">
-            <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
-            <div style="position:relative; margin-bottom:10px;">
-                <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:12px;"></i>
-                <input type="text" id="codeSearchInput" class="form-control" placeholder="Search by Product Code..."
-                       style="padding-left:30px;" oninput="filterInventory()">
+        <div class="tabs-row">
+            <button class="tab-btn active" onclick="switchTab('list', this)"><i class="fa-solid fa-list"></i> All Dresses</button>
+            <button class="tab-btn" onclick="switchTab('trending', this)"><i class="fa-solid fa-fire"></i> Trending</button>
+            <button class="tab-btn" onclick="switchTab('newarrival', this)"><i class="fa-solid fa-sparkles"></i> New Arrivals</button>
+            <button class="tab-btn" onclick="switchTab('cover', this)"><i class="fa-solid fa-image"></i> Landing Cover</button>
+        </div>
+
+        <!-- Tab: All Dresses -->
+        <div id="tab-list" class="tab-section">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-list"></i> Shop & New Inventory List</h4>
+                <div style="position:relative; margin-bottom:10px;">
+                    <i class="fa-solid fa-magnifying-glass" style="position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:12px;"></i>
+                    <input type="text" id="codeSearchInput" class="form-control" placeholder="Search by Product Code..."
+                           style="padding-left:30px;" oninput="filterInventory()">
+                </div>
+                <div id="bulkToolbar" style="display:flex; align-items:center; justify-content:space-between; background:#f9fafb; border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; margin-bottom:10px; font-size:11px;">
+                    <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color: var(--text-muted); font-weight:600;">
+                        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="accent-color:#111;"> Select All
+                    </label>
+                    <button class="btn-sm" id="bulkDeleteBtn" style="background:#dc2626; opacity:0.4; pointer-events:none;" onclick="deleteSelectedDresses()">
+                        <i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+                <div class="list-box" id="inventoryListContainer">
+                    <div class="item-body" style="text-align:center; color: var(--text-muted);">Loading all dresses...</div>
+                </div>
             </div>
-            <div id="bulkToolbar" style="display:flex; align-items:center; justify-content:space-between; background:#f9fafb; border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; margin-bottom:10px; font-size:11px;">
-                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color: var(--text-muted); font-weight:600;">
-                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" style="accent-color:#111;"> Select All
-                </label>
-                <button class="btn-sm" id="bulkDeleteBtn" style="background:#dc2626; opacity:0.4; pointer-events:none;" onclick="deleteSelectedDresses()">
-                    <i class="fa-solid fa-trash-can"></i> Delete Selected (<span id="selectedCount">0</span>)
-                </button>
+        </div>
+
+        <!-- Tab: Trending -->
+        <div id="tab-trending" class="tab-section" style="display:none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-fire" style="color:#f59e0b;"></i> Trending Dresses</h4>
+                <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Toggle ON — Home page-er "Trending Dresses" section-e dekhabe.</p>
+                <div class="list-box" id="trendingListContainer"></div>
             </div>
-            <div class="list-box" id="inventoryListContainer">
-                <div class="item-body" style="text-align:center; color: var(--text-muted);">Loading all dresses...</div>
+        </div>
+
+        <!-- Tab: New Arrivals -->
+        <div id="tab-newarrival" class="tab-section" style="display:none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-sparkles" style="color:#7c3aed;"></i> New Arrivals</h4>
+                <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Toggle ON — Home page-er "New Arrivals" section-e dekhabe.</p>
+                <div class="list-box" id="newArrivalListContainer"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Landing Cover -->
+        <div id="tab-cover" class="tab-section" style="display:none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-image"></i> Landing Page Cover</h4>
+                <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Eta index.html-er top banner-e dekhabe (Home page).</p>
+
+                <div class="form-group">
+                    <label>Cover Image</label>
+                    <div id="coverPreviewBox" class="cover-preview-box">
+                        <span style="font-size:11px; color:var(--text-muted);">No cover image set</span>
+                    </div>
+                    <input type="file" id="coverImgFile" class="form-control" accept="image/*" onchange="previewCoverImage()">
+                </div>
+
+                <div class="form-group">
+                    <label>Banner Title</label>
+                    <input type="text" id="coverTitle" class="form-control" placeholder="🌸 Luxury Spring Collection">
+                </div>
+                <div class="form-group">
+                    <label>Banner Subtitle</label>
+                    <input type="text" id="coverSubtitle" class="form-control" placeholder="Discover exclusive high-end designer dresses...">
+                </div>
+
+                <button class="submit-btn" onclick="saveCoverConfig()">Save Landing Cover</button>
             </div>
         </div>
     </div>
@@ -137,6 +203,111 @@
             document.getElementById('codeSearchInput').value = '';
 
             renderList(CURRENT_DRESSES.map((_, i) => i));
+        }
+
+        // ---------- Tabs ----------
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
+            document.getElementById(`tab-${tabId}`).style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (tabId === 'trending') renderToggleList('trendingListContainer', 'isTrending');
+            if (tabId === 'newarrival') renderToggleList('newArrivalListContainer', 'isNewArrival');
+            if (tabId === 'cover') loadCoverConfig();
+        }
+
+        // ---------- Trending / New Arrival toggles ----------
+        function renderToggleList(containerId, flagKey) {
+            let container = document.getElementById(containerId);
+            if (CURRENT_DRESSES.length === 0) {
+                container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);">No dresses yet. Add some from 'Add New Dress' first.</div>`;
+                return;
+            }
+            container.innerHTML = CURRENT_DRESSES.map((d, idx) => {
+                let isOn = !!d[flagKey];
+                return `
+                    <div class="list-item">
+                        <img src="${d.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'}" class="dress-thumb">
+                        <div class="dress-info">
+                            <div class="item-header">
+                                <span class="item-title">${d.name}</span>
+                                <span class="item-badge">Tk ${Number(d.price).toLocaleString()}.00</span>
+                            </div>
+                            <div class="item-body">${d.productCode ? `Code: ${d.productCode}` : ''}</div>
+                            <button class="toggle-pill ${isOn ? 'on' : 'off'}" onclick="toggleDressFlag(${idx}, '${flagKey}')">
+                                <i class="fa-solid fa-${isOn ? 'toggle-on' : 'toggle-off'}"></i> ${isOn ? 'ON — showing' : 'OFF — hidden'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function toggleDressFlag(index, flagKey) {
+            let d = CURRENT_DRESSES[index];
+            if (!d) return;
+            let newVal = !d[flagKey];
+            await updateDress(d._key, { [flagKey]: newVal });
+            d[flagKey] = newVal; // keep local cache in sync so the pill flips instantly
+            if (flagKey === 'isTrending') renderToggleList('trendingListContainer', 'isTrending');
+            else renderToggleList('newArrivalListContainer', 'isNewArrival');
+        }
+
+        // ---------- Landing Page Cover ----------
+        let coverImageFile = null;
+
+        function previewCoverImage() {
+            let file = document.getElementById('coverImgFile').files[0];
+            if (!file) return;
+            coverImageFile = file;
+            document.getElementById('coverPreviewBox').innerHTML = `<img src="${URL.createObjectURL(file)}">`;
+        }
+
+        async function loadCoverConfig() {
+            let cfg = await getSiteConfig();
+            document.getElementById('coverTitle').value = cfg.landingTitle || '';
+            document.getElementById('coverSubtitle').value = cfg.landingSubtitle || '';
+            document.getElementById('coverImgFile').value = '';
+            coverImageFile = null;
+
+            let box = document.getElementById('coverPreviewBox');
+            box.innerHTML = cfg.landingCoverImage
+                ? `<img src="${cfg.landingCoverImage}">`
+                : `<span style="font-size:11px; color:var(--text-muted);">No cover image set</span>`;
+        }
+
+        async function uploadCoverToCloudinary(file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "whiteflowery_unsigned");
+            formData.append("folder", "shop/site_config");
+            formData.append("public_id", `cover_${Date.now()}`);
+            try {
+                let res = await fetch("https://api.cloudinary.com/v1_1/dyqegwdme/image/upload", { method: "POST", body: formData });
+                let data = await res.json();
+                return (res.ok && data.secure_url) ? data.secure_url : "";
+            } catch (e) {
+                console.error("Cover upload failed:", e);
+                return "";
+            }
+        }
+
+        async function saveCoverConfig() {
+            let title = document.getElementById('coverTitle').value.trim();
+            let subtitle = document.getElementById('coverSubtitle').value.trim();
+            let patch = { landingTitle: title, landingSubtitle: subtitle };
+
+            if (coverImageFile) {
+                tg.showAlert("⏳ Uploading cover image...");
+                let url = await uploadCoverToCloudinary(coverImageFile);
+                if (!url) { tg.showAlert("❌ Cover image upload failed. Please try again."); return; }
+                patch.landingCoverImage = url;
+            }
+
+            await saveSiteConfig(patch);
+            tg.showAlert("✅ Landing page cover updated!");
+            await loadCoverConfig();
         }
 
         function filterInventory() {
