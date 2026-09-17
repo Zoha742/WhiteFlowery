@@ -109,7 +109,6 @@
                 <div style="font-size:9px; color:#999; margin-top:3px;">Select text then tap B to bold it, or tap • List to start a bullet line. Shop-এ এটাই bold/bullet হয়ে দেখাবে।</div>
             </div>
 
-            <!-- Global Size Setup (General Stock) -->
             <div class="size-row-input">
                 <div style="flex: 1;">
                     <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
@@ -138,7 +137,6 @@
                 </tbody>
             </table>
 
-            <!-- Color Variants -->
             <div class="form-group">
                 <label><i class="fa-solid fa-palette"></i> Color Variants & Sizes</label>
                 <div id="colorSlotsContainer"></div>
@@ -372,9 +370,9 @@
             
             let videoInput = document.getElementById('productVideoFile');
             
-            // Default fallback values since the UI is removed
-            let imageFit = 'contain';
-            let imageRatio = '2/3';
+            // 🔥 Default fallback values to make sure long images fill the frame properly in shop
+            let imageFit = 'cover';
+            let imageRatio = '3/4';
 
             let slotEls = Array.from(document.querySelectorAll('.color-slot'));
             let firstSlotNum = slotEls.length > 0 ? slotEls[0].dataset.slot : null;
