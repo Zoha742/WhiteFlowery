@@ -58,6 +58,14 @@
         .cover-thumb .new-badge { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(16,185,129,0.9); color: #fff; font-size: 8px; text-align: center; padding: 2px 0; font-weight: 700; }
         .add-cover-slot { width: 84px; height: 84px; border-radius: 8px; border: 1px dashed var(--card-border); background: #f9fafb; display: flex; align-items: center; justify-content: center; color: #7c3aed; font-size: 20px; cursor: pointer; }
 
+        .fee-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .fee-row-name { flex: 1.4; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; font-weight: 600; outline: none; }
+        .fee-row-amt-wrap { flex: 1; display: flex; align-items: center; background: #f9fafb; border: 1px solid var(--card-border); border-radius: 8px; overflow: hidden; }
+        .fee-row-amt-wrap span { padding: 0 8px; font-size: 11px; color: var(--text-muted); font-weight: 700; }
+        .fee-row-amt-wrap input { flex: 1; border: none; background: transparent; color: #111; padding: 9px 9px 9px 0; font-size: 12px; outline: none; }
+        .fee-row-del { background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+        .fee-row-del:disabled { opacity: 0.25; cursor: not-allowed; }
+
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; }
         .form-control { width: 100%; background: #f9fafb; border: 1px solid var(--card-border); color: #111; padding: 9px; border-radius: 8px; box-sizing: border-box; font-size: 12px; outline: none; }
@@ -81,6 +89,7 @@
             <button class="tab-btn" onclick="switchTab('trending', this)"><i class="fa-solid fa-fire"></i> Trending</button>
             <button class="tab-btn" onclick="switchTab('newarrival', this)"><i class="fa-solid fa-sparkles"></i> New Arrivals</button>
             <button class="tab-btn" onclick="switchTab('cover', this)"><i class="fa-solid fa-image"></i> Landing Cover</button>
+            <button class="tab-btn" onclick="switchTab('delivery', this)"><i class="fa-solid fa-truck-fast"></i> Delivery Fee</button>
         </div>
 
         <!-- Tab: All Dresses -->
@@ -153,6 +162,27 @@
                 </div>
 
                 <button class="submit-btn" onclick="saveCoverConfig()">Save Landing Cover</button>
+            </div>
+        </div>
+
+        <!-- Tab: Delivery Fee -->
+        <div id="tab-delivery" class="tab-section" style="display:none;">
+            <div class="admin-card">
+                <h4 class="card-title"><i class="fa-solid fa-truck-fast"></i> Delivery Fee by Division</h4>
+                <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">প্রতিটা Division-এর পাশে যত টাকা বসাবেন, ওই division-এর address-এ অর্ডার করলে cart-এ ঠিক তত টাকা Delivery Fee হিসেবে যোগ হবে — কোনো কোড লাগবে না।</p>
+
+                <div id="deliveryFeeRows"></div>
+
+                <button type="button" class="btn-sm" style="background:#10b981; color:#fff; padding:7px 12px; font-size:11px; margin-bottom:14px;" onclick="addDeliveryFeeRow()">
+                    <i class="fa-solid fa-plus"></i> Add Custom Row
+                </button>
+
+                <div class="form-group" style="border-top:1px dashed var(--card-border); padding-top:12px;">
+                    <label>Default Fee (উপরের কোনো Division-এর সাথে না মিললে)</label>
+                    <input type="number" id="deliveryFeeDefault" class="form-control" placeholder="e.g. 150">
+                </div>
+
+                <button class="submit-btn" onclick="saveDeliveryFees()">Save Delivery Fees</button>
             </div>
         </div>
     </div>
@@ -228,6 +258,7 @@
             if (tabId === 'trending') renderToggleList('trendingListContainer', 'isTrending', 'trendingOrder');
             if (tabId === 'newarrival') renderToggleList('newArrivalListContainer', 'isNewArrival', 'newArrivalOrder');
             if (tabId === 'cover') loadCoverConfig();
+            if (tabId === 'delivery') loadDeliveryFees();
         }
 
         // ---------- Trending / New Arrival toggles ----------
@@ -424,7 +455,72 @@
             await loadCoverConfig();
         }
 
-        function filterInventory() {
+        // ---------- Delivery Fee by Division ----------
+        // Standard 8 BD divisions (same list used in address.html's "Division" dropdown).
+        // Admin can still add extra custom rows (e.g. a specific district, or "Outside Dhaka")
+        // for anything beyond these — no coding needed either way.
+        const STANDARD_DIVISIONS = ["Dhaka", "Chittagong", "Rajshahi", "Khulna", "Barisal", "Sylhet", "Rangpur", "Mymensingh"];
+        let deliveryFeeRowsData = [];   // [{ name, amount }]
+
+        function renderDeliveryFeeRows() {
+            let box = document.getElementById('deliveryFeeRows');
+            box.innerHTML = deliveryFeeRowsData.map((row, i) => `
+                <div class="fee-row">
+                    <input type="text" class="fee-row-name" value="${row.name}" placeholder="Division / Area name" oninput="deliveryFeeRowsData[${i}].name = this.value">
+                    <div class="fee-row-amt-wrap">
+                        <span>Tk</span>
+                        <input type="number" value="${row.amount}" placeholder="0" oninput="deliveryFeeRowsData[${i}].amount = this.value">
+                    </div>
+                    <button type="button" class="fee-row-del" onclick="removeDeliveryFeeRow(${i})" title="Remove"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function addDeliveryFeeRow() {
+            deliveryFeeRowsData.push({ name: '', amount: '' });
+            renderDeliveryFeeRows();
+        }
+
+        function removeDeliveryFeeRow(i) {
+            deliveryFeeRowsData.splice(i, 1);
+            renderDeliveryFeeRows();
+        }
+
+        async function loadDeliveryFees() {
+            let cfg = await getSiteConfig();
+            let saved = cfg.deliveryFees || {};
+
+            // Standard divisions always shown first, pre-filled from saved data (0 if not set yet).
+            deliveryFeeRowsData = STANDARD_DIVISIONS.map(div => ({
+                name: div,
+                amount: (saved[div] !== undefined) ? saved[div] : ''
+            }));
+
+            // Any extra custom rows the admin previously added (names outside the standard list).
+            Object.keys(saved).forEach(name => {
+                if (!STANDARD_DIVISIONS.includes(name)) {
+                    deliveryFeeRowsData.push({ name: name, amount: saved[name] });
+                }
+            });
+
+            document.getElementById('deliveryFeeDefault').value = (cfg.deliveryFeeDefault !== undefined) ? cfg.deliveryFeeDefault : '';
+            renderDeliveryFeeRows();
+        }
+
+        async function saveDeliveryFees() {
+            let deliveryFees = {};
+            for (let row of deliveryFeeRowsData) {
+                let name = row.name.trim();
+                if (!name) continue;
+                deliveryFees[name] = Number(row.amount) || 0;
+            }
+
+            let defaultFee = Number(document.getElementById('deliveryFeeDefault').value) || 0;
+
+            await saveSiteConfig({ deliveryFees: deliveryFees, deliveryFeeDefault: defaultFee });
+            tg.showAlert("✅ Delivery fees updated!");
+            await loadDeliveryFees();
+        }
             let query = document.getElementById('codeSearchInput').value.trim().toLowerCase();
 
             if (!query) {
