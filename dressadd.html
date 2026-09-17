@@ -42,6 +42,10 @@
 
         .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+        .pos-btn { background: #fff; border: 1px solid var(--card-border); border-radius: 6px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #888; font-size: 11px; }
+        .pos-btn.active { background: #111; color: #fff; border-color: #111; }
+        .pos-btn i { font-size: 11px; }
         
         .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
@@ -147,6 +151,40 @@
                 </button>
             </div>
 
+            <!-- Image Frame Resize: Color 1-এর ছবিতে যদি অনেক ফাঁকা/সাদা জায়গা থাকে
+                 (যেমন ইলেকট্রনিক্স প্রোডাক্ট ফটো), Zoom বাড়িয়ে ও Focus Position ঠিক করে
+                 সেই অংশ বাদ দিয়ে শপ পেইজে প্রোডাক্টটা বড় ও সুন্দরভাবে দেখানো যাবে। -->
+            <div class="admin-card" style="padding:12px; background:#fafafa;">
+                <h4 class="card-title"><i class="fa-solid fa-crop-simple"></i> Image Frame (Zoom & Position)</h4>
+                <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:150px;">
+                        <div class="form-group">
+                            <label>Zoom: <span id="zoomValueLabel">100%</span></label>
+                            <input type="range" id="imgZoomSlider" min="100" max="250" value="100" step="5" style="width:100%;" oninput="updateFramePreview()">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Focus Position</label>
+                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:110px;">
+                                <button type="button" class="pos-btn" data-x="0" data-y="0" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-up" style="transform:rotate(-45deg);"></i></button>
+                                <button type="button" class="pos-btn" data-x="50" data-y="0" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-up"></i></button>
+                                <button type="button" class="pos-btn" data-x="100" data-y="0" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-up" style="transform:rotate(45deg);"></i></button>
+                                <button type="button" class="pos-btn" data-x="0" data-y="50" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-left"></i></button>
+                                <button type="button" class="pos-btn active" data-x="50" data-y="50" onclick="setFramePosition(this)"><i class="fa-solid fa-circle" style="font-size:6px;"></i></button>
+                                <button type="button" class="pos-btn" data-x="100" data-y="50" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-right"></i></button>
+                                <button type="button" class="pos-btn" data-x="0" data-y="100" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-down" style="transform:rotate(45deg);"></i></button>
+                                <button type="button" class="pos-btn" data-x="50" data-y="100" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-down"></i></button>
+                                <button type="button" class="pos-btn" data-x="100" data-y="100" onclick="setFramePosition(this)"><i class="fa-solid fa-caret-down" style="transform:rotate(-45deg);"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div id="framePreviewBox" style="width:110px; height:122px; border:2px dashed #ccc; border-radius:12px; overflow:hidden; background:#f3f4f6; background-repeat:no-repeat; background-size:cover; background-position:center top; margin:0 auto;"></div>
+                        <div style="font-size:9px; color:#999; margin-top:4px;">Shop Preview</div>
+                    </div>
+                </div>
+                <div style="font-size:10px; color:#888; margin-top:8px;">এই সেটিং Color 1-এর ছবি অনুযায়ী শপ পেইজের কার্ডে দেখানো হবে — অনেক ফাঁকা/সাদা জায়গাওয়ালা ছবিতে Zoom বাড়িয়ে প্রোডাক্টটা ফ্রেম জুড়ে দেখান।</div>
+            </div>
+
             <div class="form-group">
                 <label>Product Video (Optional)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;">
@@ -168,12 +206,16 @@
         let addedSizesList = {};
         let colorSizesData = {};
         let colorSlotCount = 0;
+        let frameZoom = 100;
+        let framePosX = 50;
+        let framePosY = 50;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
             addColorSlot();
             addColorSlot();
             addColorSlot();
+            updateFramePreview();
         });
 
         function createColorSlotHTML(n) {
@@ -215,6 +257,33 @@
             let el = document.querySelector(`.color-slot[data-slot="${n}"]`);
             if (el) el.remove();
             delete colorSizesData[n];
+        }
+
+        // Zoom/Position শুধু Color 1-এর ছবিতে প্রযোজ্য, কারণ শপ কার্ডে সেটাই মূল ছবি হিসেবে দেখানো হয়
+        function setFramePosition(btn) {
+            document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            framePosX = Number(btn.dataset.x);
+            framePosY = Number(btn.dataset.y);
+            updateFramePreview();
+        }
+
+        function updateFramePreview() {
+            let zoomSlider = document.getElementById('imgZoomSlider');
+            frameZoom = Number(zoomSlider.value);
+            document.getElementById('zoomValueLabel').innerText = frameZoom + '%';
+
+            let box = document.getElementById('framePreviewBox');
+            box.style.backgroundSize = frameZoom + '%';
+            box.style.backgroundPosition = `${framePosX}% ${framePosY}%`;
+
+            let file1Input = document.getElementById('imgFile1');
+            let file1 = file1Input && file1Input.files.length > 0 ? file1Input.files[0] : null;
+            if (file1) {
+                box.style.backgroundImage = `url('${URL.createObjectURL(file1)}')`;
+            } else {
+                box.style.backgroundImage = 'none';
+            }
         }
 
         function wrapDetailsSelection(marker) {
@@ -326,6 +395,7 @@
                 wrap.style.display = 'none';
                 img.src = '';
             }
+            if (n == 1) updateFramePreview();
         }
 
         function clearImageSlot(n) {
@@ -334,6 +404,7 @@
             document.getElementById('previewImg' + n).src = '';
             colorSizesData[n] = {};
             document.getElementById(`colorSizeList${n}`).innerText = '';
+            if (n == 1) updateFramePreview();
         }
 
         let lastUploadError = "";
@@ -371,10 +442,10 @@
             let isNewArrival = document.getElementById('isNewArrival').checked;
             
             let videoInput = document.getElementById('productVideoFile');
-            
-            // Default fallback values since the UI is removed
-            let imageFit = 'contain';
-            let imageRatio = '2/3';
+
+            let imageZoom = frameZoom;
+            let imagePosX = framePosX;
+            let imagePosY = framePosY;
 
             let slotEls = Array.from(document.querySelectorAll('.color-slot'));
             let firstSlotNum = slotEls.length > 0 ? slotEls[0].dataset.slot : null;
@@ -449,8 +520,9 @@
                 totalStock: totalStock,
                 isTrending: isTrending,
                 isNewArrival: isNewArrival,
-                imageFit: imageFit,
-                imageRatio: imageRatio
+                imageZoom: imageZoom,
+                imagePosX: imagePosX,
+                imagePosY: imagePosY
             };
 
             let savedKey = await saveDress(newDress);
