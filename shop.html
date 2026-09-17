@@ -42,7 +42,7 @@
         .product-card { background: var(--card-bg); display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 10px; }
         
         .product-img-box { width: 100%; height: 260px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .product-img-box img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform 0.3s; }
+        .product-img-box img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
         /* Wishlist Heart Icon Button */
@@ -63,14 +63,6 @@
 
         .quick-view-link { font-size: 11px; color: #7c3aed; text-align: center; cursor: pointer; font-weight: 600; text-decoration: underline; margin-bottom: 4px; }
 
-        .rating-line { font-size: 11px; color: #f59e0b; text-align: center; margin-bottom: 4px; }
-        .rating-line .count { color: #9ca3af; font-weight: 500; }
-
-        .review-list-item { border-top: 1px solid #f3f4f6; padding: 8px 0; }
-        .review-list-stars { color: #f59e0b; font-size: 12px; letter-spacing: 1px; }
-        .review-list-comment { font-size: 12px; color: #374151; margin: 3px 0; line-height: 1.4; }
-        .review-list-meta { font-size: 10px; color: #9ca3af; }
-
         /* Modals & Popups */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99999; justify-content: center; align-items: flex-end; }
         .modal-content { background: #ffffff; border-top-left-radius: 20px; border-top-right-radius: 20px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; position: relative; text-align: left; color: #111; animation: slideUp 0.3s ease; }
@@ -90,29 +82,6 @@
         .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
         .nav-item.active { color: #111111; font-weight: 700; }
         .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
-        .nav-icon-wrap { position: relative; display: inline-block; }
-        .nav-label { display: block; }
-        .nav-badge {
-            position: absolute; top: -5px; right: -9px; background: #ef4444; color: #fff;
-            font-size: 9px; font-weight: 800; min-width: 15px; height: 15px; line-height: 15px;
-            border-radius: 8px; text-align: center; padding: 0 3px; display: none;
-        }
-
-        /* Fullscreen Reel-style Video Modal */
-        .video-reel-overlay {
-            display: none; position: fixed; inset: 0; background: #000; z-index: 999999;
-            justify-content: center; align-items: center;
-        }
-        .video-reel-overlay video { width: 100%; height: 100%; max-width: 480px; object-fit: contain; background: #000; }
-        .video-reel-close {
-            position: absolute; top: 16px; right: 16px; font-size: 26px; color: #fff;
-            cursor: pointer; z-index: 10; background: rgba(0,0,0,0.4); width: 34px; height: 34px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
-        .video-play-badge {
-            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.25); border-radius: 8px; color: #fff; font-size: 28px; cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -160,18 +129,12 @@
         </div>
     </div>
 
-    <!-- Fullscreen Reel-style Video Modal -->
-    <div id="videoReelModal" class="video-reel-overlay">
-        <span class="video-reel-close" onclick="closeVideoReel()">&times;</span>
-        <video id="reelVideoPlayer" src="" controls autoplay playsinline></video>
-    </div>
-
     <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
-        <a class="nav-item" href="index.html"><span class="nav-icon-wrap"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
-        <a class="nav-item active" href="shop.html"><span class="nav-icon-wrap"><i class="fa-solid fa-store"></i></span><span class="nav-label">Shop</span></a>
-        <a class="nav-item" href="cart.html"><span class="nav-icon-wrap"><i class="fa-solid fa-cart-shopping"></i><span class="nav-badge" id="cartNavBadge"></span></span><span class="nav-label">Cart</span></a>
-        <a class="nav-item" href="profile.html"><span class="nav-icon-wrap"><i class="fa-solid fa-user"></i></span><span class="nav-label">Profile</span></a>
+        <a class="nav-item" href="index.html"><i class="fa-solid fa-house"></i>Home</a>
+        <a class="nav-item active" href="shop.html"><i class="fa-solid fa-store"></i>Shop</a>
+        <a class="nav-item" href="cart.html"><i class="fa-solid fa-cart-shopping"></i>Cart</a>
+        <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i>Profile</a>
     </div>
 
     <script src="db.js"></script>
@@ -179,19 +142,6 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
         let currentFilteredDresses = [];
-        let ALL_REVIEWS = []; // fetched once per render, matched to products locally
-
-        function getReviewsForDress(dress) {
-            // A review's productId is normally the dress's own _key; fall back to
-            // matching by product name for reviews created before that was wired up.
-            return ALL_REVIEWS.filter(r => r.productId === dress._key || (!r.productId && r.productName === dress.name) || r.productId === dress.name);
-        }
-
-        function ratingSummary(reviews) {
-            if (!reviews || reviews.length === 0) return null;
-            let avg = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
-            return { avg: avg, count: reviews.length };
-        }
 
         // Neutral "no photo" placeholder. Previously a missing image fell back to a
         // real product photo, which made every image-less product look like that
@@ -207,23 +157,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesFilter();
             await renderProducts();
-            updateCartBadge();
         });
-
-        function updateCartBadge() {
-            let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
-            let totalQty = cart.reduce((sum, it) => sum + (it.qty || 1), 0);
-            let badge = document.getElementById('cartNavBadge');
-            if (!badge) return;
-            if (totalQty > 0) {
-                badge.innerText = totalQty > 99 ? '99+' : totalQty;
-                badge.style.display = 'flex';
-                badge.style.alignItems = 'center';
-                badge.style.justifyContent = 'center';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
 
         async function loadCategoriesFilter() {
             let dropdown = document.getElementById('categoryFilterDropdown');
@@ -244,7 +178,6 @@
 
             // ক্লাউড ডাটাবেজ — সব অ্যাকাউন্ট/ডিভাইসে একই প্রোডাক্ট, নতুনগুলো আগে
             let dresses = await getDresses();
-            ALL_REVIEWS = await getAllReviews();
 
             let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
@@ -277,13 +210,8 @@
                     mainImg = dress.images[0];
                 }
 
-                let isWished = wishlist.some(w => (w.productId || w.name) === (dress._key || dress.name));
+                let isWished = wishlist.some(w => w.name === dress.name);
                 let encodedImages = encodeURIComponent(JSON.stringify(dress.images && dress.images.length > 0 ? dress.images : [mainImg]));
-
-                let summary = ratingSummary(getReviewsForDress(dress));
-                let ratingHtml = summary
-                    ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
-                    : '';
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
@@ -298,7 +226,6 @@
                             ${dress.productCode ? `<div class="product-code">Code: ${dress.productCode}</div>` : ''}
                             <h4 class="product-title">${dress.name}</h4>
                             <p class="product-price">Tk ${Number(dress.price).toLocaleString()}.00</p>
-                            ${ratingHtml}
                             <div class="quick-view-link" onclick="openQuickView(${index})">View Size & Details</div>
                         </div>
                     </div>
@@ -310,13 +237,8 @@
             let dress = currentFilteredDresses[index];
             if (!dress) return;
 
-            // দুইটা আলাদা প্রোডাক্টের নাম একই হতে পারে (যেমন কালার-ভ্যারিয়েন্ট আলাদা
-            // এন্ট্রি হিসেবে যোগ করা হলে) — তাই নাম দিয়ে ম্যাচ করলে একটাকে wishlist
-            // করলে একই নামের বাকিগুলোও ভুলভাবে "loved" দেখাতো। এখন _key (unique id)
-            // দিয়ে ম্যাচ হচ্ছে; _key না থাকা পুরনো এন্ট্রির জন্য নাম fallback হিসেবে থাকছে।
-            let uniqueId = dress._key || dress.name;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
-            let existingIdx = wishlist.findIndex(w => (w.productId || w.name) === uniqueId);
+            let existingIdx = wishlist.findIndex(w => w.name === dress.name);
 
             if (existingIdx !== -1) {
                 wishlist.splice(existingIdx, 1);
@@ -325,7 +247,6 @@
                 tg.showAlert("🗑️ Removed from wishlist!");
             } else {
                 wishlist.push({
-                    productId: uniqueId,
                     name: dress.name,
                     price: dress.price,
                     image: dress.image || (dress.images ? dress.images[0] : ''),
@@ -386,32 +307,9 @@
             let videoSection = dress.video ? `
                 <div style="margin-top:12px;">
                     <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">PRODUCT VIDEO:</label>
-                    <div style="position:relative; border-radius:8px; overflow:hidden; background:#000;">
-                        <video src="${dress.video}" muted playsinline style="width:100%; max-height:180px; display:block; pointer-events:none;"></video>
-                        <div class="video-play-badge" onclick="openVideoReel('${dress.video}')"><i class="fa-solid fa-circle-play"></i></div>
-                    </div>
+                    <video src="${dress.video}" controls style="width:100%; max-height:180px; border-radius:8px; background:#000;"></video>
                 </div>
             ` : '';
-
-            let dressReviews = getReviewsForDress(dress);
-            let summary = ratingSummary(dressReviews);
-            let reviewsSection = `
-                <div style="margin-top:14px; border-top:1px solid #f3f4f6; padding-top:10px;">
-                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:6px;">
-                        CUSTOMER REVIEWS ${summary ? `— ★ ${summary.avg.toFixed(1)} (${summary.count})` : ''}
-                    </label>
-                    ${dressReviews.length === 0
-                        ? `<p style="font-size:11px; color:#999; margin:0;">No reviews yet.</p>`
-                        : dressReviews.map(r => `
-                            <div class="review-list-item">
-                                <div class="review-list-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-                                ${r.comment ? `<div class="review-list-comment">"${r.comment}"</div>` : ''}
-                                <div class="review-list-meta">${r.userName || 'Customer'} · ${new Date(r.createdAt).toLocaleDateString()}</div>
-                            </div>
-                        `).join('')
-                    }
-                </div>
-            `;
 
             let contentBox = document.getElementById('modalBodyContent');
             contentBox.innerHTML = `
@@ -439,9 +337,7 @@
 
                 ${videoSection}
 
-                <button class="add-to-cart-btn" style="margin-top:14px; background:#111111;" onclick="addToCartFromModal('${dress.name}', ${dress.price}, '${firstSize}', '${mainImg}', '${dress._key || ''}')">Add to Cart</button>
-
-                ${reviewsSection}
+                <button class="add-to-cart-btn" style="margin-top:14px; background:#111111;" onclick="addToCartFromModal('${dress.name}', ${dress.price}, '${firstSize}', '${mainImg}')">Add to Cart</button>
             `;
 
             window.activeSelectedSize = firstSize;
@@ -457,7 +353,7 @@
             window.activeSelectedSize = sizeKey;
         }
 
-        function addToCartFromModal(name, price, defaultSize, image, productId) {
+        function addToCartFromModal(name, price, defaultSize, image) {
             let selectedSize = window.activeSelectedSize || defaultSize;
             let cart = JSON.parse(localStorage.getItem('cartItems')) || [];
             let itemKey = `${name}_${selectedSize}`;
@@ -472,33 +368,17 @@
                     price: Number(price),
                     size: selectedSize,
                     image: image,
-                    productId: productId || '',
                     qty: 1
-                }); 
+                });
             }
 
             localStorage.setItem('cartItems', JSON.stringify(cart));
             closeModal('quickViewModal');
-            updateCartBadge();
             tg.showAlert(`✅ Added "${name}" (${selectedSize}) to cart! (Tk ${Number(price).toLocaleString()}.00)`);
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        function openVideoReel(videoUrl) {
-            let player = document.getElementById('reelVideoPlayer');
-            player.src = videoUrl;
-            player.muted = false;
-            document.getElementById('videoReelModal').style.display = 'flex';
-        }
-
-        function closeVideoReel() {
-            let player = document.getElementById('reelVideoPlayer');
-            player.pause();
-            player.src = '';
-            document.getElementById('videoReelModal').style.display = 'none';
         }
     </script>
 </body>
