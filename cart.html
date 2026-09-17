@@ -48,8 +48,22 @@
         
         .cart-item-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-right: 30px; }
         .cart-item-info { display: flex; align-items: center; gap: 12px; }
-        .cart-item-img { width: 55px; height: 55px; background: #f9fafb; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--card-border); }
+        .cart-item-img { width: 55px; height: 55px; background: #f9fafb; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--card-border); position: relative; cursor: pointer; }
         .cart-item-img img { width: 100%; height: 100%; object-fit: contain; }
+        .img-view-badge {
+            position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.55);
+            color: #fff; font-size: 8px; font-weight: 700; text-align: center; padding: 2px 0;
+            display: flex; align-items: center; justify-content: center; gap: 3px; pointer-events: none;
+        }
+
+        /* Product View Modal */
+        .view-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .view-modal-content { background: #fff; border: 1px solid var(--card-border); width: 88%; max-width: 360px; padding: 16px; border-radius: 14px; position: relative; text-align: center; }
+        .view-modal-close { position: absolute; top: 8px; right: 12px; font-size: 22px; cursor: pointer; color: #111; }
+        .view-modal-img { width: 100%; height: 240px; object-fit: contain; background: #f9fafb; border-radius: 10px; border: 1px solid var(--card-border); margin-bottom: 12px; }
+        .view-modal-name { font-size: 15px; font-weight: 800; color: #111; margin: 0 0 4px 0; }
+        .view-modal-price { font-size: 14px; font-weight: 700; color: #059669; margin: 0 0 8px 0; }
+        .view-modal-meta { font-size: 12px; color: var(--text-muted); }
         
         .cart-item-title { margin: 0 0 2px 0; font-size: 13px; font-weight: 700; color: #111; }
         .cart-item-price { margin: 0 0 4px 0; font-size: 13px; font-weight: bold; color: #111; }
@@ -138,7 +152,7 @@
         <!-- Order Summary -->
         <div class="summary-card">
             <div class="summary-row"><span>Subtotal</span><span id="subTotal">Tk 0</span></div>
-            <div class="summary-row"><span>Delivery Fee</span><span>Tk 100</span></div>
+            <div class="summary-row"><span>Delivery Fee</span><span id="deliveryFeeDisplay">Tk 100</span></div>
             <div class="summary-row total"><span>Total Amount</span><span id="grandTotal">Tk 0</span></div>
         </div>
 
@@ -150,6 +164,17 @@
 
         <!-- Checkout Button -->
         <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+    </div>
+
+    <!-- Product View Modal (image tap-e ei modal khule, r kono action nei) -->
+    <div id="viewItemModal" class="view-modal-overlay">
+        <div class="view-modal-content">
+            <span class="view-modal-close" onclick="closeViewItemModal()">&times;</span>
+            <img id="viewItemImg" class="view-modal-img" src="" alt="Product">
+            <h4 class="view-modal-name" id="viewItemName"></h4>
+            <p class="view-modal-price" id="viewItemPrice"></p>
+            <div class="view-modal-meta" id="viewItemMeta"></div>
+        </div>
     </div>
 
     <!-- Bottom Navigation Bar -->
@@ -175,10 +200,38 @@
             </svg>`
         );
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
+            currentDeliveryFee = await computeDeliveryFee();
             renderCart();
             updateCartBadge();
         });
+
+        // ---------- Delivery Fee (controlled from dresslist.html -> "Delivery Fee" tab, no code needed) ----------
+        let currentDeliveryFee = 100; // fallback until real config loads
+
+        async function computeDeliveryFee() {
+            try {
+                let cfg = await getSiteConfig();
+                let feesMap = cfg.deliveryFees || {};
+                let defaultFee = (cfg.deliveryFeeDefault !== undefined && cfg.deliveryFeeDefault !== null && cfg.deliveryFeeDefault !== '')
+                    ? Number(cfg.deliveryFeeDefault) : 100;
+
+                let savedAddress = localStorage.getItem('userFullAddress');
+                if (!savedAddress) return defaultFee;
+
+                let addr;
+                try { addr = JSON.parse(savedAddress); } catch (e) { return defaultFee; }
+
+                let division = addr && addr.division;
+                if (division && feesMap[division] !== undefined && feesMap[division] !== null && feesMap[division] !== '') {
+                    return Number(feesMap[division]);
+                }
+                return defaultFee;
+            } catch (e) {
+                console.error("Delivery fee load failed:", e);
+                return 100;
+            }
+        }
 
         function getCart() {
             return JSON.parse(localStorage.getItem('cartItems')) || [];
@@ -233,8 +286,9 @@
                         </button>
                         <div class="cart-item-top">
                             <div class="cart-item-info">
-                                <div class="cart-item-img">
+                                <div class="cart-item-img" onclick="viewCartItem('${item.key}')">
                                     <img src="${item.image || NO_IMAGE_PLACEHOLDER}" alt="${item.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
+                                    <div class="img-view-badge"><i class="fa-solid fa-eye"></i> View</div>
                                 </div>
                                 <div>
                                     <h4 class="cart-item-title">${item.name}</h4>
@@ -267,8 +321,10 @@
         function calculateTotal() {
             let cart = getCart();
             let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let fee = cart.length ? currentDeliveryFee : 0;
             document.getElementById('subTotal').innerText = `Tk ${total.toLocaleString()}.00`;
-            document.getElementById('grandTotal').innerText = `Tk ${(total + (cart.length ? 100 : 0)).toLocaleString()}.00`;
+            document.getElementById('deliveryFeeDisplay').innerText = `Tk ${fee.toLocaleString()}.00`;
+            document.getElementById('grandTotal').innerText = `Tk ${(total + fee).toLocaleString()}.00`;
         }
 
         function updateQty(key, change) {
@@ -305,6 +361,23 @@
             tg.showAlert("✅ Dress duplicated successfully!");
         }
 
+        function viewCartItem(key) {
+            let cart = getCart();
+            let item = cart.find(it => it.key === key);
+            if (!item) return;
+
+            document.getElementById('viewItemImg').src = item.image || NO_IMAGE_PLACEHOLDER;
+            document.getElementById('viewItemImg').onerror = function () { this.onerror = null; this.src = NO_IMAGE_PLACEHOLDER; };
+            document.getElementById('viewItemName').innerText = item.name;
+            document.getElementById('viewItemPrice').innerText = `Tk ${Number(item.price).toLocaleString()}.00`;
+            document.getElementById('viewItemMeta').innerText = `Size: ${item.size || '-'}  •  Qty: ${item.qty}`;
+            document.getElementById('viewItemModal').style.display = 'flex';
+        }
+
+        function closeViewItemModal() {
+            document.getElementById('viewItemModal').style.display = 'none';
+        }
+
         function removeItem(key) {
             let cart = getCart().filter(it => it.key !== key); 
             saveCart(cart);
@@ -328,7 +401,7 @@
             }
 
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            let totalAmount = subtotal + 100;
+            let totalAmount = subtotal + currentDeliveryFee;
 
             // savedAddress আগে থেকেই JSON.stringify করা object (address.html থেকে),
             // কিন্তু পুরনো 'userAddress' fallback হতে পারে plain string — তাই parse fail
@@ -348,6 +421,7 @@
                 userName: currentUserName(),
                 items: cart,
                 address: addressData,
+                deliveryFee: currentDeliveryFee,
                 totalAmount: totalAmount,
                 status: 'Pending',
                 date: new Date().toLocaleDateString(),
