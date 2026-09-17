@@ -66,11 +66,11 @@
         /* 🔥 Strongly Fixed Image Box with Rounded Corners */
         .product-img-box { 
             width: 100%; 
-            height: 215px !important; /* ফ্রেমের উচ্চতা একদম ফিক্সড */
+            height: 215px !important; 
             background: #f9fafb; 
             border: 1px solid var(--border-color); 
-            border-radius: 12px !important; /* হালকা রাউন্ড শেপ */
-            overflow: hidden; /* ফ্রেমের বাইরে কোনো ছবি যাবে না */
+            border-radius: 12px !important; 
+            overflow: hidden; 
             position: relative; 
             margin-bottom: 8px; 
             display: flex; 
@@ -82,13 +82,11 @@
         .product-img-box img { 
             width: 100%; 
             height: 100%; 
-            border-radius: 10px; /* ইমেজের কোণাও রাউন্ড করা হলো */
-            /* object-fit inline style থেকে আসবে (cover/contain), কিন্তু ফ্রেম ভাঙবে না */
+            border-radius: 10px; 
             transition: transform 0.3s; 
         }
         .product-img-box:hover img { transform: scale(1.03); }
 
-        /* Wishlist Heart Icon Button */
         .wishlist-btn {
             position: absolute; top: 6px; right: 6px; width: 28px; height: 28px;
             background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-color);
@@ -104,9 +102,7 @@
         .product-code { font-size: 9px; color: #7c3aed; text-align: center; font-weight: 700; margin-bottom: 2px; }
         .product-title { margin: 0 0 3px 0; font-size: 12px; font-weight: 500; color: #1f2937; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; width: 100%; }
         .product-price { margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: var(--price-color); text-align: center; }
-
         .quick-view-link { font-size: 10px; color: #7c3aed; text-align: center; cursor: pointer; font-weight: 600; text-decoration: underline; margin-bottom: 2px; }
-
         .rating-line { font-size: 10px; color: #f59e0b; text-align: center; margin-bottom: 3px; }
         .rating-line .count { color: #9ca3af; font-weight: 500; }
 
@@ -167,7 +163,6 @@
 <body>
 
     <div class="container">
-        <!-- Top Filter & Sort Bar -->
         <div class="top-filter-bar">
             <div class="filter-select-box">
                 <select id="categoryFilterDropdown" onchange="renderProducts()">
@@ -192,7 +187,7 @@
         </div>
     </div>
 
-    <!-- Zoom Image Modal (Click outside to close) -->
+    <!-- Zoom Image Modal -->
     <div id="zoomModal" class="modal-overlay" style="align-items: center;" onclick="closeModal('zoomModal')">
         <div class="modal-content" style="background: transparent; box-shadow: none; padding: 10px; display: flex; flex-direction: column; align-items: center; border: none; max-height: 95vh;" onclick="event.stopPropagation()">
             <span style="position:absolute; top:-10px; right:10px; font-size:32px; cursor:pointer; color:#ffffff; z-index:10; background: rgba(0,0,0,0.5); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onclick="closeModal('zoomModal')">&times;</span>
@@ -201,7 +196,7 @@
         </div>
     </div>
 
-    <!-- Size, Stock & Details Popup Modal -->
+    <!-- Quick View Modal -->
     <div id="quickViewModal" class="modal-overlay" onclick="closeModal('quickViewModal')">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span style="position:absolute; top:15px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('quickViewModal')">&times;</span>
@@ -209,7 +204,7 @@
         </div>
     </div>
 
-    <!-- Fullscreen Reel-style Video Modal -->
+    <!-- Fullscreen Video Modal -->
     <div id="videoReelModal" class="video-reel-overlay">
         <span class="video-reel-close" onclick="closeVideoReel()">&times;</span>
         <video id="reelVideoPlayer" src="" controls autoplay playsinline></video>
@@ -270,24 +265,46 @@
         }
 
         async function loadCategoriesFilter() {
-            let dropdown = document.getElementById('categoryFilterDropdown');
-            let categories = await getCategories();
-            
-            let currentSelected = dropdown.value;
-            dropdown.innerHTML = `<option value="All">All Category</option>`;
-            
-            categories.forEach(cat => {
-                dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
-            dropdown.value = currentSelected;
+            try {
+                let dropdown = document.getElementById('categoryFilterDropdown');
+                let categories = await getCategories();
+                let currentSelected = dropdown.value;
+                dropdown.innerHTML = `<option value="All">All Category</option>`;
+                categories.forEach(cat => {
+                    dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+                dropdown.value = currentSelected;
+            } catch (e) {
+                console.error("Error loading categories:", e);
+            }
         }
 
         async function renderProducts() {
             let grid = document.getElementById('shopProductsGrid');
             grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color:#666; padding:40px; font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading products...</div>`;
 
-            let dresses = await getDresses();
-            ALL_REVIEWS = await getAllReviews();
+            let dresses = [];
+            
+            // ✅ Safe Data Fetching (Error Handling)
+            try {
+                dresses = await getDresses();
+            } catch (error) {
+                grid.innerHTML = `<div style="grid-column: span 2; text-align:center; color: #ef4444; padding: 40px; font-size: 13px; font-weight: bold;">
+                    ⚠️ Error loading products.<br>Please check your database connection.<br><br>Error: ${error.message}
+                </div>`;
+                return;
+            }
+
+            // ✅ Safe Review Fetching (If getAllReviews doesn't exist, it won't crash)
+            try {
+                if (typeof getAllReviews === "function") {
+                    ALL_REVIEWS = await getAllReviews();
+                } else {
+                    ALL_REVIEWS = [];
+                }
+            } catch (error) {
+                ALL_REVIEWS = [];
+            }
 
             let selectedCategory = document.getElementById('categoryFilterDropdown').value;
             let sortType = document.getElementById('sortDropdown').value;
@@ -327,9 +344,8 @@
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
                     : '';
 
-                // ড্রেসের ছবির জন্য top center পজিশন যুক্ত করা হলো যেন মাথা কেটে না যায়
-                let fitMode = dress.imageFit === 'cover' ? 'cover' : 'contain';
-                let positionStr = fitMode === 'cover' ? 'top center' : 'center';
+                let fitMode = (dress.imageFit === 'cover') ? 'cover' : 'contain';
+                let positionStr = (fitMode === 'cover') ? 'top center' : 'center';
 
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
