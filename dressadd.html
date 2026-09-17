@@ -32,16 +32,20 @@
         .checkbox-row { display: flex; gap: 15px; background: #f9fafb; border: 1px solid var(--card-border); padding: 10px; border-radius: 8px; margin-bottom: 12px; align-items: center; }
         .checkbox-row label { font-size: 11px; color: #111; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: 600; }
 
-        .add-slot-btn { background: #111; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .size-row-input { display: flex; gap: 6px; align-items: flex-end; margin-bottom: 10px; }
+        .add-size-btn { background: #111; color: #fff; border: none; padding: 10px 14px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; height: 38px; }
+
+        .size-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; background: #f9fafb; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
+        .size-table th, .size-table td { padding: 8px; font-size: 11px; text-align: center; border-bottom: 1px solid var(--card-border); color: #111; }
+        .size-table th { background: #e5e7eb; color: #111; }
+        .del-size { background: #ef4444; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 9px; cursor: pointer; }
 
         .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Multi Image Live Preview Gallery */
-        .live-preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .preview-thumb-box { position: relative; width: 70px; height: 85px; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); background: #f9fafb; }
-        .preview-thumb-box img { width: 100%; height: 100%; object-fit: cover; }
-        .preview-thumb-label { position: absolute; bottom: 0; inset-x: 0; background: rgba(0,0,0,0.6); color: #fff; font-size: 8px; text-align: center; padding: 2px 0; }
+        .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
+        .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
+        .delete-preview-btn { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
 
         .submit-btn { background: var(--btn-dark); color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; width: 100%; cursor: pointer; font-size: 13px; margin-top: 6px; }
         .uploading-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; color: #fff; font-size: 14px; flex-direction: column; gap: 10px; }
@@ -51,7 +55,7 @@
 
     <div class="container">
         <div class="app-header">
-            <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Product</h3>
+            <h3 class="brand-title"><i class="fa-solid fa-plus-circle"></i> Add New Dress</h3>
             <a href="myadmin.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Admin Home</a>
         </div>
 
@@ -59,8 +63,8 @@
             <h4 class="card-title"><i class="fa-solid fa-circle-plus"></i> Product & Category Setup</h4>
             
             <div class="form-group">
-                <label>Product Name</label>
-                <input type="text" id="newName" class="form-control" placeholder="e.g. AirPods Pro or Velvet Dress">
+                <label>Dress Name</label>
+                <input type="text" id="newName" class="form-control" placeholder="e.g. Winter Velvet Frock">
             </div>
 
             <div class="form-group">
@@ -72,7 +76,7 @@
             </div>
 
             <div class="checkbox-row">
-                <label><input type="checkbox" id="isTrending"> 🔥 Trending Item</label>
+                <label><input type="checkbox" id="isTrending"> 🔥 Trending Dress</label>
                 <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
             </div>
 
@@ -81,18 +85,18 @@
                 <div style="display: flex; gap: 6px; margin-bottom: 6px;">
                     <select id="newCat" class="form-control" style="flex: 2;"></select>
                     <input type="text" id="customCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
-                    <button type="button" class="add-slot-btn" onclick="addNewCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
+                    <button type="button" class="add-size-btn" onclick="addNewCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Sub-Category (Optional)</label>
-                <input type="text" id="newSubCat" class="form-control" placeholder="e.g. Gadgets, Long Dress...">
+                <input type="text" id="newSubCat" class="form-control" placeholder="e.g. Long Dress, Two-Piece...">
             </div>
 
             <div class="form-group">
                 <label>Price (Tk)</label>
-                <input type="number" id="newPrice" class="form-control" placeholder="1000">
+                <input type="number" id="newPrice" class="form-control" placeholder="4500">
             </div>
 
             <div class="form-group">
@@ -101,49 +105,75 @@
                     <button type="button" onclick="wrapDetailsSelection('**')" title="Bold" style="width:32px; height:28px; border:1px solid var(--card-border); border-radius:6px; background:#f9fafb; color:#111; font-weight:800; font-size:12px; cursor:pointer;">B</button>
                     <button type="button" onclick="insertDetailsBullet()" title="Bullet point" style="padding:0 10px; height:28px; border:1px solid var(--card-border); border-radius:6px; background:#f9fafb; color:#111; font-weight:600; font-size:11px; cursor:pointer;">• List</button>
                 </div>
-                <textarea id="newDetails" class="form-control" placeholder="Write specifications, features, or description..."></textarea>
+                <textarea id="newDetails" class="form-control" placeholder="Write fabric details, work, or description..."></textarea>
+                <div style="font-size:9px; color:#999; margin-top:3px;">Select text then tap B to bold it, or tap • List to start a bullet line. Shop-এ এটাই bold/bullet হয়ে দেখাবে।</div>
             </div>
 
-            <!-- Product Images & Color Slots -->
+            <!-- Global Size Setup (General Stock) -->
+            <div class="size-row-input">
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Select Size</label>
+                    <select id="sizeDropdown" class="form-control">
+                        <option value="S">S Size</option>
+                        <option value="M">M Size</option>
+                        <option value="L">L Size</option>
+                        <option value="XL">XL Size</option>
+                        <option value="XXL">XXL Size</option>
+                        <option value="Free Size">Free Size</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; display: block;">Pieces (Qty)</label>
+                    <input type="number" id="sizeQty" class="form-control" placeholder="10" value="1">
+                </div>
+                <button type="button" class="add-size-btn" onclick="addSizeToTable()"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+
+            <table class="size-table">
+                <thead>
+                    <tr><th>Size</th><th>Pieces</th><th>Action</th></tr>
+                </thead>
+                <tbody id="sizeTableBody">
+                    <tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Color Variants -->
             <div class="form-group">
-                <label><i class="fa-solid fa-images"></i> Product Photos & Colors</label>
+                <label><i class="fa-solid fa-palette"></i> Color Variants & Sizes</label>
                 <div id="colorSlotsContainer"></div>
                 <button type="button" class="submit-btn" style="background:#10b981; margin-top:4px;" onclick="addColorSlot()">
-                    <i class="fa-solid fa-plus"></i> Add Another Photo / Color
+                    <i class="fa-solid fa-plus"></i> Add More Color / Product Photo
                 </button>
             </div>
 
-            <!-- Live Multi-Image Preview Gallery Bar -->
-            <div class="form-group" style="margin-top: 14px;">
-                <label><i class="fa-solid fa-eye"></i> Uploaded Images Live Preview:</label>
-                <div id="liveGalleryPreview" class="live-preview-container">
-                    <span style="font-size: 11px; color: var(--text-muted);">No images uploaded yet.</span>
-                </div>
-            </div>
-
-            <div class="form-group" style="margin-top: 14px;">
+            <div class="form-group">
                 <label>Product Video (Optional)</label>
                 <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;">
             </div>
 
-            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish</button>
+            <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
         </div>
     </div>
 
     <div id="uploadOverlay" class="uploading-overlay">
         <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #fff;"></i>
-        <span>Uploading images & publishing product...</span>
+        <span>Uploading images & publishing dress...</span>
     </div>
 
     <script src="db.js"></script>
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        let addedSizesList = {};
+        let colorSizesData = {};
         let colorSlotCount = 0;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
-            addColorSlot(); // default 1 slot
+            addColorSlot();
+            addColorSlot();
+            addColorSlot();
         });
 
         function createColorSlotHTML(n) {
@@ -151,52 +181,40 @@
             return `
                 <div class="color-slot" data-slot="${n}">
                     <div class="color-slot-header">
-                        <span>Photo / Color ${n} ${isFirst ? '<span style="color:#ef4444;">*Required</span>' : '<span style="color:#9ca3af; font-weight:500;">(Optional)</span>'}</span>
-                        ${!isFirst ? `<button type="button" class="del-size" style="background:#ef4444; color:#fff; border:none; padding:3px 6px; border-radius:4px; font-size:9px; cursor:pointer;" onclick="removeColorSlot(${n})"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <span>Color ${n} ${isFirst ? '<span style="color:#ef4444;">*Required</span>' : '<span style="color:#9ca3af; font-weight:500;">(Optional)</span>'}</span>
+                        ${!isFirst ? `<button type="button" class="del-size" onclick="removeColorSlot(${n})"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
-                    <input type="text" id="colorName${n}" class="form-control" placeholder="Variant name e.g. White / Default" style="margin-bottom:8px;">
-                    <input type="file" id="imgFile${n}" class="form-control" accept="image/*" style="color: #111;" onchange="updateLiveGallery()">
+                    <input type="text" id="colorName${n}" class="form-control" placeholder="Color name e.g. Red" style="margin-bottom:8px;">
+                    <input type="file" id="imgFile${n}" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewImage(${n})">
+                    <div class="img-preview-wrap" id="previewWrap${n}">
+                        <img id="previewImg${n}" src="" alt="Preview">
+                        <button type="button" class="delete-preview-btn" onclick="clearImageSlot(${n})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <label style="font-size:10px; font-weight:bold; color:#555;">Color ${n} Sizes & Qty:</label>
+                        <div style="display:flex; gap:4px; margin-bottom:6px;">
+                            <select id="colorSizeKey${n}" class="form-control" style="flex:1; padding:6px; font-size:11px;">
+                                <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="Free Size">Free Size</option>
+                            </select>
+                            <input type="number" id="colorSizeQty${n}" class="form-control" placeholder="Qty" style="flex:1; padding:6px; font-size:11px;" value="5">
+                            <button type="button" class="add-size-btn" style="padding:6px 10px; height:30px; font-size:10px;" onclick="addColorSize(${n})">Add</button>
+                        </div>
+                        <div id="colorSizeList${n}" style="font-size:11px; color:#059669; font-weight:bold;"></div>
+                    </div>
                 </div>`;
         }
 
         function addColorSlot() {
             colorSlotCount++;
             let n = colorSlotCount;
+            colorSizesData[n] = {};
             document.getElementById('colorSlotsContainer').insertAdjacentHTML('beforeend', createColorSlotHTML(n));
         }
 
         function removeColorSlot(n) {
             let el = document.querySelector(`.color-slot[data-slot="${n}"]`);
             if (el) el.remove();
-            updateLiveGallery();
-        }
-
-        function updateLiveGallery() {
-            let galleryBox = document.getElementById('liveGalleryPreview');
-            let slotEls = Array.from(document.querySelectorAll('.color-slot'));
-            let validFilesCount = 0;
-
-            galleryBox.innerHTML = '';
-
-            slotEls.forEach((slotEl) => {
-                let n = slotEl.dataset.slot;
-                let fileInput = document.getElementById('imgFile' + n);
-                if (fileInput && fileInput.files && fileInput.files[0]) {
-                    validFilesCount++;
-                    let file = fileInput.files[0];
-                    let blobUrl = URL.createObjectURL(file);
-                    galleryBox.innerHTML += `
-                        <div class="preview-thumb-box">
-                            <img src="${blobUrl}" alt="Thumb">
-                            <div class="preview-thumb-label">Img ${validFilesCount}</div>
-                        </div>
-                    `;
-                }
-            });
-
-            if (validFilesCount === 0) {
-                galleryBox.innerHTML = `<span style="font-size: 11px; color: var(--text-muted);">No images uploaded yet.</span>`;
-            }
+            delete colorSizesData[n];
         }
 
         function wrapDetailsSelection(marker) {
@@ -249,6 +267,75 @@
             }
         }
 
+        function addSizeToTable() {
+            let size = document.getElementById('sizeDropdown').value;
+            let qty = parseInt(document.getElementById('sizeQty').value) || 0;
+            if (qty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
+            addedSizesList[size] = qty;
+            renderSizeTable();
+        }
+
+        function removeSize(sizeKey) {
+            delete addedSizesList[sizeKey];
+            renderSizeTable();
+        }
+
+        function renderSizeTable() {
+            let tbody = document.getElementById('sizeTableBody');
+            let keys = Object.keys(addedSizesList);
+            if (keys.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="color: var(--text-muted); font-size: 10px;">No sizes added yet.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = '';
+            keys.forEach(size => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><b>${size}</b></td>
+                        <td style="color:#059669; font-weight:bold;">${addedSizesList[size]} Pcs</td>
+                        <td><button class="del-size" onclick="removeSize('${size}')"><i class="fa-solid fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function addColorSize(slotNum) {
+            let sKey = document.getElementById(`colorSizeKey${slotNum}`).value;
+            let sQty = parseInt(document.getElementById(`colorSizeQty${slotNum}`).value) || 0;
+            if(sQty <= 0) { tg.showAlert("⚠️ Enter valid quantity!"); return; }
+
+            colorSizesData[slotNum][sKey] = sQty;
+            
+            let listContainer = document.getElementById(`colorSizeList${slotNum}`);
+            let text = "";
+            for(let [k, v] of Object.entries(colorSizesData[slotNum])) {
+                text += `[${k}: ${v} pcs] `;
+            }
+            listContainer.innerText = text;
+        }
+
+        function previewImage(n) {
+            let fileInput = document.getElementById('imgFile' + n);
+            let wrap = document.getElementById('previewWrap' + n);
+            let img = document.getElementById('previewImg' + n);
+            let file = fileInput.files[0];
+            if (file) {
+                img.src = URL.createObjectURL(file);
+                wrap.style.display = 'block';
+            } else {
+                wrap.style.display = 'none';
+                img.src = '';
+            }
+        }
+
+        function clearImageSlot(n) {
+            document.getElementById('imgFile' + n).value = '';
+            document.getElementById('previewWrap' + n).style.display = 'none';
+            document.getElementById('previewImg' + n).src = '';
+            colorSizesData[n] = {};
+            document.getElementById(`colorSizeList${n}`).innerText = '';
+        }
+
         let lastUploadError = "";
         async function uploadToCloudinary(file, resourceType) {
             let type = resourceType || "image";
@@ -284,18 +371,23 @@
             let isNewArrival = document.getElementById('isNewArrival').checked;
             
             let videoInput = document.getElementById('productVideoFile');
+            
+            // Default fallback values since the UI is removed
+            let imageFit = 'contain';
+            let imageRatio = '2/3';
 
             let slotEls = Array.from(document.querySelectorAll('.color-slot'));
             let firstSlotNum = slotEls.length > 0 ? slotEls[0].dataset.slot : null;
             let firstFile = firstSlotNum ? document.getElementById('imgFile' + firstSlotNum).files[0] : null;
 
             if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
-            if (!firstFile) { tg.showAlert("⚠️ At least Photo 1 is required!"); return; }
+            if (!firstFile) { tg.showAlert("⚠️ Color 1 Photo is required!"); return; }
 
             document.getElementById('uploadOverlay').style.display = 'flex';
 
             let images = [];
             let colorVariants = [];
+            let combinedSizes = { ...addedSizesList };
 
             for (let slotEl of slotEls) {
                 let n = slotEl.dataset.slot;
@@ -306,20 +398,30 @@
                 let url = await uploadToCloudinary(file);
                 if (!url) {
                     document.getElementById('uploadOverlay').style.display = 'none';
-                    tg.showAlert(`❌ Photo ${n} upload failed: ${lastUploadError}`);
+                    tg.showAlert(`❌ Color ${n} photo upload failed: ${lastUploadError}`);
                     return;
                 }
                 images.push(url);
-                let colorName = document.getElementById('colorName' + n).value.trim() || `Variant ${n}`;
+                let colorName = document.getElementById('colorName' + n).value.trim() || `Color ${n}`;
                 colorVariants.push({
                     colorName: colorName,
-                    image: url
+                    image: url,
+                    sizes: colorSizesData[n] || {}
                 });
+                for (let [k, v] of Object.entries(colorSizesData[n] || {})) {
+                    combinedSizes[k] = (combinedSizes[k] || 0) + Number(v);
+                }
             }
 
             if (images.length === 0) {
                 document.getElementById('uploadOverlay').style.display = 'none';
-                tg.showAlert("⚠️ At least Photo 1 is required!");
+                tg.showAlert("⚠️ Color 1 Photo is required!");
+                return;
+            }
+
+            if (Object.keys(combinedSizes).length === 0) {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert("⚠️ Please add at least one size & quantity!");
                 return;
             }
 
@@ -327,6 +429,9 @@
             if(videoInput.files.length > 0) {
                 videoUrl = await uploadToCloudinary(videoInput.files[0], "video");
             }
+
+            let totalStock = 0;
+            Object.values(combinedSizes).forEach(q => totalStock += Number(q) || 0);
 
             let newDress = {
                 id: 'WF-' + Math.floor(1000 + Math.random() * 9000),
@@ -340,8 +445,12 @@
                 image: images[0],
                 colors: colorVariants,
                 video: videoUrl,
+                sizes: combinedSizes,
+                totalStock: totalStock,
                 isTrending: isTrending,
-                isNewArrival: isNewArrival
+                isNewArrival: isNewArrival,
+                imageFit: imageFit,
+                imageRatio: imageRatio
             };
 
             let savedKey = await saveDress(newDress);
@@ -351,7 +460,7 @@
                 return;
             }
 
-            tg.showAlert(`✅ Product "${name}" published successfully!`);
+            tg.showAlert(`✅ Dress "${name}" published successfully!`);
             location.reload();
         }
     </script>
