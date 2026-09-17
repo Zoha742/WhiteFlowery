@@ -91,6 +91,9 @@
                 <label><input type="checkbox" id="isTrending"> 🔥 Trending Dress</label>
                 <label><input type="checkbox" id="isNewArrival"> ✨ New Arrival</label>
             </div>
+            <div style="font-size:9px; color:#999; margin:-6px 0 12px 2px;">
+                প্রতিটা প্রোডাক্ট এমনিতেই Shop-এ দেখাবে। এখান থেকেই টিক দিয়ে চাইলে Trending, চাইলে New Arrival, চাইলে দুটোতেই — যেকোনো এক বা একাধিক জায়গায় দেখাতে পারবেন। আলাদা কোনো Tab লাগবে না।
+            </div>
 
             <div class="form-group">
                 <label>Category</label>
@@ -175,11 +178,16 @@
                 <p style="font-size:10px; color:var(--text-muted); margin-top:-8px;">Eta index.html-er top banner-e dekhabe (Home page).</p>
 
                 <div class="form-group">
-                    <label>Cover Image</label>
+                    <label>Cover Image (একটাই ছবি দেওয়া যাবে)</label>
                     <div id="coverPreviewBox" class="cover-preview-box">
                         <span style="font-size:11px; color:var(--text-muted);">No cover image set</span>
                     </div>
                     <input type="file" id="coverImgFile" class="form-control" accept="image/*" onchange="previewCoverImage()">
+                    <div style="font-size:9px; color:#999; margin-top:5px; line-height:1.5;">
+                        প্রস্তাবিত সাইজ: <b>1200 × 600 px</b> (2:1 ratio, landscape) — কম হলে অন্তত 800 × 400 px।<br>
+                        ফাইল সাইজ 1MB-এর নিচে রাখলে লোড ফাস্ট হবে। ফরম্যাট: JPG/PNG/WebP।<br>
+                        নতুন ছবি সিলেক্ট করলে পুরনোটা বদলে যাবে — একসাথে শুধু একটাই cover থাকে।
+                    </div>
                 </div>
 
                 <div class="form-group">
