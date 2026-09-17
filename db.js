@@ -173,6 +173,19 @@ async function saveReview(review) {
 
 async function deleteReview(key) { return dbDelete("reviews", key); }
 
+/* ---------------- Site Config (landing page cover banner) ---------------- */
+
+async function getSiteConfig() {
+  const cfg = await dbGetRaw("siteConfig");
+  return cfg || {};
+}
+
+async function saveSiteConfig(patch) {
+  const current = await getSiteConfig();
+  const merged = { ...current, ...patch };
+  return dbSet("siteConfig", merged);
+}
+
 /* ---------------- Notifications (broadcast) ---------------- */
 
 async function getNotifications() {
