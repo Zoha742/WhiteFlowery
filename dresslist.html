@@ -38,6 +38,8 @@
         .btn-edit { background: #2563eb; }
         .btn-delete { background: #dc2626; }
         .btn-view { background: #059669; }
+        .btn-move { background: #6b7280; }
+        .btn-move:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .tabs-row { display: flex; gap: 6px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
         .tab-btn { flex-shrink: 0; background: #f9fafb; border: 1px solid var(--card-border); color: #555; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; }
@@ -212,20 +214,39 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            if (tabId === 'trending') renderToggleList('trendingListContainer', 'isTrending');
-            if (tabId === 'newarrival') renderToggleList('newArrivalListContainer', 'isNewArrival');
+            if (tabId === 'trending') renderToggleList('trendingListContainer', 'isTrending', 'trendingOrder');
+            if (tabId === 'newarrival') renderToggleList('newArrivalListContainer', 'isNewArrival', 'newArrivalOrder');
             if (tabId === 'cover') loadCoverConfig();
         }
 
         // ---------- Trending / New Arrival toggles ----------
-        function renderToggleList(containerId, flagKey) {
+        // Each item's position on the Home page is controlled by an explicit
+        // order field (trendingOrder / newArrivalOrder) — ON items are sorted by
+        // it, and the ▲▼ buttons swap that value with the neighbouring item.
+        function renderToggleList(containerId, flagKey, orderKey) {
             let container = document.getElementById(containerId);
             if (CURRENT_DRESSES.length === 0) {
                 container.innerHTML = `<div class="item-body" style="text-align:center; color: var(--text-muted);">No dresses yet. Add some from 'Add New Dress' first.</div>`;
                 return;
             }
-            container.innerHTML = CURRENT_DRESSES.map((d, idx) => {
+
+            let paired = CURRENT_DRESSES.map((d, idx) => ({ d, idx }));
+            let onItems = paired.filter(p => p.d[flagKey]).sort((a, b) => (a.d[orderKey] || 0) - (b.d[orderKey] || 0));
+            let offItems = paired.filter(p => !p.d[flagKey]).sort((a, b) => (a.d.name || '').localeCompare(b.d.name || ''));
+            let ordered = [...onItems, ...offItems];
+
+            container.innerHTML = ordered.map(pair => {
+                let d = pair.d, idx = pair.idx;
                 let isOn = !!d[flagKey];
+                let posInOn = onItems.findIndex(p => p.idx === idx);
+                let canMoveUp = isOn && posInOn > 0;
+                let canMoveDown = isOn && posInOn < onItems.length - 1;
+
+                let moveButtonsHtml = isOn ? `
+                    <button class="btn-sm btn-move" ${canMoveUp ? '' : 'disabled'} onclick="moveItem(${idx}, '${flagKey}', '${orderKey}', -1)" title="Move up"><i class="fa-solid fa-arrow-up"></i></button>
+                    <button class="btn-sm btn-move" ${canMoveDown ? '' : 'disabled'} onclick="moveItem(${idx}, '${flagKey}', '${orderKey}', 1)" title="Move down"><i class="fa-solid fa-arrow-down"></i></button>
+                ` : '';
+
                 return `
                     <div class="list-item">
                         <img src="${d.image || 'https://res.cloudinary.com/dyqegwdme/image/upload/v1788180133/2_g6yybc.webp'}" class="dress-thumb">
@@ -235,23 +256,61 @@
                                 <span class="item-badge">Tk ${Number(d.price).toLocaleString()}.00</span>
                             </div>
                             <div class="item-body">${d.productCode ? `Code: ${d.productCode}` : ''}</div>
-                            <button class="toggle-pill ${isOn ? 'on' : 'off'}" onclick="toggleDressFlag(${idx}, '${flagKey}')">
-                                <i class="fa-solid fa-${isOn ? 'toggle-on' : 'toggle-off'}"></i> ${isOn ? 'ON — showing' : 'OFF — hidden'}
-                            </button>
+                            <div class="action-btns">
+                                <button class="toggle-pill ${isOn ? 'on' : 'off'}" onclick="toggleDressFlag(${idx}, '${flagKey}', '${orderKey}')">
+                                    <i class="fa-solid fa-${isOn ? 'toggle-on' : 'toggle-off'}"></i> ${isOn ? 'ON' : 'OFF'}
+                                </button>
+                                ${moveButtonsHtml}
+                                <button class="btn-sm btn-edit" onclick="openEditModal(${idx})">Edit</button>
+                                <button class="btn-sm btn-delete" onclick="deleteDressAt(${idx})" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        async function toggleDressFlag(index, flagKey) {
+        async function toggleDressFlag(index, flagKey, orderKey) {
             let d = CURRENT_DRESSES[index];
             if (!d) return;
             let newVal = !d[flagKey];
-            await updateDress(d._key, { [flagKey]: newVal });
-            d[flagKey] = newVal; // keep local cache in sync so the pill flips instantly
-            if (flagKey === 'isTrending') renderToggleList('trendingListContainer', 'isTrending');
-            else renderToggleList('newArrivalListContainer', 'isNewArrival');
+            let patch = { [flagKey]: newVal };
+
+            if (newVal) {
+                // Turning ON — place it at the end of the current order
+                let maxOrder = CURRENT_DRESSES.reduce((max, dd) => dd[flagKey] ? Math.max(max, dd[orderKey] || 0) : max, 0);
+                patch[orderKey] = maxOrder + 1;
+            }
+
+            await updateDress(d._key, patch);
+            Object.assign(d, patch); // keep local cache in sync so the UI updates instantly
+            renderToggleList(flagKey === 'isTrending' ? 'trendingListContainer' : 'newArrivalListContainer', flagKey, orderKey);
+        }
+
+        async function moveItem(index, flagKey, orderKey, direction) {
+            let d = CURRENT_DRESSES[index];
+            if (!d) return;
+
+            let onItems = CURRENT_DRESSES
+                .map((dd, idx) => ({ dd, idx }))
+                .filter(p => p.dd[flagKey])
+                .sort((a, b) => (a.dd[orderKey] || 0) - (b.dd[orderKey] || 0));
+
+            let pos = onItems.findIndex(p => p.idx === index);
+            let swapPos = pos + direction;
+            if (pos === -1 || swapPos < 0 || swapPos >= onItems.length) return;
+
+            let other = onItems[swapPos].dd;
+            let myOrder = d[orderKey] || 0;
+            let otherOrder = other[orderKey] || 0;
+
+            await updateDress(d._key, { [orderKey]: otherOrder });
+            await updateDress(other._key, { [orderKey]: myOrder });
+
+            d[orderKey] = otherOrder;
+            other[orderKey] = myOrder;
+
+            renderToggleList(flagKey === 'isTrending' ? 'trendingListContainer' : 'newArrivalListContainer', flagKey, orderKey);
         }
 
         // ---------- Landing Page Cover ----------
