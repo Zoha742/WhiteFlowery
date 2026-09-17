@@ -23,14 +23,14 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0; 
-            padding: 0 0 95px 0; 
+            padding: 0 0 100px 0; /* নেভিবারের নিচে প্রোপার স্পেস রাখার জন্য */
             display: flex; 
             justify-content: center;
         }
         .container { width: 100%; max-width: 480px; padding: 10px; box-sizing: border-box; background: #ffffff; }
 
         /* Top Filter & Sort Bar */
-        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
         .filter-select-box, .sort-select-box {
             flex: 1; background: #ffffff; border: 1px solid var(--border-color); padding: 8px 10px;
             border-radius: 8px; font-size: 12px; font-weight: 600; color: #374151;
@@ -39,12 +39,12 @@
         }
         .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 12px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
 
-        /* Products Grid - Exactly 2 items side-by-side without overflowing screen */
+        /* Products Grid - Exactly 2 items side-by-side without overflowing */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; box-sizing: border-box; }
-        .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 4px; box-sizing: border-box; }
+        .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; position: relative; margin-bottom: 6px; box-sizing: border-box; }
         
-        /* Normal Clean Frame Box - No cutting, perfect fit */
-        .product-img-box { width: 100%; height: 190px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        /* Product Image Box - Normal balanced height & object-fit to prevent cutting */
+        .product-img-box { width: 100%; height: 210px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; position: relative; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .product-img-box img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform 0.3s; }
         .product-img-box:hover img { transform: scale(1.03); }
 
@@ -57,7 +57,7 @@
         }
         .wishlist-btn:hover, .wishlist-btn.active { color: #ec4899; background: #fff; }
 
-        .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 8px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; }
+        .add-to-cart-btn { background: var(--btn-dark); color: #fff; border: none; padding: 9px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 6px; text-align: center; letter-spacing: 0.2px; }
         .add-to-cart-btn:active { opacity: 0.85; }
 
         .product-code { font-size: 9px; color: #7c3aed; text-align: center; font-weight: 700; margin-bottom: 2px; }
@@ -83,7 +83,7 @@
         .size-pill { background: #f3f4f6; border: 1px solid #d1d5db; color: #374151; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; display: inline-block; margin: 4px; }
         .size-pill.selected { background: #111111; color: #fff; border-color: #111111; }
 
-        /* Fixed Bottom Navigation Bar - Standard height and locked perfectly at bottom */
+        /* Fixed Bottom Navigation Bar - Standard height, locked at bottom securely */
         .bottom-nav {
             position: fixed; 
             bottom: 0; 
@@ -95,14 +95,14 @@
             border-top: 1px solid var(--border-color); 
             display: flex; 
             justify-content: space-around;
-            padding: 10px 0 12px 0; 
+            padding: 10px 0 14px 0; 
             box-sizing: border-box; 
             z-index: 99999;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
         .nav-item { text-align: center; color: #6b7280; text-decoration: none; font-size: 11px; font-weight: 600; flex: 1; }
         .nav-item.active { color: #111111; font-weight: 700; }
-        .nav-item i { font-size: 20px; display: block; margin-bottom: 3px; }
+        .nav-item i { font-size: 20px; display: block; margin-bottom: 4px; }
         .nav-icon-wrap { position: relative; display: inline-block; }
         .nav-label { display: block; }
         .nav-badge {
@@ -157,8 +157,8 @@
     </div>
 
     <!-- Zoom Image Modal -->
-    <div id="zoomModal" class="modal-overlay" style="align-items: center;" onclick="checkCloseZoom(event)">
-        <div class="modal-content" style="border-radius: 16px; max-width: 420px; text-align: center; background: #ffffff; color: #111; border: 1px solid #e5e7eb;" onclick="event.stopPropagation()">
+    <div id="zoomModal" class="modal-overlay" style="align-items: center;">
+        <div class="modal-content" style="border-radius: 16px; max-width: 420px; text-align: center; background: #ffffff; color: #111; border: 1px solid #e5e7eb;">
             <span style="position:absolute; top:12px; right:16px; font-size:24px; cursor:pointer; color:#111; z-index:10;" onclick="closeModal('zoomModal')">&times;</span>
             <img id="zoomedImg" src="" alt="Zoom" style="width:100%; max-height:360px; object-fit:contain; border-radius:8px; margin-bottom:12px; background:#f9fafb;">
             <div id="zoomThumbnails" style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;"></div>
@@ -166,8 +166,8 @@
     </div>
 
     <!-- Size, Stock & Details Popup Modal -->
-    <div id="quickViewModal" class="modal-overlay" onclick="checkCloseModal(event, 'quickViewModal')">
-        <div class="modal-content" onclick="event.stopPropagation()">
+    <div id="quickViewModal" class="modal-overlay">
+        <div class="modal-content">
             <span style="position:absolute; top:15px; right:15px; font-size:22px; cursor:pointer; color:#111;" onclick="closeModal('quickViewModal')">&times;</span>
             <div id="modalBodyContent"></div>
         </div>
@@ -179,7 +179,7 @@
         <video id="reelVideoPlayer" src="" controls autoplay playsinline></video>
     </div>
 
-    <!-- Bottom Navigation Bar - Fixed standard size and locked at bottom -->
+    <!-- Bottom Navigation Bar -->
     <div class="bottom-nav">
         <a class="nav-item" href="index.html"><span class="nav-icon-wrap"><i class="fa-solid fa-house"></i></span><span class="nav-label">Home</span></a>
         <a class="nav-item active" href="shop.html"><span class="nav-icon-wrap"><i class="fa-solid fa-store"></i></span><span class="nav-label">Shop</span></a>
@@ -205,7 +205,7 @@
         }
 
         const NO_IMAGE_PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400">
+            `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="360">
                 <rect width="100%" height="100%" fill="#f3f4f6"/>
                 <text x="50%" y="48%" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#9ca3af">🖼️</text>
                 <text x="50%" y="60%" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#9ca3af">No photo</text>
@@ -291,13 +291,15 @@
                     ? `<div class="rating-line">★ ${summary.avg.toFixed(1)} <span class="count">(${summary.count})</span></div>`
                     : '';
 
+                let fitMode = dress.imageFit === 'contain' ? 'contain' : 'cover';
+
                 grid.innerHTML += `
                     <div class="product-card" id="card-${index}">
                         <div class="product-img-box" onclick="openZoomModal('${encodedImages}')">
                             <button class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${index}, this)">
                                 <i class="fa-${isWished ? 'solid' : 'regular'} fa-heart"></i>
                             </button>
-                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
+                            <img src="${mainImg || NO_IMAGE_PLACEHOLDER}" alt="${dress.name}" style="object-fit:${fitMode};" onerror="this.onerror=null; this.src='${NO_IMAGE_PLACEHOLDER}'">
                         </div>
                         <button class="add-to-cart-btn" onclick="openQuickView(${index})">Add to cart</button>
                         <div>
@@ -361,18 +363,6 @@
             document.getElementById('zoomModal').style.display = 'flex';
         }
 
-        function checkCloseZoom(event) {
-            if (event.target.id === 'zoomModal') {
-                closeModal('zoomModal');
-            }
-        }
-
-        function checkCloseModal(event, modalId) {
-            if (event.target.id === modalId) {
-                closeModal(modalId);
-            }
-        }
-
         function openQuickView(index) {
             let dress = currentFilteredDresses[index];
             if (!dress) return;
@@ -418,8 +408,9 @@
                         ? `<p style="font-size:11px; color:#999; margin:0;">No reviews yet.</p>`
                         : dressReviews.map(r => `
                             <div class="review-list-item">
-                                <div class="review-list-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>${r.comment ? `<div class="review-list-comment">"${r.comment}"</div>` : ''}
-                                <div class="review-list-meta">${r.userName \vert{}\vert{} 'Customer'} ·${new Date(r.createdAt).toLocaleDateString()}</div>
+                                <div class="review-list-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                                ${r.comment ? `<div class="review-list-comment">"${r.comment}"</div>` : ''}
+                                <div class="review-list-meta">${r.userName || 'Customer'} · ${new Date(r.createdAt).toLocaleDateString()}</div>
                             </div>
                         `).join('')
                     }
