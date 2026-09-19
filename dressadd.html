@@ -43,6 +43,12 @@
         .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .phone-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
+        .chip-group-label { font-size: 9px; color: #9ca3af; font-weight: 700; margin: 6px 0 3px 0; text-transform: uppercase; }
+        .chip-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 2px; }
+        .chip-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 14px; cursor: pointer; }
+        .chip-btn:active { background: #111; color: #fff; }
+        .chip-btn.chip-color { background: #fdf4ff; border-color: #e9d5ff; color: #7c3aed; }
+        .chip-clear-btn { background: #fee2e2; border: 1px solid #fecaca; color: #dc2626; font-size: 10px; font-weight: 700; padding: 5px 9px; border-radius: 14px; cursor: pointer; }
         
         .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
@@ -630,6 +636,44 @@
             }
         }
 
+        // Tap-to-select chips for the Variant Name field — saves retyping common
+        // RAM/Storage/Color combos every time. Tapping appends to whatever's already typed.
+        const PHONE_RAM_STORAGE_PRESETS = ['4/64', '4/128', '6/128', '6/256', '8/128', '8/256', '12/256', '12/512', '16/512'];
+        const PHONE_STORAGE_PRESETS = ['64GB', '128GB', '256GB', '512GB', '1TB'];
+        const PHONE_COLOR_PRESETS = ['Black', 'White', 'Blue', 'Silver', 'Gold', 'Titanium', 'Green', 'Purple', 'Red'];
+
+        function buildPhoneChipsHtml(n) {
+            let ramChips = PHONE_RAM_STORAGE_PRESETS.map(v => `<button type="button" class="chip-btn" onclick="tapPhoneChip(${n}, '${v}')">${v}</button>`).join('');
+            let storageChips = PHONE_STORAGE_PRESETS.map(v => `<button type="button" class="chip-btn" onclick="tapPhoneChip(${n}, '${v}')">${v}</button>`).join('');
+            let colorChips = PHONE_COLOR_PRESETS.map(v => `<button type="button" class="chip-btn chip-color" onclick="tapPhoneChip(${n}, '${v}')">${v}</button>`).join('');
+            return `
+                <div class="chip-group-label">RAM/Storage (GB) — tap to select:</div>
+                <div class="chip-row">${ramChips}</div>
+                <div class="chip-group-label">Storage only:</div>
+                <div class="chip-row">${storageChips}</div>
+                <div class="chip-group-label">Color:</div>
+                <div class="chip-row">
+                    ${colorChips}
+                    <button type="button" class="chip-clear-btn" onclick="clearPhoneVariantName(${n})"><i class="fa-solid fa-eraser"></i> Clear</button>
+                </div>
+            `;
+        }
+
+        function tapPhoneChip(n, value) {
+            let input = document.getElementById('phoneVariantName' + n);
+            let current = input.value.trim();
+            if (!current) {
+                input.value = value;
+            } else if (!current.includes(value)) {
+                input.value = current + ' - ' + value;
+            }
+            input.focus();
+        }
+
+        function clearPhoneVariantName(n) {
+            document.getElementById('phoneVariantName' + n).value = '';
+        }
+
         function createPhoneSlotHTML(n) {
             let isFirst = (n === 1);
             return `
@@ -638,7 +682,8 @@
                         <span>Variant ${n} ${isFirst ? '<span style="color:#ef4444;">*Required</span>' : '<span style="color:#9ca3af; font-weight:500;">(Optional)</span>'}</span>
                         ${!isFirst ? `<button type="button" class="del-size" onclick="removePhoneSlot(${n})"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
-                    <input type="text" id="phoneVariantName${n}" class="form-control" placeholder="e.g. 128GB - Black" style="margin-bottom:8px;">
+                    <input type="text" id="phoneVariantName${n}" class="form-control" placeholder="e.g. 128GB - Black" style="margin-bottom:6px;">
+                    ${buildPhoneChipsHtml(n)}
                     <input type="file" id="phoneImgFile${n}" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewPhoneImage(${n})">
                     <div class="img-preview-wrap" id="phonePreviewWrap${n}">
                         <img id="phonePreviewImg${n}" src="" alt="Preview">
