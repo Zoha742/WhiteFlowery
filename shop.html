@@ -308,7 +308,7 @@
                             <h4 class="product-title">${dress.name}</h4>
                             <p class="product-price">Tk ${Number(dress.price).toLocaleString()}.00</p>
                             ${ratingHtml}
-                            <div class="quick-view-link" onclick="openQuickView(${index})">View Size & Details</div>
+                            <div class="quick-view-link" onclick="openQuickView(${index})">View Options & Details</div>
                         </div>
                     </div>
                 `;
@@ -433,7 +433,7 @@
                 ${imagesHtml ? `<div style="display:flex; gap:6px; margin-bottom:12px;">${imagesHtml}</div>` : ''}
 
                 <div style="margin-bottom:12px;">
-                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">SELECT SIZE:</label>
+                    <label style="font-size:11px; font-weight:bold; color:#555; display:block; margin-bottom:4px;">${dress.type === 'phone' ? 'SELECT VARIANT' : 'SELECT SIZE'}:</label>
                     <div id="modalSizeContainer">${sizePillsHtml || '<span style="font-size:11px; color:red;">Stock Out</span>'}</div>
                 </div>
 
