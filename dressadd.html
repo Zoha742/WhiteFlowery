@@ -42,6 +42,7 @@
 
         .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .phone-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         
         .img-preview-wrap { position: relative; width: 90px; height: 90px; margin-top: 8px; display: none; }
         .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--card-border); }
@@ -73,6 +74,7 @@
 
         <div class="tabs-row">
             <button class="tab-btn active" onclick="switchTopTab('add', this)"><i class="fa-solid fa-circle-plus"></i> Add Dress</button>
+            <button class="tab-btn" onclick="switchTopTab('phone', this)"><i class="fa-solid fa-mobile-screen-button"></i> Add Phone</button>
             <button class="tab-btn" onclick="switchTopTab('cover', this)"><i class="fa-solid fa-image"></i> Landing Cover</button>
         </div>
 
@@ -177,6 +179,73 @@
         </div>
         </div>
 
+        <!-- Add Phone tab -->
+        <div id="toptab-phone" class="toptab-section" style="display:none;">
+        <div class="admin-card">
+            <h4 class="card-title"><i class="fa-solid fa-mobile-screen-button"></i> Phone / Electronics Setup</h4>
+
+            <div class="form-group">
+                <label>Phone Name</label>
+                <input type="text" id="phoneName" class="form-control" placeholder="e.g. iPhone 17">
+            </div>
+
+            <div class="form-group">
+                <label>Product Code</label>
+                <div style="display: flex; align-items: stretch;">
+                    <span style="display:flex; align-items:center; background:#e5e7eb; border:1px solid var(--card-border); border-right:none; padding:0 10px; border-radius:8px 0 0 8px; font-size:12px; font-weight:700; color:#111;">PH-</span>
+                    <input type="text" id="phoneProductCodeNumber" class="form-control" placeholder="101" style="border-radius:0 8px 8px 0;">
+                </div>
+            </div>
+
+            <div class="checkbox-row">
+                <label><input type="checkbox" id="phoneIsTrending"> 🔥 Trending</label>
+                <label><input type="checkbox" id="phoneIsNewArrival"> ✨ New Arrival</label>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+                    <select id="phoneCat" class="form-control" style="flex: 2;"></select>
+                    <input type="text" id="phoneCustomCatInput" class="form-control" placeholder="New Cat..." style="flex: 1;">
+                    <button type="button" class="add-size-btn" onclick="addNewPhoneCategory()" style="background:#10b981; height:38px;"><i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div style="font-size:9px; color:#999;">Category list Add Dress tab-er sathe shared — "Phones" / "Electronics" category banaye nao.</div>
+            </div>
+
+            <div class="form-group">
+                <label>Sub-Category (Optional)</label>
+                <input type="text" id="phoneSubCat" class="form-control" placeholder="e.g. Smartphone, Earbuds, Accessories...">
+            </div>
+
+            <div class="form-group">
+                <label>Price (Tk)</label>
+                <input type="number" id="phonePrice" class="form-control" placeholder="145000">
+            </div>
+
+            <div class="form-group">
+                <label>Product Details / Description</label>
+                <textarea id="phoneDetails" class="form-control" placeholder="Write specs, warranty, box contents, etc."></textarea>
+            </div>
+
+            <!-- Variant slots: each = one storage/color combo with its own photo + qty -->
+            <div class="form-group">
+                <label><i class="fa-solid fa-layer-group"></i> Variants (Storage / Color) & Stock</label>
+                <div style="font-size:9px; color:#999; margin:-2px 0 8px 0;">Proti variant-e ekta label dao (jemon "128GB - Black"), photo dao, ar oi variant-er stock quantity dao. Jotogula storage/color combo ache, totogula variant add koro.</div>
+                <div id="phoneSlotsContainer"></div>
+                <button type="button" class="submit-btn" style="background:#10b981; margin-top:4px;" onclick="addPhoneSlot()">
+                    <i class="fa-solid fa-plus"></i> Add Another Variant
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label>Product Video (Optional)</label>
+                <input type="file" id="phoneVideoFile" class="form-control" accept="video/*" style="color: #111;">
+            </div>
+
+            <button class="submit-btn" onclick="publishPhone()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
+        </div>
+        </div>
+
         <!-- Landing Cover tab (also manageable from dresslist.html) -->
         <div id="toptab-cover" class="toptab-section" style="display:none;">
             <div class="admin-card">
@@ -230,6 +299,8 @@
             addColorSlot();
         });
 
+        let phoneInitialized = false;
+
         // ---------- Top-level tabs ----------
         function switchTopTab(tabId, btn) {
             document.querySelectorAll('.toptab-section').forEach(s => s.style.display = 'none');
@@ -238,6 +309,12 @@
             btn.classList.add('active');
 
             if (tabId === 'cover') loadCoverConfig();
+            if (tabId === 'phone' && !phoneInitialized) {
+                phoneInitialized = true;
+                loadPhoneCategoriesDropdown();
+                addPhoneSlot();
+                addPhoneSlot();
+            }
         }
 
         // ---------- Landing Page Cover (same feature also lives in dresslist.html) ----------
@@ -521,6 +598,184 @@
                 lastUploadError = err.message;
                 return "";
             }
+        }
+
+        // ---------- Add Phone tab ----------
+        let phoneSlotCount = 0;
+
+        async function loadPhoneCategoriesDropdown() {
+            let catSelect = document.getElementById('phoneCat');
+            let categories = await getCategories();
+            catSelect.innerHTML = '';
+            categories.forEach(cat => {
+                catSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        async function addNewPhoneCategory() {
+            let customInput = document.getElementById('phoneCustomCatInput');
+            let newCat = customInput.value.trim();
+            if (!newCat) { tg.showAlert("⚠️ Enter new category name!"); return; }
+            let categories = await getCategories();
+            if (!categories.includes(newCat)) {
+                categories.push(newCat);
+                await saveCategories(categories);
+                await loadCategoriesDropdown();   // keep the Add Dress tab's dropdown in sync too
+                await loadPhoneCategoriesDropdown();
+                document.getElementById('phoneCat').value = newCat;
+                customInput.value = '';
+                tg.showAlert(`✅ Category "${newCat}" created successfully!`);
+            } else {
+                tg.showAlert("⚠️ Category already exists!");
+            }
+        }
+
+        function createPhoneSlotHTML(n) {
+            let isFirst = (n === 1);
+            return `
+                <div class="phone-slot" data-pslot="${n}">
+                    <div class="color-slot-header">
+                        <span>Variant ${n} ${isFirst ? '<span style="color:#ef4444;">*Required</span>' : '<span style="color:#9ca3af; font-weight:500;">(Optional)</span>'}</span>
+                        ${!isFirst ? `<button type="button" class="del-size" onclick="removePhoneSlot(${n})"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </div>
+                    <input type="text" id="phoneVariantName${n}" class="form-control" placeholder="e.g. 128GB - Black" style="margin-bottom:8px;">
+                    <input type="file" id="phoneImgFile${n}" class="form-control" accept="image/*" style="color: #111; margin-bottom:8px;" onchange="previewPhoneImage(${n})">
+                    <div class="img-preview-wrap" id="phonePreviewWrap${n}">
+                        <img id="phonePreviewImg${n}" src="" alt="Preview">
+                        <button type="button" class="delete-preview-btn" onclick="clearPhoneImageSlot(${n})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:8px;">
+                        <label style="font-size:10px; font-weight:bold; color:#555;">Stock Quantity for this variant:</label>
+                        <input type="number" id="phoneVariantQty${n}" class="form-control" placeholder="e.g. 10" value="5" style="margin-top:4px;">
+                    </div>
+                </div>`;
+        }
+
+        function addPhoneSlot() {
+            phoneSlotCount++;
+            let n = phoneSlotCount;
+            document.getElementById('phoneSlotsContainer').insertAdjacentHTML('beforeend', createPhoneSlotHTML(n));
+        }
+
+        function removePhoneSlot(n) {
+            let el = document.querySelector(`.phone-slot[data-pslot="${n}"]`);
+            if (el) el.remove();
+        }
+
+        function previewPhoneImage(n) {
+            let fileInput = document.getElementById('phoneImgFile' + n);
+            let wrap = document.getElementById('phonePreviewWrap' + n);
+            let img = document.getElementById('phonePreviewImg' + n);
+            let file = fileInput.files[0];
+            if (file) {
+                img.src = URL.createObjectURL(file);
+                wrap.style.display = 'block';
+            } else {
+                wrap.style.display = 'none';
+                img.src = '';
+            }
+        }
+
+        function clearPhoneImageSlot(n) {
+            document.getElementById('phoneImgFile' + n).value = '';
+            document.getElementById('phonePreviewWrap' + n).style.display = 'none';
+            document.getElementById('phonePreviewImg' + n).src = '';
+        }
+
+        async function publishPhone() {
+            let name = document.getElementById('phoneName').value.trim();
+            let productCodeNumber = document.getElementById('phoneProductCodeNumber').value.trim();
+            let productCode = productCodeNumber ? ('PH-' + productCodeNumber) : '';
+            let cat = document.getElementById('phoneCat').value;
+            let subCat = document.getElementById('phoneSubCat').value.trim();
+            let price = parseFloat(document.getElementById('phonePrice').value) || 0;
+            let details = document.getElementById('phoneDetails').value.trim();
+            let isTrending = document.getElementById('phoneIsTrending').checked;
+            let isNewArrival = document.getElementById('phoneIsNewArrival').checked;
+            let videoInput = document.getElementById('phoneVideoFile');
+
+            let slotEls = Array.from(document.querySelectorAll('.phone-slot'));
+            let firstSlotNum = slotEls.length > 0 ? slotEls[0].dataset.pslot : null;
+            let firstFile = firstSlotNum ? document.getElementById('phoneImgFile' + firstSlotNum).files[0] : null;
+
+            if (!name || price <= 0) { tg.showAlert("⚠️ Enter valid name and price!"); return; }
+            if (!firstFile) { tg.showAlert("⚠️ Variant 1 Photo is required!"); return; }
+
+            document.getElementById('uploadOverlay').style.display = 'flex';
+
+            let images = [];
+            let variantList = [];
+            let combinedSizes = {};
+
+            for (let slotEl of slotEls) {
+                let n = slotEl.dataset.pslot;
+                let fileInput = document.getElementById('phoneImgFile' + n);
+                let file = fileInput.files[0];
+                if (!file) continue;
+
+                let url = await uploadToCloudinary(file);
+                if (!url) {
+                    document.getElementById('uploadOverlay').style.display = 'none';
+                    tg.showAlert(`❌ Variant ${n} photo upload failed: ${lastUploadError}`);
+                    return;
+                }
+                images.push(url);
+
+                let variantLabel = document.getElementById('phoneVariantName' + n).value.trim() || `Variant ${n}`;
+                let qty = parseInt(document.getElementById('phoneVariantQty' + n).value) || 0;
+
+                variantList.push({ colorName: variantLabel, image: url, sizes: { [variantLabel]: qty } });
+                combinedSizes[variantLabel] = (combinedSizes[variantLabel] || 0) + qty;
+            }
+
+            if (images.length === 0) {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert("⚠️ Variant 1 Photo is required!");
+                return;
+            }
+
+            if (Object.keys(combinedSizes).length === 0 || Object.values(combinedSizes).every(q => q <= 0)) {
+                document.getElementById('uploadOverlay').style.display = 'none';
+                tg.showAlert("⚠️ Set a quantity greater than 0 for at least one variant!");
+                return;
+            }
+
+            let videoUrl = "";
+            if (videoInput.files.length > 0) {
+                videoUrl = await uploadToCloudinary(videoInput.files[0], "video");
+            }
+
+            let totalStock = 0;
+            Object.values(combinedSizes).forEach(q => totalStock += Number(q) || 0);
+
+            let newPhone = {
+                id: 'PH-' + Math.floor(1000 + Math.random() * 9000),
+                productCode: productCode || 'PH-CODE',
+                name: name,
+                category: cat,
+                subCategory: subCat,
+                price: price,
+                details: details || "No details provided.",
+                images: images,
+                image: images[0],
+                colors: variantList,
+                video: videoUrl,
+                sizes: combinedSizes,
+                totalStock: totalStock,
+                isTrending: isTrending,
+                isNewArrival: isNewArrival,
+                type: 'phone'
+            };
+
+            let savedKey = await saveDress(newPhone);
+            document.getElementById('uploadOverlay').style.display = 'none';
+            if (!savedKey) {
+                tg.showAlert("❌ Could not save to cloud.");
+                return;
+            }
+
+            tg.showAlert(`✅ Phone "${name}" published successfully!`);
+            location.reload();
         }
 
         async function publishDress() {
