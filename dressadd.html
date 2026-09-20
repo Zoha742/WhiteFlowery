@@ -43,6 +43,9 @@
         .color-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
         .color-slot-header { font-size: 12px; font-weight: 700; color: #111; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .phone-slot { border: 1px solid var(--card-border); border-radius: 10px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
+        .video-preview-wrap { display: none; position: relative; margin-top: 8px; }
+        .video-preview-wrap video { width: 100%; max-height: 200px; border-radius: 8px; background: #000; display: block; }
+        .video-preview-wrap .delete-preview-btn { position: absolute; top: 6px; right: 6px; background: #dc2626; color: #fff; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
         .chip-group-label { font-size: 9px; color: #9ca3af; font-weight: 700; margin: 6px 0 3px 0; text-transform: uppercase; }
         .chip-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 2px; }
         .chip-btn { background: #f3f4f6; border: 1px solid var(--card-border); color: #111; font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 14px; cursor: pointer; }
@@ -188,7 +191,11 @@
 
             <div class="form-group">
                 <label>Product Video (Optional)</label>
-                <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;">
+                <input type="file" id="productVideoFile" class="form-control" accept="video/*" style="color: #111;" onchange="previewProductVideo('productVideoFile', 'productVideoPreviewWrap', 'productVideoPreviewPlayer')">
+                <div class="video-preview-wrap" id="productVideoPreviewWrap">
+                    <video id="productVideoPreviewPlayer" controls></video>
+                    <button type="button" class="delete-preview-btn" onclick="clearProductVideo('productVideoFile', 'productVideoPreviewWrap', 'productVideoPreviewPlayer')"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
 
             <button class="submit-btn" onclick="publishDress()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
@@ -273,7 +280,11 @@
 
             <div class="form-group">
                 <label>Product Video (Optional)</label>
-                <input type="file" id="phoneVideoFile" class="form-control" accept="video/*" style="color: #111;">
+                <input type="file" id="phoneVideoFile" class="form-control" accept="video/*" style="color: #111;" onchange="previewProductVideo('phoneVideoFile', 'phoneVideoPreviewWrap', 'phoneVideoPreviewPlayer')">
+                <div class="video-preview-wrap" id="phoneVideoPreviewWrap">
+                    <video id="phoneVideoPreviewPlayer" controls></video>
+                    <button type="button" class="delete-preview-btn" onclick="clearProductVideo('phoneVideoFile', 'phoneVideoPreviewWrap', 'phoneVideoPreviewPlayer')"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
 
             <button class="submit-btn" onclick="publishPhone()"><i class="fa-solid fa-cloud-arrow-up"></i> Save & Add More</button>
@@ -664,6 +675,30 @@
             document.getElementById('previewImg' + n).src = '';
             colorSizesData[n] = {};
             document.getElementById(`colorSizeList${n}`).innerText = '';
+        }
+
+        // Shown after picking a video file, for both the Dress and Phone tabs, so the
+        // admin can actually confirm the right file was selected before publishing.
+        function previewProductVideo(inputId, wrapId, playerId) {
+            let input = document.getElementById(inputId);
+            let wrap = document.getElementById(wrapId);
+            let player = document.getElementById(playerId);
+            let file = input.files[0];
+            if (file) {
+                player.src = URL.createObjectURL(file);
+                wrap.style.display = 'block';
+            } else {
+                wrap.style.display = 'none';
+                player.removeAttribute('src');
+            }
+        }
+
+        function clearProductVideo(inputId, wrapId, playerId) {
+            document.getElementById(inputId).value = '';
+            document.getElementById(wrapId).style.display = 'none';
+            let player = document.getElementById(playerId);
+            player.pause();
+            player.removeAttribute('src');
         }
 
         // Firebase Realtime DB rejects any key containing . # $ [ ] /  — this makes such
