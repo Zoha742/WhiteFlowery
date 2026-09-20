@@ -30,14 +30,22 @@
         .container { width: 100%; max-width: 480px; padding: 10px; box-sizing: border-box; background: #ffffff; }
 
         /* Top Filter & Sort Bar */
-        .top-filter-bar { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
-        .filter-select-box, .sort-select-box {
-            flex: 1; background: #ffffff; border: 1px solid var(--border-color); padding: 8px 10px;
-            border-radius: 8px; font-size: 12px; font-weight: 600; color: #374151;
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-            outline: none; box-sizing: border-box; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px; scrollbar-width: none; }
+        .categories-scroll::-webkit-scrollbar { display: none; }
+        .cat-chip {
+            flex-shrink: 0; background: #f9fafb; border: 1px solid var(--border-color); color: #555;
+            padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
         }
-        .filter-select-box select, .sort-select-box select { background: transparent; border: none; font-size: 12px; font-weight: 600; color: #374151; width: 100%; outline: none; cursor: pointer; }
+        .cat-chip.active { background: #111; color: #fff; border-color: #111; }
+
+        .sort-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+        .sort-toggle-btn {
+            background: #ffffff; border: 1px solid var(--border-color); color: #374151;
+            padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 7px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .sort-toggle-btn i { color: #7c3aed; font-size: 13px; }
+        .sort-toggle-btn:active { background: #f3f4f6; }
 
         /* Products Grid - Exactly 2 items side-by-side without overflowing */
         .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; box-sizing: border-box; }
@@ -134,24 +142,17 @@
 <body>
 
     <div class="container">
-        <!-- Top Filter & Sort Bar -->
-        <div class="top-filter-bar">
-            <div class="filter-select-box">
-                <select id="categoryFilterDropdown" onchange="renderProducts()">
-                    <option value="All">All Category</option>
-                    <option value="Winter">Winter</option>
-                    <option value="Summer">Summer</option>
-                    <option value="All-Time">All-Time</option>
-                </select>
-            </div>
-            <div class="sort-select-box">
-                <select id="sortDropdown" onchange="renderProducts()">
-                    <option value="new">Date, new to old</option>
-                    <option value="old">Date, old to new</option>
-                    <option value="price-low">Price, low to high</option>
-                    <option value="price-high">Price, high to low</option>
-                </select>
-            </div>
+        <!-- Category chips (always visible, no dropdown to open) -->
+        <div class="categories-scroll" id="categoriesContainer">
+            <div class="cat-chip active" onclick="filterCategory('All', this)">All Category</div>
+        </div>
+
+        <!-- Sort — a single icon button that cycles through modes -->
+        <div class="sort-row">
+            <button class="sort-toggle-btn" id="sortToggleBtn" onclick="cycleSortMode()">
+                <i class="fa-solid fa-clock" id="sortIcon"></i>
+                <span id="sortLabel">Newest First</span>
+            </button>
         </div>
 
         <div class="products-grid" id="shopProductsGrid">
@@ -236,17 +237,42 @@
             }
         }
 
+        let selectedCategory = 'All';
+        let sortMode = 'new'; // cycles: new -> old -> price-low -> price-high -> new
+        const SORT_MODES = {
+            'new':        { icon: 'fa-clock',                    label: 'Newest First' },
+            'old':        { icon: 'fa-clock-rotate-left',        label: 'Oldest First' },
+            'price-low':  { icon: 'fa-arrow-up-short-wide',      label: 'Price: Low to High' },
+            'price-high': { icon: 'fa-arrow-down-short-wide',    label: 'Price: High to Low' }
+        };
+
         async function loadCategoriesFilter() {
-            let dropdown = document.getElementById('categoryFilterDropdown');
+            let container = document.getElementById('categoriesContainer');
             let categories = await getCategories();
-            
-            let currentSelected = dropdown.value;
-            dropdown.innerHTML = `<option value="All">All Category</option>`;
-            
+
+            container.innerHTML = `<div class="cat-chip ${selectedCategory === 'All' ? 'active' : ''}" onclick="filterCategory('All', this)">All Category</div>`;
             categories.forEach(cat => {
-                dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+                container.innerHTML += `<div class="cat-chip ${selectedCategory === cat ? 'active' : ''}" onclick="filterCategory('${cat}', this)">${cat}</div>`;
             });
-            dropdown.value = currentSelected;
+        }
+
+        function filterCategory(cat, chipEl) {
+            selectedCategory = cat;
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            chipEl.classList.add('active');
+            renderProducts();
+        }
+
+        function cycleSortMode() {
+            let keys = Object.keys(SORT_MODES);
+            let nextIndex = (keys.indexOf(sortMode) + 1) % keys.length;
+            sortMode = keys[nextIndex];
+
+            let mode = SORT_MODES[sortMode];
+            document.getElementById('sortIcon').className = `fa-solid ${mode.icon}`;
+            document.getElementById('sortLabel').innerText = mode.label;
+
+            renderProducts();
         }
 
         async function renderProducts() {
@@ -256,19 +282,17 @@
             let dresses = await getDresses();
             ALL_REVIEWS = await getAllReviews();
 
-            let selectedCategory = document.getElementById('categoryFilterDropdown').value;
-            let sortType = document.getElementById('sortDropdown').value;
             let wishlist = JSON.parse(localStorage.getItem('wishlistItems')) || [];
 
             if (selectedCategory !== 'All') {
                 dresses = dresses.filter(d => d.category === selectedCategory);
             }
 
-            if (sortType === 'price-low') {
+            if (sortMode === 'price-low') {
                 dresses.sort((a, b) => a.price - b.price);
-            } else if (sortType === 'price-high') {
+            } else if (sortMode === 'price-high') {
                 dresses.sort((a, b) => b.price - a.price);
-            } else if (sortType === 'old') {
+            } else if (sortMode === 'old') {
                 dresses.reverse();
             }
 
