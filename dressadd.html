@@ -119,6 +119,16 @@
             </div>
 
             <div class="form-group">
+                <label>Rename Category</label>
+                <div style="display: flex; gap: 6px;">
+                    <select id="renameCatSelect" class="form-control" style="flex: 2;"></select>
+                    <input type="text" id="renameCatInput" class="form-control" placeholder="New name..." style="flex: 1;">
+                    <button type="button" class="add-size-btn" onclick="renameCategory('renameCatSelect', 'renameCatInput')" style="background:#f59e0b; height:38px;"><i class="fa-solid fa-pen"></i></button>
+                </div>
+                <div style="font-size:9px; color:#999; margin-top:4px;">Category list Dress + Phone dutar jonno shared — ekhane rename korle shob jaygay update hobe.</div>
+            </div>
+
+            <div class="form-group">
                 <label>Sub-Category (Optional)</label>
                 <input type="text" id="newSubCat" class="form-control" placeholder="e.g. Long Dress, Two-Piece...">
             </div>
@@ -219,6 +229,24 @@
             </div>
 
             <div class="form-group">
+                <label>Rename Category</label>
+                <div style="display: flex; gap: 6px;">
+                    <select id="phoneRenameCatSelect" class="form-control" style="flex: 2;"></select>
+                    <input type="text" id="phoneRenameCatInput" class="form-control" placeholder="New name..." style="flex: 1;">
+                    <button type="button" class="add-size-btn" onclick="renameCategory('phoneRenameCatSelect', 'phoneRenameCatInput')" style="background:#f59e0b; height:38px;"><i class="fa-solid fa-pen"></i></button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Condition</label>
+                <select id="phoneCondition" class="form-control">
+                    <option value="New">🆕 New (Brand New / Sealed)</option>
+                    <option value="Fresh">✨ Fresh (Like New)</option>
+                    <option value="Used">♻️ Used</option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label>Sub-Category (Optional)</label>
                 <input type="text" id="phoneSubCat" class="form-control" placeholder="e.g. Smartphone, Earbuds, Accessories...">
             </div>
@@ -300,6 +328,7 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             await loadCategoriesDropdown();
+            await loadRenameCatDropdown('renameCatSelect');
             addColorSlot();
             addColorSlot();
             addColorSlot();
@@ -318,6 +347,7 @@
             if (tabId === 'phone' && !phoneInitialized) {
                 phoneInitialized = true;
                 loadPhoneCategoriesDropdown();
+                loadRenameCatDropdown('phoneRenameCatSelect');
                 addPhoneSlot();
                 addPhoneSlot();
             }
@@ -514,6 +544,59 @@
             }
         }
 
+        // Category list is shared between Dress and Phone tabs, and renaming updates
+        // every existing product (dress or phone) that used the old name, so nothing
+        // gets orphaned into a category that no longer exists in the dropdown.
+        async function loadRenameCatDropdown(selectId) {
+            let sel = document.getElementById(selectId);
+            if (!sel) return;
+            let categories = await getCategories();
+            sel.innerHTML = '';
+            categories.forEach(cat => {
+                sel.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        async function renameCategory(selectId, inputId) {
+            let oldName = document.getElementById(selectId).value;
+            let newNameInput = document.getElementById(inputId);
+            let newName = newNameInput.value.trim();
+
+            if (!oldName) { tg.showAlert("⚠️ No category selected!"); return; }
+            if (!newName) { tg.showAlert("⚠️ Enter the new category name!"); return; }
+
+            let categories = await getCategories();
+            if (newName !== oldName && categories.includes(newName)) {
+                tg.showAlert(`⚠️ Category "${newName}" already exists! Choose a different name.`);
+                return;
+            }
+
+            categories = categories.map(c => c === oldName ? newName : c);
+            await saveCategories(categories);
+
+            let allProducts = await getDresses();
+            let updatedCount = 0;
+            for (let p of allProducts) {
+                if (p.category === oldName) {
+                    await updateDress(p._key, { category: newName });
+                    updatedCount++;
+                }
+            }
+
+            await loadCategoriesDropdown();
+            await loadRenameCatDropdown('renameCatSelect');
+            document.getElementById('newCat').value = newName;
+
+            if (document.getElementById('phoneCat')) {
+                await loadPhoneCategoriesDropdown();
+                await loadRenameCatDropdown('phoneRenameCatSelect');
+                document.getElementById('phoneCat').value = newName;
+            }
+
+            newNameInput.value = '';
+            tg.showAlert(`✅ Category renamed to "${newName}"! (${updatedCount} product(s) updated)`);
+        }
+
         function addSizeToTable() {
             let size = document.getElementById('sizeDropdown').value;
             let qty = parseInt(document.getElementById('sizeQty').value) || 0;
@@ -596,12 +679,14 @@
                 let res = await fetch(`https://api.cloudinary.com/v1_1/dyqegwdme/${type}/upload`, { method: "POST", body: formData });
                 let data = await res.json();
                 if (!res.ok || !data.secure_url) {
-                    lastUploadError = (data && data.error && data.error.message) ? data.error.message : "Cloudinary rejected upload";
+                    lastUploadError = (data && data.error && data.error.message) ? data.error.message : `Cloudinary rejected upload (HTTP ${res.status})`;
+                    console.error("Cloudinary upload rejected — full response:", data);
                     return "";
                 }
                 return data.secure_url;
             } catch (err) {
-                lastUploadError = err.message;
+                lastUploadError = err.message || "Network error";
+                console.error("Cloudinary upload threw an error:", err);
                 return "";
             }
         }
@@ -793,12 +878,15 @@
             let totalStock = 0;
             Object.values(combinedSizes).forEach(q => totalStock += Number(q) || 0);
 
+            let condition = document.getElementById('phoneCondition').value;
+
             let newPhone = {
                 id: 'PH-' + Math.floor(1000 + Math.random() * 9000),
                 productCode: productCode || 'PH-CODE',
                 name: name,
                 category: cat,
                 subCategory: subCat,
+                condition: condition,
                 price: price,
                 details: details || "No details provided.",
                 images: images,
