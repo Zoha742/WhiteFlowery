@@ -666,6 +666,12 @@
             document.getElementById(`colorSizeList${n}`).innerText = '';
         }
 
+        // Firebase Realtime DB rejects any key containing . # $ [ ] /  — this makes such
+        // a key safe while keeping it visually close to what the admin typed.
+        function sanitizeFirebaseKey(str) {
+            return str.replace(/\//g, '／').replace(/[.#$\[\]]/g, '-');
+        }
+
         let lastUploadError = "";
         async function uploadToCloudinary(file, resourceType) {
             let type = resourceType || "image";
@@ -853,9 +859,14 @@
 
                 let variantLabel = document.getElementById('phoneVariantName' + n).value.trim() || `Variant ${n}`;
                 let qty = parseInt(document.getElementById('phoneVariantQty' + n).value) || 0;
+                // Firebase keys can't contain "/" (used as a path separator) — the RAM/Storage
+                // chips (e.g. "8/256") produced labels with a slash, which silently broke the
+                // save. Swap it for a full-width look-alike so it still reads as "8/256" but is
+                // a safe key; colorName keeps the exact original text for display anywhere else.
+                let sizeKey = sanitizeFirebaseKey(variantLabel);
 
-                variantList.push({ colorName: variantLabel, image: url, sizes: { [variantLabel]: qty } });
-                combinedSizes[variantLabel] = (combinedSizes[variantLabel] || 0) + qty;
+                variantList.push({ colorName: variantLabel, image: url, sizes: { [sizeKey]: qty } });
+                combinedSizes[sizeKey] = (combinedSizes[sizeKey] || 0) + qty;
             }
 
             if (images.length === 0) {
